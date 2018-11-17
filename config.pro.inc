@@ -18,12 +18,13 @@ else {
 }
 
 SHARED_DIR = ../macsCommon
+PROTO_DIR = ../larcmacs-protobuf
 LIB_DIR = ../lib
 DESTDIR = ../bin$${SUFFIX_STR}
 
 # ----------PERSONAL-----------
 #MATLAB_DIR = d:/Work)/MATLAB/R2012b_x86/extern/
-MATLAB_DIR = 'C:/Program Files (x86)/MATLAB/R2013b/extern/'
+MATLAB_DIR = 'C:/Program Files (x86)/MATLAB/R2015b/extern/'
 # -----------------------------
 
 unix {
@@ -45,9 +46,11 @@ win32 {
   DEFINES += NOMINMAX
 
   INCLUDEPATH += ../inc
+  INCLUDEPATH += ../larcmacs-protobuf/include
 
   QMAKE_CXXFLAGS += /wd4250
   QMAKE_CXXFLAGS += /Fd$(IntDir)
+  QMAKE_CXXFLAGS += /D__STDC_LIMIT_MACROS
 
   #enable SSE2
   QMAKE_CXXFLAGS += /arch:SSE2
@@ -59,8 +62,5 @@ win32 {
   #QMAKE_CXXFLAGS_RELEASE += /Zi
   #QMAKE_LFLAGS_RELEASE += /DEBUG
 }
-
-#protobuf
-include( macsCommon/proto/proto.pro.inc )
 
 OTHER_FILES +=
