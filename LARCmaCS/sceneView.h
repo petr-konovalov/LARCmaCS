@@ -5,44 +5,18 @@
 #include <QSharedPointer>
 #include "packetSSL.h"
 #include "fieldScene.h"
+#include "sceneViewWorker.h"
 
-struct sceneViewWorker: public QObject
+struct SceneView: QObject
 {
     Q_OBJECT
 
 public:
-    explicit sceneViewWorker(){}
-
-public slots:
-    void start()
-    {
-        shutdownview = false;
-        cout << "sceneView worker started" << endl;
-        run();
-    }
-
-    void stop() { shutdownview = true; }
-    //void repaintScene(PacketSSL packetssl);
-
-signals:
-    void updateView();    
-//    void updateRobots();
-
-private:
-    void run();
-    bool shutdownview;
-};
-
-struct sceneView: QObject
-{
-    Q_OBJECT
-
-public:
-    sceneViewWorker worker;
+    SceneViewWorker worker;
     QThread thread;
 
-    explicit sceneView(){}
-    ~sceneView() {
+    explicit SceneView(){}
+    ~SceneView() {
         stop();
         thread.wait(100);
         thread.terminate();

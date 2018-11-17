@@ -33,7 +33,7 @@ public:
 
 protected:
     bool scalingRequested;
-    sceneView sceneview;
+    SceneView sceneview;
     Receiver receiver;
     MainAlg mainalg;
     Connector connector;

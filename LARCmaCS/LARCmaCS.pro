@@ -73,6 +73,7 @@ SOURCES += main.cpp\
     ipdialog.cpp \
     client.cpp \
     reference.cpp \
+    sceneViewWorker.cpp
 
 HEADERS  += \
   $${SHARED_DIR}/net/netraw.h \
@@ -95,6 +96,8 @@ HEADERS  += \
     ipdialog.h \
     client.h \
     reference.h \
+    sceneViewWorker.h \
+    receiverWorker.h
 
 FORMS    += larcmacs.ui \
     remotecontrol.ui \
