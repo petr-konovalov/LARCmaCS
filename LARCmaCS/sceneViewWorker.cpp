@@ -2,8 +2,22 @@
 #include <QtWidgets/QApplication>
 #include <QThread>
 
-void SceneViewWorker::run(){
 
+void SceneViewWorker::start(){
+    shutdownview = false;
+    cout << "sceneView worker started" << std::endl;
+    //cout << "sceneView worker started" << endl;
+
+    run();
+}
+
+void SceneViewWorker::stop()
+{
+    shutdownview = true;
+}
+
+void SceneViewWorker::run()
+{
     while(!shutdownview){
 //        cout << "signal updateView" << endl;
         emit updateView();
@@ -11,5 +25,4 @@ void SceneViewWorker::run(){
         QApplication::processEvents();
         Sleep(1);
     }
-
 }

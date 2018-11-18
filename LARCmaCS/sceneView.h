@@ -23,23 +23,9 @@ public:
         thread.wait(100);
     }
 
-    void init()
-    {
-        worker.moveToThread(&thread);
-        cout << "sceneView init ok" << endl;
-        connect(this, SIGNAL(wstart()), &worker, SLOT(start()));
-        connect(this, SIGNAL(wstop()), &worker, SLOT(stop()));
-        connect(&thread, SIGNAL(finished()), &worker, SLOT(deleteLater()));
-    }
-
-    void start()
-    {
-        thread.start();
-        cout << "Scene view thread started" << endl;
-        emit wstart();
-    }
-
-    void stop() { emit wstop(); }
+    void init();
+    void start();
+    void stop();
 
 signals:
     void wstart();
