@@ -1,12 +1,17 @@
+#pragma once
+
 #include <iostream>
 #include <QObject>
 
 #include "packetSSL.h"
 #include "robocup_ssl_client.h"
 
+
+//#include "receiver.h"
+
 using namespace std;
 
-#include <time.h>
+#include <time.h> /* clock_t, clock(), CLOCKS_PER_SEC */
 
 struct ReceiverWorker : public QObject
 {

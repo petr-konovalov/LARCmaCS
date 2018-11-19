@@ -1,6 +1,7 @@
 #include "sceneViewWorker.h"
 #include <QtWidgets/QApplication>
 #include <QThread>
+#include <iostream>
 
 SceneViewWorker::SceneViewWorker(){};
 
