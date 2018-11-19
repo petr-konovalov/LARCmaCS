@@ -4,6 +4,16 @@
 
 using namespace std;
 
+SceneView::SceneView(){};
+
+SceneView::~SceneView()
+{
+        stop();
+        thread.wait(100);
+        thread.terminate();
+        thread.wait(100);
+    }
+
 void SceneView::init()
 {
     worker.moveToThread(&thread);

@@ -2,6 +2,7 @@
 #include <QtWidgets/QApplication>
 #include <QThread>
 
+SceneViewWorker::SceneViewWorker(){};
 
 void SceneViewWorker::start(){
     shutdownview = false;

@@ -15,13 +15,8 @@ public:
     SceneViewWorker worker;
     QThread thread;
 
-    explicit SceneView(){}
-    ~SceneView() {
-        stop();
-        thread.wait(100);
-        thread.terminate();
-        thread.wait(100);
-    }
+    explicit SceneView();
+    ~SceneView();
 
     void init();
     void start();

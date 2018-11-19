@@ -8,19 +8,11 @@ struct SceneViewWorker: public QObject
     Q_OBJECT
 
 public:
-    explicit SceneViewWorker(){}
+    explicit SceneViewWorker();
 
 public slots:
-    void start()
-    {
-        shutdownview = false;
-        cout << "sceneView worker started" << std::endl;
-        //cout << "sceneView worker started" << endl;
-
-        run();
-    }
-
-    void stop() { shutdownview = true; }
+    void start();
+    void stop();
     //void repaintScene(PacketSSL packetssl);
 
 signals:
