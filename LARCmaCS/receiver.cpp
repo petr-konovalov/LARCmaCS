@@ -1,7 +1,5 @@
 ﻿#include "receiver.h"
-
 #include <iostream>
-//#include <QtWidgets/QApplication>
 
 using namespace std;
 

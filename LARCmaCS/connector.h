@@ -6,7 +6,6 @@
 #include <QTcpSocket>
 #include <QHostAddress>
 #include <QThread>
-
 #include <QtCore>
 #include <QtNetwork>
 #include <QTimer>
@@ -30,9 +29,7 @@ public:
     ~Connector();
 
     void init();
-
     void start();
-
     void stop();
 
 signals:

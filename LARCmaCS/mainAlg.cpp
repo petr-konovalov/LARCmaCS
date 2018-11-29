@@ -1,3 +1,5 @@
+#include "mainAlg.h"
+
 #include <iostream>
 #include <windows.h>
 
@@ -6,7 +8,6 @@
 using namespace std;
 
 #include "message.h"
-#include "mainAlg.h"
 
 MainAlg::MainAlg(){}
 

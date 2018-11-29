@@ -1,5 +1,5 @@
-#include <iostream>
 #include "sceneView.h"
+#include <iostream>
 #include "sceneViewWorker.h"
 
 using namespace std;

@@ -89,9 +89,7 @@ QByteArray Message::generateByteArray()
 quint32 Message::calculateCRC(const QByteArray &buf, int len)
 {
     quint32 crc_table[256];
-
     quint32 crc;
-
     quint32 i;
 
     for (i = 0; i < 256; i++) {
@@ -109,13 +107,11 @@ quint32 Message::calculateCRC(const QByteArray &buf, int len)
     }
 
     crc = 0xFFFFFFFF;
-
     quint32 vsp = 0;
 
     while (len-- > 0) {
         crc = crc_table[(crc ^ buf[vsp]) & 0xFF] ^ (crc >> 8);
         vsp++;
     }
-
     return crc ^ 0xFFFFFFFF;
 }

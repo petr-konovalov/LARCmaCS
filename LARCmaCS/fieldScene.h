@@ -4,7 +4,6 @@
 #include "field_default_constants.h"
 #include "robocup_ssl_client.h"
 #include "timer.h"
-
 #include "robot.h"
 
 class FieldScene : public QGraphicsScene
@@ -16,14 +15,9 @@ public:
     void AddRobot ( Robot* robot );
     void UpdateRobots ( SSL_DetectionFrame &detection );
     int UpdateBalls ( QVector<QPointF> &_balls, int cameraID );
-
     void UpdateGeometry(SSL_GeometryFieldSize fieldSize);
     void LoadFieldGeometry();
     void LoadFieldGeometry ( SSL_GeometryFieldSize &fieldSize );
-
-signals:
-
-public slots:
 
 private:
 
@@ -59,6 +53,4 @@ private:
     double free_kick_from_defense_dist;
     double penalty_spot_from_field_line_dist;
     double penalty_line_from_spot_dist;
-
 };
-

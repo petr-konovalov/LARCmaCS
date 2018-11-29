@@ -24,14 +24,12 @@ IpDialog::IpDialog(ConnectorWorker &worker,  QWidget *parent) :
     ui->lineEditIp12->setText(worker.numIP[12]);
 
     qDebug() << connector.worker.numIP;
-
 }
 
 IpDialog::~IpDialog()
 {
     delete ui;
 }
-
 
 void IpDialog::on_buttonBox_accepted()
 {

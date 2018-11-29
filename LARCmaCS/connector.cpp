@@ -1,9 +1,8 @@
+#include "connector.h"
+
 #include <stdlib.h>
 #include <iostream>
 #include <QMap>
-
-#include "connector.h"
-//#include "connectorWorker.h"
 
 Connector::Connector() {}
 

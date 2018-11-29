@@ -11,6 +11,7 @@
 #include "mlData.h"
 #include "client.h"
 #include "mainAlgWorker.h"
+
 #define MAX_NUM_ROBOTS 12
 
 using namespace std;
@@ -28,15 +29,10 @@ public:
     ~MainAlg();
 
     void init();
-
     void start();
-
     void stop();
 
 signals:
     void wstart();
     void wstop();
-
-public slots:
-
 };

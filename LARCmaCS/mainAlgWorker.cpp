@@ -1,9 +1,9 @@
-#include <QtWidgets/QApplication>
-#include "QDebug"
-#include <fstream>
-
-#include "message.h"
 #include "mainAlgWorker.h"
+
+#include <QtWidgets/QApplication>
+#include <fstream>
+#include "QDebug"
+#include "message.h"
 
 int initConfig(RCConfig *config){
     ifstream configFile;
@@ -66,7 +66,6 @@ int initConfig(RCConfig *config){
     }
 
     configFile.close();
-
     return 0;
 }
 
@@ -370,7 +369,6 @@ void MainAlgWorker::init(){
         rcconfig.RULE_LENGTH=7;
         rcconfig.BACK_AMOUNT=10;
         rcconfig.BACK_LENGTH=8;
-
     }
 
     MlData mtl(rcconfig);

@@ -1,7 +1,7 @@
+#include "packetSSL.h"
+
 #include <QVector>
 #include <QPoint>
-
-#include "packetSSL.h"
 
 PacketSSL::PacketSSL()
 {

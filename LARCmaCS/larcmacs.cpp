@@ -1,7 +1,6 @@
 #include <math.h>
 #include "larcmacs.h"
 #include "ui_larcmacs.h"
-//#include "packetSSL.h"
 #include "commandData.h"
 
 
@@ -180,8 +179,6 @@ void LARCmaCS::remcontrolsender(int l, int r,int k, int b, bool kickUp)
     command.append(b);
 }
 
-
-
 void LARCmaCS::fieldsceneUpdateRobots()
 {
     fieldscene->UpdateRobots(receiver.worker.detection);
@@ -193,7 +190,6 @@ void LARCmaCS::fieldsceneUpdateGeometry()
     fieldscene->UpdateGeometry(receiver.worker.geometry);
     emit updateGeometry();
 }
-
 
 LARCmaCS::~LARCmaCS()
 {
@@ -247,7 +243,6 @@ void LARCmaCS::updateView()
       scalingRequested = false;
       ui->fieldView->viewport()->update();
   }
-
 }
 
 void LARCmaCS::on_pushButton_Pause_clicked()
@@ -290,7 +285,6 @@ void LARCmaCS::on_pushButton_SetupIP_clicked()
     ipDialog->open();
     qDebug() << connector.worker.numIP;
 }
-
 
 void LARCmaCS::on_but_reference_clicked()
 {

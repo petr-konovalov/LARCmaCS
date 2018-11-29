@@ -11,9 +11,7 @@
 struct PacketSSL
 {
     PacketSSL();
-
     PacketSSL(const PacketSSL &ps);
-
     double robots_blue[48];
     double robots_yellow[48];
     double balls[3];

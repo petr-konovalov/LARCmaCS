@@ -1,6 +1,5 @@
-#include <QtWidgets/QApplication>
-
 #include "receiverWorker.h"
+#include <QtWidgets/QApplication>
 
 ReceiverWorker::ReceiverWorker()
 {

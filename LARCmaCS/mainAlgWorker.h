@@ -4,6 +4,7 @@
 #include "packetSSL.h"
 #include "mlData.h"
 #include "client.h"
+
 #define MAX_NUM_ROBOTS 12
 
 using namespace std;
@@ -21,6 +22,7 @@ struct MainAlgWorker : public QObject
 public:
     MainAlgWorker();
     ~MainAlgWorker();
+
 signals:
     void sendToConnector(int N,QByteArray command);
     void sendToBTtransmitter(char * message);
@@ -31,9 +33,7 @@ signals:
 public slots:
 
     void start();
-
     void Send2BTChangeit(bool *send2BT_);
-
     void stop();
     void run(PacketSSL packetssl);
     void Pause();
@@ -43,7 +43,6 @@ public slots:
 
 private:
     void init();
-
     char m_buffer[256]; // matlab buffer
     MlData fmldata;
     bool fmtlab;

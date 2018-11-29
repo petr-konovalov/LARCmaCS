@@ -17,7 +17,6 @@ Reference::Reference(QWidget *parent) :
     }
 
     QTextStream in(&file);
-
     ui->textBrowser->setText(in.readAll());
 }
 

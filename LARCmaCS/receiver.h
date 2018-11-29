@@ -25,9 +25,7 @@ public:
     ~Receiver();
 
     void init();
-
     void start();
-
     void stop();
 
 signals:

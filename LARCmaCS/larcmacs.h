@@ -1,7 +1,6 @@
 #pragma once
 
 #include <QWidget>
-
 #include "fieldScene.h"
 #include "receiver.h"
 #include "mainAlg.h"
@@ -10,7 +9,6 @@
 #include "remotecontrol.h"
 #include "ipdialog.h"
 #include "reference.h"
-
 
 #define NUM_CONTROL_ROBOTS 12
 
@@ -38,7 +36,6 @@ protected:
     MainAlg mainalg;
     Connector connector;
 
-
 private:
     Ui::LARCmaCS *ui;
     float drawscale;
@@ -60,11 +57,9 @@ private slots:
     void on_pushButton_SetMLdir_clicked();
     void on_pushButton_RC_clicked();
     void remcontrolsender(int l, int r,int k, int b, bool kickUp);
-
     void on_checkBox_MlMaxFreq_stateChanged(int arg1);
     void on_pushButton_RemoteControl_clicked();
     void on_pushButton_SetupIP_clicked();
-
     void on_but_reference_clicked();
 
 signals:

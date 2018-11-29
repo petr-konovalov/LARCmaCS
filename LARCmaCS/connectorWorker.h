@@ -3,7 +3,6 @@
 #include <QObject>
 #include <QFile>
 #include <QUdpSocket>
-
 #include <QtCore>
 #include <QMap>
 
@@ -37,7 +36,6 @@ public:
 
     char dat[12];
 
-
 signals:
     void receivedDatagram(QByteArray datagram);
     void receivedAddresses(QByteArray addressDatagram);
@@ -48,15 +46,12 @@ signals:
     void sendMacs(QList<QString>);
     void sendPortList(QStringList);
 
-
 public slots:
     void init();
-
     void start();
     void stop();
     void run(int N, QByteArray command);
     void udpProcessPendingDatagrams();
-
     void receiveMacArray(QString*);
     void addIp(int id, QString ip);
 };

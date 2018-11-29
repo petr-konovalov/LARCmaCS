@@ -25,5 +25,4 @@ public:
 signals:
     void wstart();
     void wstop();
-
 };
