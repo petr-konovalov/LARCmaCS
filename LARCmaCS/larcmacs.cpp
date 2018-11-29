@@ -1,7 +1,8 @@
 #include <math.h>
 #include "larcmacs.h"
 #include "ui_larcmacs.h"
-#include "packetSSL.h"
+//#include "packetSSL.h"
+#include "commandData.h"
 
 
 LARCmaCS::LARCmaCS(QWidget *parent) :
@@ -109,17 +110,7 @@ quint32 Crc32(QByteArray buf, int len)
     }
     return crc ^ 0xFFFFFFFF;
 }
-struct CommandData {
-    quint32 speed_x;
-    quint32 speed_y;
-    quint32 speed_r;
-    quint32 speed_dribbler;
-    quint8 dribbler_enable;
-    quint32 kicker_volatage_level;
-    quint8 kicker_charge_enable;
-    quint8 kick_up;
-    quint8 kick_forward;
-};
+
 QByteArray serializeCommand(CommandData data) {
     QByteArray byteArray;
     QDataStream baWriter(&byteArray, QIODevice::WriteOnly | QIODevice::Append);
@@ -141,7 +132,6 @@ QByteArray serializeCommand(CommandData data) {
     baWriter << crc;
     return byteArray;
 }
-
 
 
 void LARCmaCS::remcontrolsender(int l, int r,int k, int b, bool kickUp)
