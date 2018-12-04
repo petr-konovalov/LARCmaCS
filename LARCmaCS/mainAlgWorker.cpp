@@ -31,7 +31,8 @@ int initConfig(RCConfig *config){
             config->name = line.substr(line.find('=') + 1);
 
             if(config->name.size() > 16) {
-                cerr << "[WARNING] rfclient.name value is too long." << endl << "It will be truncated up to 16 characters." << endl;
+				cerr << "[WARNING] rfclient.name value is too long."
+					 << endl << "It will be truncated up to 16 characters." << endl;
                 config->name.resize(16);
             }
         }
@@ -40,7 +41,8 @@ int initConfig(RCConfig *config){
             string fom = line.substr(line.find('=') + 1);
 
             if(fom.size() > 16) {
-                cerr << "[WARNING] rfclient.file_of_matlab value is too long." << endl << "It will be truncated up to 16 characters." << endl;
+				cerr << "[WARNING] rfclient.file_of_matlab value is too long."
+					 << endl << "It will be truncated up to 16 characters." << endl;
                 fom.resize(16);
             }
             char *str = new char[fom.length() + 1];
@@ -134,9 +136,11 @@ void MainAlgWorker::run(PacketSSL packetssl)
 // Забираем Rules и очищаем его в воркспейсе
 
     fmldata.Rule = engGetVariable(fmldata.ep, "Rules");
-    double *ruleArray = (double *)malloc(fmldata.config.RULE_AMOUNT * fmldata.config.RULE_LENGTH * sizeof(double));
+	double *ruleArray =
+			(double *)malloc(fmldata.config.RULE_AMOUNT * fmldata.config.RULE_LENGTH * sizeof(double));
     if (fmldata.Rule!=0)
-        memcpy(ruleArray, mxGetPr(fmldata.Rule), fmldata.config.RULE_AMOUNT * fmldata.config.RULE_LENGTH * sizeof(double));
+		memcpy(ruleArray, mxGetPr(fmldata.Rule)
+			   , fmldata.config.RULE_AMOUNT * fmldata.config.RULE_LENGTH * sizeof(double));
     else
         memset(ruleArray,0,fmldata.config.RULE_AMOUNT * fmldata.config.RULE_LENGTH * sizeof(double));
 

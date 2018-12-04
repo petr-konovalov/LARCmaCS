@@ -6,7 +6,8 @@ namespace Ui {
 class Form;
 }
 
-class Reference : public QWidget {
+class Reference : public QWidget
+{
     Q_OBJECT
 
 public:

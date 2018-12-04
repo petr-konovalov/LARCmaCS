@@ -55,7 +55,8 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
     connect(&receiver.worker, SIGNAL(UpdateSSLFPS(QString)), this, SLOT(UpdateSSLFPS(QString)));
 
     //remotecontrol
-    connect(&remotecontol,SIGNAL(RC_control(int,int,int,int, bool)),this,SLOT(remcontrolsender(int, int,int, int, bool)));
+	connect(&remotecontol,SIGNAL(RC_control(int,int,int,int, bool))
+			,this,SLOT(remcontrolsender(int, int,int, int, bool)));
     connect(this,SIGNAL(sendToConnectorRM(int,QByteArray)),&connector.worker,SLOT(run(int,QByteArray)));
 
     QObject::connect(this, SIGNAL(addIp(int, QString)),

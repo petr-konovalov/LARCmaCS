@@ -209,9 +209,13 @@ void FieldScene::ConstructField()
   field->moveTo ( ( field_length/(2*ksize)-defense_radius/ksize ),defense_stretch/(2*ksize) );
   field->lineTo ( ( field_length/(2*ksize)-defense_radius/ksize ),-defense_stretch/(2*ksize) );
   field->moveTo ( ( field_length/(2*ksize)-defense_radius/ksize ),defense_stretch/(2*ksize) );
-  field->arcTo ( ( field_length/(2*ksize)-defense_radius/ksize ),- ( defense_radius/ksize-defense_stretch/(2*ksize) ),2*defense_radius/ksize,2*defense_radius/ksize,180,90 );
+  field->arcTo ( ( field_length/(2*ksize)-defense_radius/ksize )
+				 ,- ( defense_radius/ksize-defense_stretch/(2*ksize) )
+				 , 2*defense_radius/ksize,2*defense_radius/ksize,180,90 );
   field->moveTo ( ( field_length/(2*ksize)-defense_radius/ksize ),-defense_stretch/(2*ksize) );
-  field->arcTo ( ( field_length/(2*ksize)-defense_radius/ksize ),- ( defense_radius/ksize+defense_stretch/(2*ksize) ),2*defense_radius/ksize,2*defense_radius/ksize,180,-90 );
+  field->arcTo ( ( field_length/(2*ksize)-defense_radius/ksize )
+				 ,- ( defense_radius/ksize+defense_stretch/(2*ksize) )
+				 ,2*defense_radius/ksize,2*defense_radius/ksize,180,-90 );
 
   field->moveTo ( -field_length/(2*ksize),goal_width/(2*ksize) );
   field->lineTo ( - ( field_length/(2*ksize)+goal_depth/ksize ),goal_width/(2*ksize) );
@@ -220,9 +224,13 @@ void FieldScene::ConstructField()
   field->moveTo ( - ( field_length/(2*ksize)-defense_radius/ksize ),defense_stretch/(2*ksize) );
   field->lineTo ( - ( field_length/(2*ksize)-defense_radius/ksize ),-defense_stretch/(2*ksize) );
   field->moveTo ( - ( field_length/(2*ksize)-defense_radius/ksize ),defense_stretch/(2*ksize) );
-  field->arcTo ( - ( field_length/(2*ksize)+defense_radius/ksize ),- (defense_radius/ksize-defense_stretch/(2*ksize) ),2*defense_radius/ksize,2*defense_radius/ksize,0,-90 );
+  field->arcTo ( - ( field_length/(2*ksize)+defense_radius/ksize )
+				 ,- (defense_radius/ksize-defense_stretch/(2*ksize) )
+				 ,2*defense_radius/ksize,2*defense_radius/ksize,0,-90 );
   field->moveTo ( - ( field_length/(2*ksize)-defense_radius/ksize ),-defense_stretch/(2*ksize) );
-  field->arcTo ( - ( field_length/(2*ksize)+defense_radius/ksize ),- ( defense_radius/ksize+defense_stretch/(2*ksize) ),2*defense_radius/ksize,2*defense_radius/ksize,0,90 );
+  field->arcTo ( - ( field_length/(2*ksize)+defense_radius/ksize )
+				 ,- ( defense_radius/ksize+defense_stretch/(2*ksize) )
+				 ,2*defense_radius/ksize,2*defense_radius/ksize,0,90 );
 }
 
 void FieldScene::LoadFieldGeometry()
