@@ -1,0 +1,13 @@
+language: c++
+compiler:
+- gcc
+git:
+  depth: 1
+script:
+ - ./.travis/task01/script.sh
+matrix:
+  include:
+    - os: linux
+      name: "Some GNU/Linux"
+    - os: osx
+      name: "macOS"
