@@ -73,24 +73,25 @@
   #ifndef _CRT_SECURE_NO_DEPRECATE
   #define _CRT_SECURE_NO_DEPRECATE
   #endif
-  #include "xmlParser.h"
+#ifdef _XMLWINDOWS
+//#ifdef _DEBUG
+//#define _CRTDBG_MAP_ALLOC
+//#include <crtdbg.h>
+//#endif
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h> // to have IsTextUnicode, MultiByteToWideChar, WideCharToMultiByte to handle unicode files
+                    // to have "MessageBoxA" to display error messages for openFilHelper
+#endif
+
+#include <memory.h>
+#include <assert.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#include "xmlParser.h"
   namespace VarTypes {
-  #ifdef _XMLWINDOWS
-  //#ifdef _DEBUG
-  //#define _CRTDBG_MAP_ALLOC
-  //#include <crtdbg.h>
-  //#endif
-  #define WIN32_LEAN_AND_MEAN
-  #include <Windows.h> // to have IsTextUnicode, MultiByteToWideChar, WideCharToMultiByte to handle unicode files
-                      // to have "MessageBoxA" to display error messages for openFilHelper
-  #endif
-  
-  #include <memory.h>
-  #include <assert.h>
-  #include <stdio.h>
-  #include <string.h>
-  #include <stdlib.h>
-  
+
   XMLCSTR XMLNode::getVersion() { return _T("v2.23"); }
   void free_XMLDLL(void *t){free(t);}
   

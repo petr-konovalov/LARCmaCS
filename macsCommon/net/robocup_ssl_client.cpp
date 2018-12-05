@@ -48,15 +48,15 @@ bool RoboCupSSLClient::open(bool blocking) {
     return(false);
   }
 
-  Net::Address multiaddr,interface;
+  Net::Address multiaddr,interface_;
   multiaddr.setHost(_net_address.c_str(),_port);
   if(_net_interface.length() > 0){
-    interface.setHost(_net_interface.c_str(),_port);
+    interface_.setHost(_net_interface.c_str(),_port);
   }else{
-    interface.setAny();
+    interface_.setAny();
   }
 
-  if(!mc.addMulticast(multiaddr,interface)) {
+  if(!mc.addMulticast(multiaddr,interface_)) {
     fprintf(stderr,"Unable to setup UDP multicast\n");
     fflush(stderr);
     return(false);
