@@ -29,7 +29,7 @@ public slots:
 
 public:
     SSL_DetectionFrame detection;
-    SSL_GeometryFieldSize geometry;
+	SSL_GeometryFieldSize fieldsize;
 
 signals:
     void activateGUI();

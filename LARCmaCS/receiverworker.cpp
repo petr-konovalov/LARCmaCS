@@ -64,7 +64,7 @@ void ReceiverWorker::run()
     while (!shutdownread) {
         if (client.receive(packet)) {
             if (packet.has_geometry()) {
-                geometry = packet.geometry().field();
+				fieldsize = packet.geometry().field();
                 emit updatefieldGeometry();
                 emit activateGUI();
             }

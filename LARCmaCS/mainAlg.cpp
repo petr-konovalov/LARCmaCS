@@ -21,7 +21,12 @@ MainAlg::~MainAlg()
 
 void MainAlg::init()
 {
-    engEvalString(fmldata.ep,s.toUtf8().data());
+	worker.moveToThread(&thread);
+	cout << "Init mainAlg ok" << endl;
+	connect(this, SIGNAL(wstart()), &worker, SLOT(start()));
+	connect(this, SIGNAL(wstop()), &worker, SLOT(stop()));
+	connect(&thread, SIGNAL(finished()), &worker, SLOT(deleteLater()));
+	//engEvalString(fmldata.ep,s.toUtf8().data());
 }
 //void MainAlgWorker::Pause()
 //{
