@@ -3,7 +3,7 @@
 #include <QWidget>
 
 namespace Ui {
-class Form;
+class Help;
 }
 
 class Reference : public QWidget
@@ -18,5 +18,5 @@ signals:
 private slots:
     //void on_pushButton_clicked();
 private:
-    Ui::Form *ui;
+    Ui::Help *ui;
 };

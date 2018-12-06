@@ -6,7 +6,7 @@
 
 Reference::Reference(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::Form)
+    ui(new Ui::Help)
 {
     ui->setupUi(this);
 
