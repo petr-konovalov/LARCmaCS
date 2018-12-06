@@ -2,6 +2,7 @@
 #include "larcmacs.h"
 #include "ui_larcmacs.h"
 #include "packetSSL.h"
+#include "message.h"
 
 
 LARCmaCS::LARCmaCS(QWidget *parent) :
@@ -108,65 +109,32 @@ quint32 Crc32(QByteArray buf, int len)
     }
     return crc ^ 0xFFFFFFFF;
 }
-struct CommandData {
-    quint32 speed_x;
-    quint32 speed_y;
-    quint32 speed_r;
-    quint32 speed_dribbler;
-    quint8 dribbler_enable;
-    quint32 kicker_volatage_level;
-    quint8 kicker_charge_enable;
-    quint8 kick_up;
-    quint8 kick_forward;
-};
-QByteArray serializeCommand(CommandData data) {
-    QByteArray byteArray;
-    QDataStream baWriter(&byteArray, QIODevice::WriteOnly | QIODevice::Append);
-    baWriter.setByteOrder(QDataStream::LittleEndian);
-    baWriter << (quint8)0xAA;
-    baWriter << (quint8)0xAA;
-    baWriter << (quint8)0xAA;
-    baWriter << (quint8)0xAA;
-    baWriter << data.speed_x;
-    baWriter << data.speed_y;
-    baWriter << data.speed_r;
-    baWriter << data.speed_dribbler;
-    baWriter << data.dribbler_enable;
-    baWriter << data.kicker_volatage_level;
-    baWriter << data.kicker_charge_enable;
-    baWriter << data.kick_up;
-    baWriter << data.kick_forward;
-    quint32 crc =Crc32(byteArray, 28);
-    baWriter << crc;
-    return byteArray;
-}
-
 
 
 void LARCmaCS::remcontrolsender(int l, int r,int k, int b, bool kickUp)
 {
     QString ip = ui->lineEditRobotIp->text();
-    CommandData data;
-    data.speed_x = l;
-    data.speed_y = r;
-    data.speed_r = k;
-    data.speed_dribbler = 0;
-    data.dribbler_enable = 0;
+    Message data;
+    data.setSpeedX(l);
+    data.setSpeedY(r);
+    data.setSpeedR(k);
+    data.setSpeedDribbler(0);
+    data.setDribblerEnable(0);
 
     if(b!=-1){
-        data.kicker_volatage_level = 4;
-        data.kicker_charge_enable = 1;
-        data.kick_up = kickUp;
-        data.kick_forward = 0;
+        data.setKickVoltageLevel(4);
+        data.setKickerChargeEnable(1);
+        data.setKickUp(kickUp);
+        data.setKickForward(0);
     }
     else{
-        data.kicker_volatage_level = 0;
-        data.kicker_charge_enable = 0;
-        data.kick_up = 0;
-        data.kick_forward = 0;
+        data.setKickVoltageLevel(0);
+        data.setKickerChargeEnable(0);
+        data.setKickUp(0);
+        data.setKickForward(0);
     }
 
-    QByteArray byteData = serializeCommand(data);
+    QByteArray byteData = data.generateByteArray();
 
     if(socket.ConnectedState == QUdpSocket::ConnectedState) {
         socket.writeDatagram(byteData, byteData.length(), QHostAddress(ip), 10000);
