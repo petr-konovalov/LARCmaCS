@@ -55,7 +55,8 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
     connect(&receiver.worker, SIGNAL(UpdateSSLFPS(QString)), this, SLOT(UpdateSSLFPS(QString)));
 
     //remotecontrol
-    connect(&remotecontol,SIGNAL(RC_control(int,int,int,int, bool)),this,SLOT(remcontrolsender(int, int,int, int, bool)));
+	connect(&remotecontol,SIGNAL(RC_control(int,int,int,int, bool))
+			,this,SLOT(remcontrolsender(int, int,int, int, bool)));
     connect(this,SIGNAL(sendToConnectorRM(int,QByteArray)),&connector.worker,SLOT(run(int,QByteArray)));
 
     QObject::connect(this, SIGNAL(addIp(int, QString)),
@@ -110,7 +111,6 @@ quint32 Crc32(QByteArray buf, int len)
     return crc ^ 0xFFFFFFFF;
 }
 
-
 void LARCmaCS::remcontrolsender(int l, int r,int k, int b, bool kickUp)
 {
     QString ip = ui->lineEditRobotIp->text();
@@ -156,8 +156,6 @@ void LARCmaCS::remcontrolsender(int l, int r,int k, int b, bool kickUp)
     command.append(k);
     command.append(b);
 }
-
-
 
 void LARCmaCS::fieldsceneUpdateRobots()
 {
@@ -223,7 +221,6 @@ void LARCmaCS::updateView()
       scalingRequested = false;
       ui->fieldView->viewport()->update();
   }
-
 }
 
 //void LARCmaCS::on_pushButton_Pause_clicked()
@@ -266,7 +263,6 @@ void LARCmaCS::on_pushButton_SetupIP_clicked()
     ipDialog->open();
     qDebug() << connector.worker.numIP;
 }
-
 
 void LARCmaCS::on_but_reference_clicked()
 {

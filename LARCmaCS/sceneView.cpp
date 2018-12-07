@@ -1,26 +1,36 @@
 #include "sceneView.h"
 #include <iostream>
-
-#include <QtWidgets/QApplication>
+#include "sceneViewWorker.h"
 
 using namespace std;
 
-void sceneViewWorker::run(){
+SceneView::SceneView(){};
 
-    while(!shutdownview){
-//        cout << "signal updateView" << endl;
-        emit updateView();
-        //emit updateRobots();
-        QApplication::processEvents();
-        Sleep(1);
+SceneView::~SceneView()
+{
+        stop();
+        thread.wait(100);
+        thread.terminate();
+        thread.wait(100);
     }
 
+void SceneView::init()
+{
+    worker.moveToThread(&thread);
+    cout << "sceneView init ok" << endl;
+    connect(this, SIGNAL(wstart()), &worker, SLOT(start()));
+    connect(this, SIGNAL(wstop()), &worker, SLOT(stop()));
+    connect(&thread, SIGNAL(finished()), &worker, SLOT(deleteLater()));
 }
 
-/*
-void sceneViewWorker::repaintScene(PacketSSL packetssl){
-   // cout << "yep! repain" << endl;
-    emit updateRobots();
-    QApplication::processEvents();
+void SceneView::start()
+{
+    thread.start();
+    cout << "Scene view thread started" << endl;
+    emit wstart();
 }
-*/
+
+void SceneView::stop()
+{
+    emit wstop();
+}

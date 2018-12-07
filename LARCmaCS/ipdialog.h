@@ -18,7 +18,6 @@ public:
 
 private slots:
     void on_buttonBox_accepted();
-
     void on_buttonBox_rejected();
 
 private:
@@ -26,8 +25,6 @@ private:
     Receiver receiver;
     Connector connector;
 
-
 signals:
     void addIp(int, QString);
-
 };
