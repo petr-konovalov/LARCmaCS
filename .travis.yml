@@ -4,10 +4,10 @@ compiler:
 git:
   depth: 1
 script:
- - ./.travis/task01/script.sh
+ - ./runVera++.sh 
 matrix:
   include:
     - os: linux
       name: "Some GNU/Linux"
-    - os: osx
-      name: "macOS"
+before_install:
+  - sudo apt-get install vera++
