@@ -1,7 +1,7 @@
 #include <math.h>
 #include "larcmacs.h"
 #include "ui_larcmacs.h"
-#include "packetSSL.h"
+#include "commandData.h"
 
 
 LARCmaCS::LARCmaCS(QWidget *parent) :
@@ -54,7 +54,8 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
     connect(&receiver.worker, SIGNAL(UpdateSSLFPS(QString)), this, SLOT(UpdateSSLFPS(QString)));
 
     //remotecontrol
-    connect(&remotecontol,SIGNAL(RC_control(int,int,int,int, bool)),this,SLOT(remcontrolsender(int, int,int, int, bool)));
+	connect(&remotecontol,SIGNAL(RC_control(int,int,int,int, bool))
+			,this,SLOT(remcontrolsender(int, int,int, int, bool)));
     connect(this,SIGNAL(sendToConnectorRM(int,QByteArray)),&connector.worker,SLOT(run(int,QByteArray)));
 
     QObject::connect(this, SIGNAL(addIp(int, QString)),
@@ -108,17 +109,7 @@ quint32 Crc32(QByteArray buf, int len)
     }
     return crc ^ 0xFFFFFFFF;
 }
-struct CommandData {
-    quint32 speed_x;
-    quint32 speed_y;
-    quint32 speed_r;
-    quint32 speed_dribbler;
-    quint8 dribbler_enable;
-    quint32 kicker_volatage_level;
-    quint8 kicker_charge_enable;
-    quint8 kick_up;
-    quint8 kick_forward;
-};
+
 QByteArray serializeCommand(CommandData data) {
     QByteArray byteArray;
     QDataStream baWriter(&byteArray, QIODevice::WriteOnly | QIODevice::Append);
@@ -140,7 +131,6 @@ QByteArray serializeCommand(CommandData data) {
     baWriter << crc;
     return byteArray;
 }
-
 
 
 void LARCmaCS::remcontrolsender(int l, int r,int k, int b, bool kickUp)
@@ -188,8 +178,6 @@ void LARCmaCS::remcontrolsender(int l, int r,int k, int b, bool kickUp)
     command.append(k);
     command.append(b);
 }
-
-
 
 void LARCmaCS::fieldsceneUpdateRobots()
 {
@@ -255,7 +243,6 @@ void LARCmaCS::updateView()
       scalingRequested = false;
       ui->fieldView->viewport()->update();
   }
-
 }
 
 //void LARCmaCS::on_pushButton_Pause_clicked()
@@ -298,7 +285,6 @@ void LARCmaCS::on_pushButton_SetupIP_clicked()
     ipDialog->open();
     qDebug() << connector.worker.numIP;
 }
-
 
 void LARCmaCS::on_but_reference_clicked()
 {

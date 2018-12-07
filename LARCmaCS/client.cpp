@@ -35,6 +35,5 @@ bool Client::writeData(const QByteArray &data)
             res = res && socket->waitForBytesWritten();
         }
     }
-
     return res;
 }

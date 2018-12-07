@@ -43,7 +43,6 @@ RemoteControl::~RemoteControl()
     delete ui;
 }
 
-
 #define QT_KEY_SHIFT_NATIVE 16
 #define QT_KEY_ESCAPE_NATIVE 27
 
@@ -77,7 +76,6 @@ void RemoteControl::keyReleaseEvent(QKeyEvent * key)
         qDebug() << "Space release";
     }
 }
-
 
 void RemoteControl::RC_send(void)
 {

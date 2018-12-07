@@ -1,0 +1,13 @@
+language: c++
+compiler:
+- gcc
+git:
+  depth: 1
+script:
+ - ./runVera++.sh 
+matrix:
+  include:
+    - os: linux
+      name: "Some GNU/Linux"
+before_install:
+  - sudo apt-get install vera++

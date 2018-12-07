@@ -73,6 +73,12 @@ SOURCES += main.cpp\
     ipdialog.cpp \
     client.cpp \
     reference.cpp \
+    sceneViewWorker.cpp \
+    robot.cpp \
+    receiverWorker.cpp \
+    mainAlgWorker.cpp \
+    connectorWorker.cpp \
+    packetSSL.cpp \
 
 HEADERS  += \
   $${SHARED_DIR}/net/netraw.h \
@@ -94,6 +100,11 @@ HEADERS  += \
     ipdialog.h \
     client.h \
     reference.h \
+    sceneViewWorker.h \
+    receiverWorker.h \
+    robot.h \
+    mainAlgWorker.h \
+    connectorWorker.h \
 
 FORMS    += larcmacs.ui \
     remotecontrol.ui \
