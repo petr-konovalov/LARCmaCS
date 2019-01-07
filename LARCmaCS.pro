@@ -64,4 +64,13 @@ defineTest(copyToDestdir) {
 
 msvc: copyToDestdir($$DLLS)
 
+!exists($$OUT_PWD/bin/LARCmaCS.cnf){
+  INIT_FILES = \
+    $$PWD/bin/LARCmaCS.cnf \
+    $$PWD/bin/LARCmaCS.exe.embed.manifest \
+    $$PWD/bin/gamepads.txt \
+    $$PWD/bin/help.png \
+    $$PWD/bin/help.html
+  copyToDestdir($$INIT_FILES)
+}
 

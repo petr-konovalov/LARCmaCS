@@ -364,11 +364,8 @@ void MainAlgWorker::init(){
     }
     else {
         cerr << "...bad" << endl;
-        char *str = new char[16];
-        str = "Robofootball";
-        rcconfig.name = str;
-        str = "main";
-        rcconfig.file_of_matlab=str;
+        rcconfig.name = "Robofootball";
+        rcconfig.file_of_matlab = "main";
         rcconfig.RULE_AMOUNT=5;
         rcconfig.RULE_LENGTH=7;
         rcconfig.BACK_AMOUNT=10;

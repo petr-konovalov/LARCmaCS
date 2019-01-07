@@ -45,6 +45,12 @@ SOURCES += \
     $$PWD/ipdialog.cpp \
     $$PWD/client.cpp \
     $$PWD/reference.cpp \
+    $$PWD/sceneViewWorker.cpp \
+    $$PWD/robot.cpp \
+    $$PWD/receiverWorker.cpp \
+    $$PWD/mainAlgWorker.cpp \
+    $$PWD/connectorWorker.cpp \
+    $$PWD/packetSSL.cpp \
 
 
 HEADERS  += \
@@ -52,7 +58,6 @@ HEADERS  += \
   $${SHARED_DIR}/net/robocup_ssl_client.h \
   $${SHARED_DIR}/net/Pipe.h \
   $${SHARED_DIR}/util/timer.h \
-  $${SHARED_DIR}/util/field.h \
   $${SHARED_DIR}/util/field_default_constants.h \
   $${SHARED_DIR}/rfprotocol/rfprotocol.h \
     $$PWD/larcmacs.h \
@@ -68,6 +73,11 @@ HEADERS  += \
     $$PWD/ipdialog.h \
     $$PWD/client.h \
     $$PWD/reference.h \
+    $$PWD/sceneViewWorker.h \
+    $$PWD/receiverWorker.h \
+    $$PWD/robot.h \
+    $$PWD/mainAlgWorker.h \
+    $$PWD/connectorWorker.h \
 
 FORMS += \
     $$PWD/larcmacs.ui \

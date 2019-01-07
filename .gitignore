@@ -1,9 +1,9 @@
 *.pdb
-/LARCmaCS/*.user*
-/LARCmaCS/Makefile*
+*.user*
+*Makefile*
 /bind/*
 /bin/*.exe
 /build/*
 /build*
-/proto-generated/generated/*.pb*
+/proto/generated/*.pb*
 personal.pri
