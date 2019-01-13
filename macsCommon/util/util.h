@@ -42,43 +42,12 @@
 #define M_2PI 6.28318530717958647693
 #endif
 
-inline double rint(double nr)
-{
-  double f = floor(nr);
-  double c = ceil(nr);
-  return (((c-nr) >= (nr-f)) ? f:c);
-}
-
 using std::sort;
-
-#if 1
 
 using std::min;
 using std::max;
 using std::swap;
 
-#else
-template <class num>
-inline num max(num a,num b)
-{
-  return((a > b)? a : b);
-}
-
-template <class num>
-inline num min(num a,num b)
-{
-  return((a < b)? a : b);
-}
-
-template <class data>
-inline void swap(data &a,data &b)
-{
-  data t;
-  t = a;
-  a = b;
-  b = t;
-}
-#endif
 
 template <class num1,class num2>
 inline num1 bound(num1 x,num2 low,num2 high) MustUseResult;
