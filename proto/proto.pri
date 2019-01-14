@@ -18,6 +18,8 @@ INCLUDEPATH += $${PROTO_DIR}/include
 PROTO_GENERATED_DIR = $$PWD/generated/
 INCLUDEPATH += $$PROTO_GENERATED_DIR
 
-old_ssl: PROTOS = $$files($$PWD/ssl-2012/*.proto)
+old_ssl: PROTOS = $$files($$PWD/ssl-2009/*.proto)
 !old_ssl: PROTOS = $$files($$PWD/ssl-2018/*.proto)
 message($$PROTOS)
+message($$INCLUDEPATH)
+
