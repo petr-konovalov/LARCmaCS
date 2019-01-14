@@ -17,5 +17,5 @@ msvc {
 INCLUDEPATH += $${PROTO_DIR}/include
 PROTO_GENERATED_DIR = $$PWD/generated/
 INCLUDEPATH += $$PROTO_GENERATED_DIR
-PROTOS = $$files($$PWD/*.proto)
+PROTOS = $$files($$PWD/ssl-2018/*.proto)
 
