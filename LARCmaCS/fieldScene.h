@@ -16,7 +16,9 @@ public:
     void UpdateRobots ( SSL_DetectionFrame &detection );
     int UpdateBalls ( QVector<QPointF> &_balls, int cameraID );
 
+#ifndef OLD_SSL_PROTO
     void UpdateField(SSL_GeometryFieldSize field);
+#endif
 
     void UpdateGeometry(SSL_GeometryFieldSize fieldSize);
     void LoadFieldGeometry();
@@ -42,8 +44,21 @@ private:
     double ksize;
 
     //Field dimensions and geometry
-    vector<SSL_FieldLineSegment> field_lines;
-    vector<SSL_FieldCicularArc> field_arcs;
+
+#ifdef OLD_SSL_PROTO
+	double referee_width;
+	double goal_wall_width;
+	double defense_radius;
+	double defense_stretch;
+	double free_kick_from_defense_dist;
+	double penalty_spot_from_field_line_dist;
+	double penalty_line_from_spot_dist;
+#else
+	vector<SSL_FieldLineSegment> field_lines;
+	vector<SSL_FieldCicularArc> field_arcs;
+	double penalty_area_width;
+	double penalty_area_depth;
+#endif
     double line_width;
     double field_length;
     double field_width;
@@ -52,6 +67,4 @@ private:
     double goal_depth;
     double center_circle_radius;
 
-    double penalty_area_width;
-    double penalty_area_depth;
 };
