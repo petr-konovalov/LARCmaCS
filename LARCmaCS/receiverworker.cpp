@@ -1,8 +1,5 @@
 #include "receiverWorker.h"
 #include <QtWidgets/QApplication>
-#include <QDebug>
-
-using namespace std;
 
 ReceiverWorker::ReceiverWorker()
 {
@@ -47,7 +44,6 @@ void ReceiverWorker::ChangeMaxPacketFrequencyMod(bool state)
 
 void ReceiverWorker::run()
 {
-	qDebug() << "run";
     QPointF p;
 
     int balls_n = 0;
@@ -67,7 +63,6 @@ void ReceiverWorker::run()
 
     while (!shutdownread) {
         if (client.receive(packet)) {
-			qDebug() << "package";
             if (packet.has_geometry()) {
 				fieldsize = packet.geometry().field();
                 emit updatefieldGeometry();

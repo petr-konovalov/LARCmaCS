@@ -21,7 +21,6 @@ isEmpty(MATLAB_DIR): error("You need to specify the path to MATLAB_DIR!")
 
 #generate and include proto-files
 include(proto/proto.pri)
-CONFIG += protobuf
 
 SHARED_DIR = macsCommon
 
