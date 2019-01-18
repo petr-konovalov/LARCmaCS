@@ -151,7 +151,7 @@ void FieldScene::UpdateGeometry(SSL_GeometryFieldSize fieldSize) {
     LoadFieldGeometry(fieldSize);
 }
 
-int FieldScene::UpdateBalls ( QVector<QPointF> &_balls, int cameraID )
+int FieldScene::UpdateBalls(QVector<QPointF> &_balls, int cameraID)
 {
   QVector<QGraphicsEllipseItem*> tmp;
   while(cameraID+1>ballItems.size())
