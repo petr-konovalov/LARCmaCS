@@ -1,5 +1,5 @@
 CONFIG -= warn_off
-CONFIG += debug_and_release build_all
+CONFIG -= debug_and_release debug_and_release_target
 CONFIG += qt thread
 CONFIG += console
 
@@ -21,7 +21,6 @@ mingw {
 
 DEBUG_SUFFIX        =
 RELEASE_SUFFIX      =
-
 win32 {
   DEBUG_SUFFIX      = d
   DEBUG_PREFIX      = debug/
@@ -40,18 +39,10 @@ else {
 
 DESTDIR = bin$${SUFFIX_STR}
 
-
 unix {
-  DEFINES+=UNIX
-  DEFINES+=LINUX
-  DEFINES+=_GNU_SOURCE
-
-#profiling:
-#  CONFIG += debug
-#  QMAKE_CFLAGS+=-pg
-#  QMAKE_CXXFLAGS+=-pg
-#  QMAKE_LFLAGS+=-pg
-
+  DEFINES += UNIX
+  DEFINES += LINUX
+  DEFINES += _GNU_SOURCE
 }
 
 win32:msvc {

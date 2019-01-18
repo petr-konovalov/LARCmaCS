@@ -1,0 +1,3 @@
+PATH='C:\Windows\System32;$${OTHER_BIN};$${MATLAB_BIN}'
+cd bin$${SUFFIX_STR}
+.\LARCmaCS.exe

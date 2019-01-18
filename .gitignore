@@ -7,3 +7,7 @@
 /build*
 /proto/generated/*.pb*
 personal.pri
+*stash
+*Debug
+*Release
+LARCmaCS.cmd
