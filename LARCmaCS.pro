@@ -1,25 +1,13 @@
-#-------------------------------------------------
-#
-# Project created
-#
-#-------------------------------------------------
-
-#read the global configuration file
 include(config.pri)
-
-#personal info
 include(personal.pri)
-
 #check personal info
 msvc {
-  isEmpty(VCPKG_DIR): error("To use MSVC, you need to specify the path to VCPKG_DIR!")
+  isEmpty(VCPKG_DIR): error("To use MSVC you need to specify the path to VCPKG_DIR!")
 }
 mingw {
-  isEmpty(MSYS_DIR): error("To use MINGW, you need to specify the path to MSYS_DIR!")
+  isEmpty(MSYS_DIR): error("To use MINGW you need to specify the path to MSYS_DIR!")
 }
 isEmpty(MATLAB_DIR): error("You need to specify the path to MATLAB_DIR!")
-
-#generate and include proto-files
 include(proto/proto.pri)
 CONFIG += protobuf
 
@@ -40,37 +28,30 @@ UI_DIR = build/LARCmaCS/ui
 #where to place intermediate resource files
 RCC_DIR = build/LARCmaCS/resources
 
-
-DLLS += \
-  $$[QT_INSTALL_BINS]/Qt5Core.dll \
-  $$[QT_INSTALL_BINS]/Qt5Widgets.dll \
-  $$[QT_INSTALL_BINS]/Qt5Network.dll \
-  $$[QT_INSTALL_BINS]/Qt5Gui.dll \
-
 defineTest(copyToDestdir) {
-    files = $$1
+	files = $$1
 
-    for(FILE, files) {
-        DDIR = $$DESTDIR
+	for(FILE, files) {
+		DDIR = $$DESTDIR
+		# Replace slashes in paths with backslashes for Windows
+		win32:FILE ~= s,/,\\,g
+		win32:DDIR ~= s,/,\\,g
+		QMAKE_POST_LINK += $$QMAKE_COPY $$quote($$FILE) $$quote($$DDIR) $$escape_expand(\\n\\t)
+	}
 
-        # Replace slashes in paths with backslashes for Windows
-        win32:FILE ~= s,/,\\,g
-        win32:DDIR ~= s,/,\\,g
-        QMAKE_POST_LINK += $$QMAKE_COPY $$quote($$FILE) $$quote($$DDIR) $$escape_expand(\\n\\t)
-    }
-
-    export(QMAKE_POST_LINK)
+	export(QMAKE_POST_LINK)
 }
 
-msvc: copyToDestdir($$DLLS)
+INIT_FILES = \
+	$$PWD/resources/LARCmaCS.cnf \
+	$$PWD/resources/LARCmaCS.exe.embed.manifest \
+	$$PWD/resources/gamepads.txt \
+	$$PWD/resources/help.png \
+	$$PWD/resources/help.html
 
-!exists($$OUT_PWD/bin/LARCmaCS.cnf){
-  INIT_FILES = \
-    $$PWD/bin/LARCmaCS.cnf \
-    $$PWD/bin/LARCmaCS.exe.embed.manifest \
-    $$PWD/bin/gamepads.txt \
-    $$PWD/bin/help.png \
-    $$PWD/bin/help.html
-  copyToDestdir($$INIT_FILES)
-}
+copyToDestdir($$INIT_FILES)
 
+MATLAB_BIN = $${MATLAB_DIR}\..\bin\win$$BIT
+msvc: OTHER_BIN = '$$[QT_INSTALL_BINS];$${PROTO_DIR}/$${PREFIX_STR}bin/'
+mingw: OTHER_BIN = '$${MSYS_DIR}\mingw$${BIT}\bin'
+QMAKE_SUBSTITUTES += LARCmaCS.cmd.in
