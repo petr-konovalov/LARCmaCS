@@ -54,6 +54,4 @@ copyToDestdir($$INIT_FILES)
 MATLAB_BIN = $${MATLAB_DIR}\..\bin\win$$BIT
 msvc: OTHER_BIN = '$$[QT_INSTALL_BINS];$${PROTO_DIR}/$${PREFIX_STR}bin/'
 mingw: OTHER_BIN = '$${MSYS_DIR}\mingw$${BIT}\bin'
-#mingw: SET_PATH = 'C:\Windows\System32;$${MSYS_DIR}\mingw$${BIT}\bin;$${MATLAB_BIN}'
-#msvc: SET_PATH = 'C:\Windows\System32;$${MATLAB_BIN}'
 QMAKE_SUBSTITUTES += LARCmaCS.cmd.in

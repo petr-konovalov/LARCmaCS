@@ -19,11 +19,11 @@ mingw {
   error($$CONFIG)
 }
 
-DEBUG_SUFFIX        =
-RELEASE_SUFFIX      =
+DEBUG_SUFFIX =
+RELEASE_SUFFIX =
 win32 {
-  DEBUG_SUFFIX      = d
-  DEBUG_PREFIX      = debug/
+  DEBUG_SUFFIX = d
+  DEBUG_PREFIX = debug/
   !amd64: BIT = 32
   amd64: BIT = 64
 }
