@@ -10,48 +10,48 @@ using std::map;
 
 struct ConnectorWorker : QObject
 {
-    Q_OBJECT
+Q_OBJECT
 public:
-    ConnectorWorker(){}
+	ConnectorWorker(){}
 
-    int shutdownconnector;
-    char *curRuleArray;
+	int shutdownconnector;
+	char *curRuleArray;
 
-    QString filename;
-    QFile *ipFile;
-    QUdpSocket *udpSocket;
-    map<int const, QString> robotAddrMap;
-    int connectedAllSocketsFlag;
-    QMap<int,QString> numIP;
-    QMap<QString,QString> macIP;
+	QString filename;
+	QFile *ipFile;
+	QUdpSocket *udpSocket;
+	map<int const, QString> robotAddrMap;
+	int connectedAllSocketsFlag;
+	QMap<int,QString> numIP;
+	QMap<QString,QString> macIP;
 
-    QList<QString> macList;
+	QList<QString> macList;
 
-    int gotPacketsNum;
-    QTimer* timer;
+	int gotPacketsNum;
+	QTimer* timer;
 
-    int connectedSockets;
-    int connectedRobots;
-    QByteArray command;
+	int connectedSockets;
+	int connectedRobots;
+	QByteArray command;
 
-    char dat[12];
+	char dat[12];
 
 signals:
-    void receivedDatagram(QByteArray datagram);
-    void receivedAddresses(QByteArray addressDatagram);
-    void gotStringAddresses(QByteArray stringAddressDatagram);
-    void allNeededRobotsEnabled();
-    void allTasksDone();
-    void robotAdded(QString);
-    void sendMacs(QList<QString>);
-    void sendPortList(QStringList);
+	void receivedDatagram(QByteArray datagram);
+	void receivedAddresses(QByteArray addressDatagram);
+	void gotStringAddresses(QByteArray stringAddressDatagram);
+	void allNeededRobotsEnabled();
+	void allTasksDone();
+	void robotAdded(QString);
+	void sendMacs(QList<QString>);
+	void sendPortList(QStringList);
 
 public slots:
-    void init();
-    void start();
-    void stop();
-    void run(int N, QByteArray command);
-    void udpProcessPendingDatagrams();
-    void receiveMacArray(QString*);
-    void addIp(int id, QString ip);
+	void init();
+	void start();
+	void stop();
+	void run(int N, QByteArray command);
+	void udpProcessPendingDatagrams();
+	void receiveMacArray(QString*);
+	void addIp(int id, QString ip);
 };

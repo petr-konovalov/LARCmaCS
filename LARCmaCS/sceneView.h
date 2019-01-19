@@ -9,20 +9,20 @@
 
 struct SceneView: QObject
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    SceneViewWorker worker;
-    QThread thread;
+	SceneViewWorker worker;
+	QThread thread;
 
-    explicit SceneView();
-    ~SceneView();
+	explicit SceneView();
+	~SceneView();
 
-    void init();
-    void start();
-    void stop();
+	void init();
+	void start();
+	void stop();
 
 signals:
-    void wstart();
-    void wstop();
+	void wstart();
+	void wstop();
 };

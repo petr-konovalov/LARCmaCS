@@ -6,42 +6,29 @@
 
 typedef struct
 {
-    std::string	name;
-    const char *file_of_matlab;
-    int RULE_AMOUNT;
-    int RULE_LENGTH;
-    int BACK_AMOUNT;
-    int BACK_LENGTH;
+	std::string	name;
+	const char *file_of_matlab;
+	int RULE_AMOUNT;
+	int RULE_LENGTH;
+	int BACK_AMOUNT;
+	int BACK_LENGTH;
 } RCConfig;
 
 class MlData
 {
 public:
-    MlData(){}
-    MlData(RCConfig conf);
-    MlData(const MlData &data);
+	MlData(){}
+	MlData(RCConfig conf);
+	MlData(const MlData &data);
 
-    // Вроде MATLAB, а потому и вся прога крашится при mxDestroyArray, пока без деструктора
-//    virtual ~MlData() {
-//        mxDestroyArray(Ball);
-//        mxDestroyArray(Blue);
-//        mxDestroyArray(Yellow);
-//        mxDestroyArray(Rules_length);
-//        mxDestroyArray(Rules_count);
-//        mxDestroyArray(Rule);
-//        mxDestroyArray(Back_Params);
-//        mxDestroyArray(Back_Amount);
-//        mxDestroyArray(Back_Length);
-//    }
+	RCConfig config;
 
-    RCConfig config;
-
-    Engine  *ep;
-    mxArray *Rule;
-    mxArray *Ball;
-    mxArray *Blue;
-    mxArray *Yellow;
-    mxArray *Back_Params;
-    mxArray *Back_Amount;
-    mxArray *Back_Length;
+	Engine  *ep;
+	mxArray *Rule;
+	mxArray *Ball;
+	mxArray *Blue;
+	mxArray *Yellow;
+	mxArray *Back_Params;
+	mxArray *Back_Amount;
+	mxArray *Back_Length;
 };

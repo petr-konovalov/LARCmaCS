@@ -16,19 +16,19 @@ using namespace std;
 
 struct Receiver : public QObject
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    ReceiverWorker worker;
-    QThread thread;
+	ReceiverWorker worker;
+	QThread thread;
 
-    Receiver();
-    ~Receiver();
+	Receiver();
+	~Receiver();
 
-    void init();
-    void start();
-    void stop();
+	void init();
+	void start();
+	void stop();
 
 signals:
-    void wstart();
-    void wstop();
+	void wstart();
+	void wstop();
 };

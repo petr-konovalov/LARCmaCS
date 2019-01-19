@@ -3,34 +3,33 @@
 #include <QWidget>
 #include <QTimer>
 namespace Ui {
-class RemoteControl;
+	class RemoteControl;
 }
 
 #include <QKeyEvent>
 class RemoteControl : public QWidget
 {
-    Q_OBJECT
+	Q_OBJECT
 
-    void closeEvent(QCloseEvent *);
+	void closeEvent(QCloseEvent *);
 
 public:
-    explicit RemoteControl(QWidget *parent = 0);
-    ~RemoteControl();
+	explicit RemoteControl(QWidget *parent = 0);
+	~RemoteControl();
 private:
-    QTimer timer;
-    void keyPressEvent(QKeyEvent *key);
-    void keyReleaseEvent(QKeyEvent * key);
-    int keys[256];
-    int key_shift;
-    int effort;
+	QTimer timer;
+	void keyPressEvent(QKeyEvent *key);
+	void keyReleaseEvent(QKeyEvent * key);
+	int keys[256];
+	int key_shift;
+	int effort;
 private slots:
-    void RC_send(void);
+	void RC_send(void);
 public slots:
-    void TimerStart();
-    void TimerStop();
+	void TimerStart();
+	void TimerStop();
 private:
-    Ui::RemoteControl *ui;
+	Ui::RemoteControl *ui;
 signals:
-    void RC_control(int left,int right,int kick,int beep, bool kickUp);
+	void RC_control(int left,int right,int kick,int beep, bool kickUp);
 };
-
