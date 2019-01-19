@@ -42,7 +42,11 @@ protected:
   string _net_address;
   string _net_interface;
 public:
-    RoboCupSSLClient(int port = 10006,
+#ifdef OLD_SSL_PROTO
+	RoboCupSSLClient(int port = 10002,
+#else
+	RoboCupSSLClient(int port = 10006,
+#endif
                      string net_ref_address="224.5.23.2",
                      string net_ref_interface="");
 
