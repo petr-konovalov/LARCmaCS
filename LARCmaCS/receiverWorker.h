@@ -6,12 +6,7 @@
 #include "packetSSL.h"
 #include "robocup_ssl_client.h"
 
-
-//#include "receiver.h"
-
-using namespace std;
-
-#include <time.h> /* clock_t, clock(), CLOCKS_PER_SEC */
+#include <time.h>
 
 struct ReceiverWorker : public QObject
 {
@@ -29,6 +24,7 @@ public slots:
 
 public:
     SSL_DetectionFrame detection;
+
 	SSL_GeometryFieldSize fieldsize;
 
 signals:

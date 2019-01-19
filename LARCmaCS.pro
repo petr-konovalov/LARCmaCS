@@ -9,7 +9,6 @@ mingw {
 }
 isEmpty(MATLAB_DIR): error("You need to specify the path to MATLAB_DIR!")
 include(proto/proto.pri)
-CONFIG += protobuf
 
 SHARED_DIR = macsCommon
 

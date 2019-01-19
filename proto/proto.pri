@@ -14,6 +14,7 @@
 
 
 #define path to directories with protobuf headers and libs
+CONFIG += protobuf
 
 mingw {
   PROTO_DIR = $${MSYS_DIR}/mingw$${BIT}
@@ -32,5 +33,6 @@ msvc {
 INCLUDEPATH += $${PROTO_DIR}/include
 PROTO_GENERATED_DIR = $$PWD/generated/
 INCLUDEPATH += $$PROTO_GENERATED_DIR
-PROTOS = $$files($$PWD/*.proto)
 
+old_ssl: PROTOS = $$files($$PWD/ssl-2009/*.proto)
+!old_ssl: PROTOS = $$files($$PWD/ssl-2018/*.proto)
