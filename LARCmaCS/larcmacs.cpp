@@ -66,11 +66,7 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 
     //fieldScene Update
 	connect(&receiver.worker,SIGNAL(activateGUI()),this,SLOT(fieldsceneUpdateRobots()));
-#ifndef OLD_SSL_PROTO
 	connect(&receiver.worker, SIGNAL(updatefieldGeometry()), this, SLOT (fieldsceneUpdateField()));
-#else
-	connect(&receiver.worker, SIGNAL(updateField()), this, SLOT (fieldsceneUpdateField()));
-#endif
 	connect(this,SIGNAL(updateRobots()),fieldscene,SLOT(update()));
     connect(this, SIGNAL(updateGeometry()),fieldscene,SLOT(update()));
     //    connect(&receiver.worker, SIGNAL(activateGUI(PacketSSL)), &sceneview.worker, SLOT(repaintScene(PacketSSL)));
