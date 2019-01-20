@@ -40,3 +40,4 @@ MlData::MlData(const MlData &dat)
 	Back_Length  = mxCreateDoubleMatrix(1, 1, mxREAL);
 	memcpy(Back_Length, &dat.Back_Length, sizeof(Back_Length));
 }
+S

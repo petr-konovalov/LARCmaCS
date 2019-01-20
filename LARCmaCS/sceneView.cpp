@@ -8,29 +8,29 @@ SceneView::SceneView(){};
 
 SceneView::~SceneView()
 {
-        stop();
-        thread.wait(100);
-        thread.terminate();
-        thread.wait(100);
-    }
+	stop();
+	thread.wait(100);
+	thread.terminate();
+	thread.wait(100);
+}
 
 void SceneView::init()
 {
-    worker.moveToThread(&thread);
-    cout << "sceneView init ok" << endl;
-    connect(this, SIGNAL(wstart()), &worker, SLOT(start()));
-    connect(this, SIGNAL(wstop()), &worker, SLOT(stop()));
-    connect(&thread, SIGNAL(finished()), &worker, SLOT(deleteLater()));
+	worker.moveToThread(&thread);
+	cout << "sceneView init ok" << endl;
+	connect(this, SIGNAL(wstart()), &worker, SLOT(start()));
+	connect(this, SIGNAL(wstop()), &worker, SLOT(stop()));
+	connect(&thread, SIGNAL(finished()), &worker, SLOT(deleteLater()));
 }
 
 void SceneView::start()
 {
-    thread.start();
-    cout << "Scene view thread started" << endl;
-    emit wstart();
+	thread.start();
+	cout << "Scene view thread started" << endl;
+	emit wstart();
 }
 
 void SceneView::stop()
 {
-    emit wstop();
+	emit wstop();
 }

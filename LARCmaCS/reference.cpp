@@ -8,19 +8,19 @@ Reference::Reference(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Help)
 {
-    ui->setupUi(this);
+	ui->setupUi(this);
 
-    QFile file(QCoreApplication::applicationDirPath() + "\\help.html");
+	QFile file(QCoreApplication::applicationDirPath() + "\\help.html");
 
-    if(!file.open(QIODevice ::ReadOnly)) {
-        QMessageBox::information(0, "File not found!", file.errorString());
-    }
+	if(!file.open(QIODevice ::ReadOnly)) {
+		QMessageBox::information(0, "File not found!", file.errorString());
+	}
 
-    QTextStream in(&file);
-    ui->textBrowser->setText(in.readAll());
+	QTextStream in(&file);
+	ui->textBrowser->setText(in.readAll());
 }
 
 Reference::~Reference()
 {
-    delete ui;
+	delete ui;
 }
