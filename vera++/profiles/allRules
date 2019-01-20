@@ -20,4 +20,5 @@ set rules {
   OneFileOneClass
   ForeachsForbidden
   OpeningParethesisForClass
+  NoSpacesAtTheStart 
 }
