@@ -9,6 +9,7 @@
 #include "remotecontrol.h"
 #include "ipdialog.h"
 #include "reference.h"
+#include "robotReceiver.h"
 
 #define NUM_CONTROL_ROBOTS 12
 
@@ -42,6 +43,7 @@ private:
 	qreal sizescene;
 	QString wifiaddrdata[NUM_CONTROL_ROBOTS];
 	QUdpSocket socket;
+	RobotReceiver robotReceiver;
 
 private slots:
 	void fieldsceneUpdateRobots();

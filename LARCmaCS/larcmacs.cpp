@@ -69,12 +69,14 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 	connect(this, SIGNAL(updateGeometry()),fieldscene,SLOT(update()));
 	//    connect(&receiver.worker, SIGNAL(activateGUI(PacketSSL)), &sceneview.worker, SLOT(repaintScene(PacketSSL)));
 
-	sceneview.start();
-	receiver.start();
-	mainalg.start();
-	connector.start();
-	UpdateStatusBar("Waiting SSL connection...");
-	UpdateSSLFPS("FPS=0");
+	connect(&robotReceiver, SIGNAL(ballStatus(bool)), &mainalg.worker, SLOT(changeBallStatus(bool)));
+
+    sceneview.start();
+    receiver.start();
+    mainalg.start();
+    connector.start();
+    UpdateStatusBar("Waiting SSL connection...");
+    UpdateSSLFPS("FPS=0");
 }
 
 void LARCmaCS::remcontrolsender(int l, int r,int k, int b, bool kickUp)

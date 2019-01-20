@@ -5,13 +5,14 @@ MlData::MlData(RCConfig conf)
 {
 	config = conf;
 
-	Ball = mxCreateDoubleMatrix(1, 3, mxREAL);
-	Blue = mxCreateDoubleMatrix(12, 4, mxREAL);
-	Yellow = mxCreateDoubleMatrix(12, 4, mxREAL);
-	Rule = mxCreateDoubleMatrix(config.RULE_LENGTH, config.RULE_AMOUNT, mxREAL);
-	Back_Params = mxCreateDoubleMatrix(config.BACK_LENGTH, config.BACK_AMOUNT, mxREAL);
-	Back_Amount = mxCreateDoubleMatrix(1, 1, mxREAL);
-	Back_Length = mxCreateDoubleMatrix(1, 1, mxREAL);
+	Ball         = mxCreateDoubleMatrix(1, 3, mxREAL);
+	Blue         = mxCreateDoubleMatrix(12, 4, mxREAL);
+	Yellow       = mxCreateDoubleMatrix(12, 4, mxREAL);
+	Rule         = mxCreateDoubleMatrix(config.RULE_LENGTH, config.RULE_AMOUNT, mxREAL);
+	Back_Params  = mxCreateDoubleMatrix(config.BACK_LENGTH, config.BACK_AMOUNT, mxREAL);
+	Back_Amount  = mxCreateDoubleMatrix(1, 1, mxREAL);
+	Back_Length  = mxCreateDoubleMatrix(1, 1, mxREAL);
+	ballInside   = mxCreateDoubleScalar(0);
 }
 
 MlData::MlData(const MlData &dat)
@@ -39,4 +40,7 @@ MlData::MlData(const MlData &dat)
 
 	Back_Length  = mxCreateDoubleMatrix(1, 1, mxREAL);
 	memcpy(Back_Length, &dat.Back_Length, sizeof(Back_Length));
+
+	ballInside   = mxCreateDoubleScalar(0);
+	memcpy(ballInside, &dat.ballInside, sizeof(ballInside));
 }
