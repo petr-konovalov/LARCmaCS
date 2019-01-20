@@ -5,8 +5,8 @@
 #include <QTextStream>
 
 Reference::Reference(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::Help)
+	QWidget(parent),
+	ui(new Ui::Help)
 {
 	ui->setupUi(this);
 

@@ -23,54 +23,51 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 	sceneview.init();
 	connector.init();
 
-    //robots connect
+//robots connect
 //    connect(&wifiform,SIGNAL(initRobots()),&connector.worker, SLOT(startBroadcast()));
 //    connect(&wifiform,SIGNAL(stopInit()),&connector.worker, SLOT(stopBroadcast()));
 //    connect(&connector.worker,SIGNAL(robotAdded(QString)),&wifiform,SLOT(addRobot(QString)));
 //    connect(&connector.worker,SIGNAL(allNeededRobotsEnabled()),&wifiform,SLOT(initEnded()));
 
-    // GUIS
+	// GUIS
 	connect(&connector.worker,SIGNAL(sendPortList(QStringList)),this,SLOT(displayPorts(QStringList)));
 	connect(this,SIGNAL(openPort(QString)),&connector.worker,SLOT(openPort(QString)));
 
-    //algorithm connect
+	//algorithm connect
 	connect(this, SIGNAL(MLEvalString(QString)),&mainalg.worker,SLOT(EvalString(QString)));
-    //connect(this, SIGNAL(MatlabPause()), &mainalg.worker, SLOT(Pause()));
+	//connect(this, SIGNAL(MatlabPause()), &mainalg.worker, SLOT(Pause()));
 	connect(&receiver.worker, SIGNAL(activateMA(PacketSSL)), &mainalg.worker, SLOT(run(PacketSSL)));
 	connect(&mainalg.worker, SIGNAL(mainAlgFree()), &receiver.worker, SLOT(MainAlgFree()));
-    //reciever
+	//reciever
 	connect(this,SIGNAL(ChangeMaxPacketFrequencyMod(bool)),&receiver.worker,SLOT(ChangeMaxPacketFrequencyMod(bool)));
 
-    //send command to robots
+	//send command to robots
 //    connect(this,SIGNAL(receiveMacArray(QString*)),&connector.worker,SLOT(receiveMacArray(QString*)));
 	connect(&mainalg.worker, SIGNAL(sendToConnector(int,QByteArray)), &connector.worker, SLOT(run(int,QByteArray)));
 
-    //gui connector
+	//gui connector
 	connect(&sceneview.worker, SIGNAL(updateView()), this, SLOT(updateView()));
 	connect(ui->sceneslider, SIGNAL(valueChanged(int)), this, SLOT(scaleView(int)));
 
-    //info GUI
+	//info GUI
 	connect(&mainalg.worker,SIGNAL(UpdatePauseState(QString)),this,SLOT(UpdatePauseState(QString)));
 	connect(&mainalg.worker, SIGNAL(StatusMessage(QString)), this, SLOT(UpdateStatusBar(QString)));
 	connect(&receiver.worker, SIGNAL(UpdateSSLFPS(QString)), this, SLOT(UpdateSSLFPS(QString)));
 
-    //remotecontrol
+	//remotecontrol
 	connect(&remotecontol,SIGNAL(RC_control(int,int,int,int, bool)),
 			this,SLOT(remcontrolsender(int, int,int, int, bool)));
 	connect(this,SIGNAL(sendToConnectorRM(int,QByteArray)),&connector.worker,SLOT(run(int,QByteArray)));
 
 	QObject::connect(this, SIGNAL(addIp(int, QString)), &connector.worker, SLOT(addIp(int, QString)));
 
-    //fieldScene Update
+	//fieldScene Update
 	connect(&receiver.worker,SIGNAL(activateGUI()),this,SLOT(fieldsceneUpdateRobots()));
-#ifndef OLD_SSL_PROTO
 	connect(&receiver.worker, SIGNAL(updatefieldGeometry()), this, SLOT (fieldsceneUpdateField()));
-#else
-	connect(&receiver.worker, SIGNAL(updateField()), this, SLOT (fieldsceneUpdateField()));
-#endif
+
 	connect(this,SIGNAL(updateRobots()),fieldscene,SLOT(update()));
 	connect(this, SIGNAL(updateGeometry()),fieldscene,SLOT(update()));
-    //    connect(&receiver.worker, SIGNAL(activateGUI(PacketSSL)), &sceneview.worker, SLOT(repaintScene(PacketSSL)));
+	//    connect(&receiver.worker, SIGNAL(activateGUI(PacketSSL)), &sceneview.worker, SLOT(repaintScene(PacketSSL)));
 
 	sceneview.start();
 	receiver.start();

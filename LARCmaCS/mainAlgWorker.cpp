@@ -289,26 +289,26 @@ void MainAlgWorker::run_matlab()
 	engOutputBuffer(fmldata.ep, m_buffer, 255);
 	printf("Matlab Engine is opened\n");
 
-    // Path_Of_Files
-   // TCHAR CurrentPath[MAX_PATH];
-   // char StringWithPath[MAX_PATH],StringPath[MAX_PATH];
+	// Path_Of_Files
+	// TCHAR CurrentPath[MAX_PATH];
+	// char StringWithPath[MAX_PATH],StringPath[MAX_PATH];
 
-    /*
-    // Detecting Directory
-    printf("Start to detect directory\n");
-    GetCurrentDirectory(sizeof(CurrentPath), CurrentPath);
+	/*
+	// Detecting Directory
+	printf("Start to detect directory\n");
+	GetCurrentDirectory(sizeof(CurrentPath), CurrentPath);
 
 #ifdef UNICODE
-    wcstombs(StringPath, CurrentPath, MAX_PATH - 1);
+	wcstombs(StringPath, CurrentPath, MAX_PATH - 1);
 #else
-    CharToOem(StringPath, CurrentPath);
+	CharToOem(StringPath, CurrentPath);
 #endif
 
-    sprintf(StringWithPath, "cd %s;", StringPath);
-    engEvalString(fmldata.ep, StringWithPath);
-    printf("We are on %s\n",StringWithPath);
+	sprintf(StringWithPath, "cd %s;", StringPath);
+	engEvalString(fmldata.ep, StringWithPath);
+	printf("We are on %s\n",StringWithPath);
 */
-    //-----create Rules-----
+	//-----create Rules-----
 	char sendString[256];
 	sprintf (sendString, "Rules=zeros(%d, %d)", fmldata.config.RULE_AMOUNT, fmldata.config.RULE_LENGTH);
 	engEvalString(fmldata.ep, sendString);

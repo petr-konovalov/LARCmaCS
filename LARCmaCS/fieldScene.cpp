@@ -168,7 +168,7 @@ int FieldScene::UpdateBalls(QVector<QPointF> &_balls, int cameraID)
 	}
 
 	for ( int i=0;i<_balls.size();i++ ) {
-    //Let's update the ball positions now
+	//Let's update the ball positions now
 //      cout << _balls[i].x()/ksize << " " << _balls[i].y()/ksize << endl;
 		ballItems[cameraID][i]->setPos ( _balls[i].x()/ksize-6,_balls[i].y()/ksize-6 );
 	}

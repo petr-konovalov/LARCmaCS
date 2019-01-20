@@ -69,7 +69,7 @@ void ReceiverWorker::run()
 		if (packet.has_detection()) {
 			Time_count++;
 			packetsNum++;
-                //cout << "Num RECEIVER:" << packetsNum << endl;
+			//cout << "Num RECEIVER:" << packetsNum << endl;
 
 
 			qRegisterMetaType<PacketSSL>("PacketSSL"); // for queueing arguments between threads
@@ -116,7 +116,7 @@ void ReceiverWorker::run()
 				packetssl.robots_yellow[robot.robot_id() + 24] = robot.y();
 				packetssl.robots_yellow[robot.robot_id() + 36] = robot.orientation();
 			}
-                // [End] Ball info
+			// [End] Ball info
 			QApplication::processEvents();
 			if (mainalgisfree) {
 				mainalgisfree=false;

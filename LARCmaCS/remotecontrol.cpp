@@ -5,8 +5,8 @@
 
 #include <QDebug>
 RemoteControl::RemoteControl(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::RemoteControl)
+	QWidget(parent),
+	ui(new Ui::RemoteControl)
 {
 	ui->setupUi(this);
 	qDebug()<<"START REMOTE CONTROL";
