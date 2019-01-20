@@ -1,8 +1,11 @@
 #include "connectorWorker.h"
-
-#include <stdlib.h>
-#include <iostream>
 #include <QMap>
+#include "settings.h"
+
+static QString configKeyForRobotNum(int n)
+{
+    return "robot_ip_" + QString::number(n);
+}
 
 void ConnectorWorker::start()
 {
@@ -47,13 +50,14 @@ void ConnectorWorker::init()
     curRuleArray = new char[4 * 7]; // FIXME!
 
     gotPacketsNum = 0;
+    Settings s;
+    for(auto i = 1; i <= 12; ++i) {
+        numIP[i] = s.value(configKeyForRobotNum(i),"").toString();
+    }
 
     timer = new QTimer(this);
-    connect(timer,SIGNAL(timeout()),SLOT(udpBroadcastRequestIP()));
+    connect(timer,SIGNAL(timeout()),this, SLOT(udpBroadcastRequestIP()));
     connect(udpSocket,SIGNAL(readyRead()),this,SLOT(udpProcessPendingDatagrams()));
-
-    numIP[3] = "192.168.43.75";
-
     qDebug()<<"INIT CONNECTOR OK";
 }
 
@@ -87,6 +91,8 @@ void ConnectorWorker::addIp(int id, QString ip)
     else{
          numIP[id] = "";
     }
+    Settings s;
+    s.setValue(configKeyForRobotNum(id), ip);
 }
 
 void ConnectorWorker::udpProcessPendingDatagrams()

@@ -1,5 +1,6 @@
 #include "ipdialog.h"
 #include "ui_ipdialog.h"
+#include "settings.h"
 
 IpDialog::IpDialog(ConnectorWorker &worker,  QWidget *parent) :
     QDialog(parent),
