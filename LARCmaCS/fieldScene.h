@@ -8,42 +8,42 @@
 
 class FieldScene : public QGraphicsScene
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    explicit FieldScene(QObject *parent = 0);
+	explicit FieldScene(QObject *parent = 0);
 
-    void AddRobot ( Robot* robot );
-    void UpdateRobots ( SSL_DetectionFrame &detection );
-    int UpdateBalls ( QVector<QPointF> &_balls, int cameraID );
+	void AddRobot ( Robot* robot );
+	void UpdateRobots ( SSL_DetectionFrame &detection );
+	int UpdateBalls ( QVector<QPointF> &_balls, int cameraID );
 
 #ifndef OLD_SSL_PROTO
-    void UpdateField(SSL_GeometryFieldSize field);
+	void UpdateField(SSL_GeometryFieldSize field);
 #endif
 
-    void UpdateGeometry(SSL_GeometryFieldSize fieldSize);
-    void LoadFieldGeometry();
-    void LoadFieldGeometry ( SSL_GeometryFieldSize &fieldSize );
+	void UpdateGeometry(SSL_GeometryFieldSize fieldSize);
+	void LoadFieldGeometry();
+	void LoadFieldGeometry ( SSL_GeometryFieldSize &fieldSize );
 
 private:
 
-    //Robots
-    QVector<Robot*> blueRobots,yellowRobots, robots;
-    //balls
-    QVector < QVector<QGraphicsEllipseItem*> > ballItems;
-    //field
-    QPainterPath *field;
-    QGraphicsPathItem *fieldItem;
-    //brushes and pens
-    QBrush *fieldBrush, *ballBrush;
-    QPen *fieldPen, *fieldLinePen, *ballPen;
-    bool shutdownSoccerView;
+	//Robots
+	QVector<Robot*> blueRobots,yellowRobots, robots;
+	//balls
+	QVector < QVector<QGraphicsEllipseItem*> > ballItems;
+	//field
+	QPainterPath *field;
+	QGraphicsPathItem *fieldItem;
+	//brushes and pens
+	QBrush *fieldBrush, *ballBrush;
+	QPen *fieldPen, *fieldLinePen, *ballPen;
+	bool shutdownSoccerView;
 
-    void ConstructField();
+	void ConstructField();
 
-    //gain size
-    double ksize;
+	//gain size
+	double ksize;
 
-    //Field dimensions and geometry
+	//Field dimensions and geometry
 
 #ifdef OLD_SSL_PROTO
 	double referee_width;
@@ -59,12 +59,11 @@ private:
 	double penalty_area_width;
 	double penalty_area_depth;
 #endif
-    double line_width;
-    double field_length;
-    double field_width;
-    double boundary_width;
-    double goal_width;
-    double goal_depth;
-    double center_circle_radius;
-
+	double line_width;
+	double field_length;
+	double field_width;
+	double boundary_width;
+	double goal_width;
+	double goal_depth;
+	double center_circle_radius;
 };

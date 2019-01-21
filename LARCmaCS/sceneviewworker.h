@@ -5,21 +5,21 @@
 
 struct SceneViewWorker: public QObject
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    explicit SceneViewWorker();
+	explicit SceneViewWorker();
 
 public slots:
-    void start();
-    void stop();
-    //void repaintScene(PacketSSL packetssl);
+	void start();
+	void stop();
+	//void repaintScene(PacketSSL packetssl);
 
 signals:
-    void updateView();
-//    void updateRobots();
+	void updateView();
+	//    void updateRobots();
 
 private:
-    void run();
-    bool shutdownview;
+	void run();
+	bool shutdownview;
 };
