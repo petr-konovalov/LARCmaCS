@@ -12,14 +12,13 @@ using namespace std;
 
 struct MainAlgWorker : public QObject
 {
-
 	Q_OBJECT
 	clock_t timer,timer_s,timer_m,timer_max;
 	int Time_count;
 	bool Send2BT[MAX_NUM_ROBOTS];
 	Client client;
 	bool isPause;
-	bool mIsBallInside;
+	double mIsBallInside;
 
 public:
 	MainAlgWorker();
