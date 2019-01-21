@@ -4,6 +4,7 @@
 #include "packetSSL.h"
 #include "message.h"
 #include <QFileDialog>
+#include "settings.h"
 
 LARCmaCS::LARCmaCS(QWidget *parent) :
 	QWidget(parent),
@@ -190,7 +191,11 @@ void LARCmaCS::updateView()
 
 void LARCmaCS::on_pushButton_SetMLdir_clicked()
 {
-	QString  dir = QFileDialog::getExistingDirectory();
+	Settings settings;
+	static const char * key = "MLScriptsDir";
+	QString  dir = settings.value(key, QCoreApplication::applicationDirPath()).toString();
+	dir = QFileDialog::getExistingDirectory(Q_NULLPTR, QString(), dir);
+	settings.setValue(key, dir);
 	QString  s = "cd "+ dir;
 	qDebug() << "New Matlab directory = " << s;
 	emit MLEvalString(s);
