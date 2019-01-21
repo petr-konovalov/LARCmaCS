@@ -65,7 +65,7 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 	connect(&receiver.worker,SIGNAL(activateGUI()),this,SLOT(fieldsceneUpdateRobots()));
 	connect(&receiver.worker, SIGNAL(updatefieldGeometry()), this, SLOT (fieldsceneUpdateField()));
 	connect(this,SIGNAL(updateRobots()),fieldscene,SLOT(update()));
-  connect(this, SIGNAL(updateGeometry()),fieldscene,SLOT(update()));
+	connect(this, SIGNAL(updateGeometry()),fieldscene,SLOT(update()));
 	//    connect(&receiver.worker, SIGNAL(activateGUI(PacketSSL)), &sceneview.worker, SLOT(repaintScene(PacketSSL)));
 
 	sceneview.start();
@@ -107,7 +107,7 @@ void LARCmaCS::remcontrolsender(int l, int r,int k, int b, bool kickUp)
 		if(socket.ConnectedState == QUdpSocket::ConnectedState) {
 			socket.writeDatagram(byteData, byteData.length(), QHostAddress(ip), 10000);
 		}
-    }
+	}
 
 	return;
 
