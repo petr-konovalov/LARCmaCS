@@ -13,10 +13,10 @@ MainAlg::MainAlg(){}
 
 MainAlg::~MainAlg()
 {
-    stop();
-    thread.wait(100);
-    thread.terminate();
-    thread.wait(100);
+	stop();
+	thread.wait(100);
+	thread.terminate();
+	thread.wait(100);
 }
 
 void MainAlg::init()
@@ -28,20 +28,15 @@ void MainAlg::init()
 	connect(&thread, SIGNAL(finished()), &worker, SLOT(deleteLater()));
 	//engEvalString(fmldata.ep,s.toUtf8().data());
 }
-//void MainAlgWorker::Pause()
-//{
-//    if (pause = !pause) {}
-//    engEvalString(fmldata.ep, "PAUSE();");
-//}
 
 void MainAlg::start()
 {
-    thread.start();
-    cout << "Thread start" << endl;
-    emit wstart();
+	thread.start();
+	cout << "Thread start" << endl;
+	emit wstart();
 }
 
 void MainAlg::stop()
 {
-    emit wstop();
+	emit wstop();
 }

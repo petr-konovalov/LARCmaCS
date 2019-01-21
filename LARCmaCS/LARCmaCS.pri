@@ -20,8 +20,8 @@ win32 {
   #add libs
   LIBS += -lws2_32
   LIBS += -L$${MATLAB_DIR}/lib/win$${BIT}/microsoft/ -llibeng \
-		  -L$${MATLAB_DIR}/lib/win$${BIT}/microsoft/ -llibmat \
-		  -L$${MATLAB_DIR}/lib/win$${BIT}/microsoft/ -llibmx
+                  -L$${MATLAB_DIR}/lib/win$${BIT}/microsoft/ -llibmat \
+                  -L$${MATLAB_DIR}/lib/win$${BIT}/microsoft/ -llibmx
 }
 
 QT += core gui network

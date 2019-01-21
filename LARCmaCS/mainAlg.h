@@ -19,20 +19,20 @@ using namespace std;
 
 struct MainAlg : public QObject
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    MainAlgWorker worker;
-    QThread thread;
+	MainAlgWorker worker;
+	QThread thread;
 
-    explicit MainAlg();
-    ~MainAlg();
+	explicit MainAlg();
+	~MainAlg();
 
-    void init();
-    void start();
-    void stop();
+	void init();
+	void start();
+	void stop();
 
 signals:
-    void wstart();
-    void wstop();
+	void wstart();
+	void wstop();
 };

@@ -6,25 +6,25 @@
 SceneViewWorker::SceneViewWorker(){};
 
 void SceneViewWorker::start(){
-    shutdownview = false;
-    cout << "sceneView worker started" << std::endl;
-    //cout << "sceneView worker started" << endl;
+	shutdownview = false;
+	cout << "sceneView worker started" << std::endl;
+	//cout << "sceneView worker started" << endl;
 
-    run();
+	run();
 }
 
 void SceneViewWorker::stop()
 {
-    shutdownview = true;
+	shutdownview = true;
 }
 
 void SceneViewWorker::run()
 {
-    while(!shutdownview){
+	while(!shutdownview){
 //        cout << "signal updateView" << endl;
-        emit updateView();
-        //emit updateRobots();
-        QApplication::processEvents();
-        Sleep(1);
-    }
+		emit updateView();
+		//emit updateRobots();
+		QApplication::processEvents();
+		Sleep(1);
+	}
 }
