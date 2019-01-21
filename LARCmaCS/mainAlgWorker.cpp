@@ -172,6 +172,7 @@ void MainAlgWorker::run(PacketSSL packetssl)
 				msg.setSpeedR(newmess[5]);
 
 				msg.setKickForward(newmess[4]);
+				msg.setKickUp(newmess[6]);
 			} else {
 				msg.setSpeedX(0);
 				msg.setSpeedY(0);
