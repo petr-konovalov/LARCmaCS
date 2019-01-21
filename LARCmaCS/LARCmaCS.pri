@@ -62,6 +62,7 @@ SOURCES += \
 	$$PWD/mainAlgWorker.cpp \
 	$$PWD/connectorWorker.cpp \
 	$$PWD/packetSSL.cpp \
+        $$PWD/settings.cpp
 
 
 HEADERS  += \
@@ -89,6 +90,7 @@ HEADERS  += \
 	$$PWD/robot.h \
 	$$PWD/mainAlgWorker.h \
 	$$PWD/connectorWorker.h \
+    $$PWD/settings.h
 
 FORMS += \
 	$$PWD/larcmacs.ui \
