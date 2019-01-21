@@ -85,9 +85,11 @@ MainAlgWorker::MainAlgWorker()
 	auto allAddrs = in.readAll().split("\n", QString::SkipEmptyParts).filter(QRegExp("^[^#;]"));
 	client.initFromList(allAddrs);
 
-	for (int i=0; i<MAX_NUM_ROBOTS; i++) {
+	for (int i=0; i<MAX_NUM_ROBOTS; i++)
+	{
 		Send2BT[i]=true;
 	}
+	mIsBallInside = false;
 }
 
 MainAlgWorker::~MainAlgWorker(){}
@@ -123,10 +125,12 @@ void MainAlgWorker::run(PacketSSL packetssl)
 	memcpy(mxGetPr(fmldata.Ball), packetssl.balls, BALL_COUNT_d);
 	memcpy(mxGetPr(fmldata.Blue), packetssl.robots_blue, TEAM_COUNT_d);
 	memcpy(mxGetPr(fmldata.Yellow), packetssl.robots_yellow, TEAM_COUNT_d);
+	memcpy(mxGetPr(fmldata.ballInside), &mIsBallInside, sizeof(double));
 
 	engPutVariable(fmldata.ep, "Balls", fmldata.Ball);
 	engPutVariable(fmldata.ep, "Blues", fmldata.Blue);
 	engPutVariable(fmldata.ep, "Yellows", fmldata.Yellow);
+	engPutVariable(fmldata.ep, "ballInside", fmldata.ballInside);
 
 	engEvalString(fmldata.ep, fmldata.config.file_of_matlab);
 
@@ -328,6 +332,11 @@ void MainAlgWorker::stop_matlab()
 void MainAlgWorker::EvalString(QString s)
 {
 	engEvalString(fmldata.ep,s.toUtf8().data());
+}
+
+void MainAlgWorker::changeBallStatus(bool ballStatus)
+{
+	mIsBallInside = ballStatus;
 }
 
 void MainAlgWorker::init(){

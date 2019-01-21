@@ -18,6 +18,7 @@ struct MainAlgWorker : public QObject
 	bool Send2BT[MAX_NUM_ROBOTS];
 	Client client;
 	bool isPause;
+	double mIsBallInside;
 
 public:
 	MainAlgWorker();
@@ -40,6 +41,7 @@ public slots:
 	void run_matlab();
 	void stop_matlab();
 	void EvalString(QString s);
+	void changeBallStatus(bool ballStatus);
 
 private:
 	void init();

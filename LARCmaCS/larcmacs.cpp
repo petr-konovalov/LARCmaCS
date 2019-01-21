@@ -69,6 +69,8 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 	connect(this, SIGNAL(updateGeometry()),fieldscene,SLOT(update()));
 	//    connect(&receiver.worker, SIGNAL(activateGUI(PacketSSL)), &sceneview.worker, SLOT(repaintScene(PacketSSL)));
 
+	connect(&robotReceiver, SIGNAL(ballStatus(bool)), &mainalg.worker, SLOT(changeBallStatus(bool)));
+
 	sceneview.start();
 	receiver.start();
 	mainalg.start();

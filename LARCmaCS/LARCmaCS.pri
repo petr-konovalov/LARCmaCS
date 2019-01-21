@@ -62,8 +62,8 @@ SOURCES += \
 	$$PWD/mainAlgWorker.cpp \
 	$$PWD/connectorWorker.cpp \
 	$$PWD/packetSSL.cpp \
-        $$PWD/settings.cpp
-
+        $$PWD/settings.cpp \
+        $$PWD/robotReceiver.cpp \
 
 HEADERS  += \
   $${SHARED_DIR}/net/netraw.h \
@@ -89,8 +89,9 @@ HEADERS  += \
 	$$PWD/receiverWorker.h \
 	$$PWD/robot.h \
 	$$PWD/mainAlgWorker.h \
-	$$PWD/connectorWorker.h \
-    $$PWD/settings.h
+        $$PWD/connectorWorker.h \
+        $$PWD/settings.h \
+        $$PWD/robotReceiver.h \
 
 FORMS += \
 	$$PWD/larcmacs.ui \
