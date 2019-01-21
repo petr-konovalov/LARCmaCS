@@ -2,6 +2,6 @@
 #include <QCoreApplication>
 
 Settings::Settings()
-    : QSettings(QCoreApplication::applicationFilePath()+".ini", QSettings::IniFormat)
+	: QSettings(QCoreApplication::applicationFilePath()+".ini", QSettings::IniFormat)
 {
 }

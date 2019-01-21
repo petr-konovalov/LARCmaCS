@@ -4,7 +4,7 @@
 
 static QString configKeyForRobotNum(int n)
 {
-    return "robot_ip_" + QString::number(n);
+	return "robot_ip_" + QString::number(n);
 }
 
 void ConnectorWorker::start()
@@ -49,16 +49,16 @@ void ConnectorWorker::init()
 	connectedAllSocketsFlag = false;
 	curRuleArray = new char[4 * 7]; // FIXME!
 
-    gotPacketsNum = 0;
-    Settings s;
-    for(auto i = 1; i <= 12; ++i) {
-        numIP[i] = s.value(configKeyForRobotNum(i),"").toString();
-    }
+	gotPacketsNum = 0;
+	Settings s;
+	for(auto i = 1; i <= 12; ++i) {
+		numIP[i] = s.value(configKeyForRobotNum(i),"").toString();
+	}
 
-    timer = new QTimer(this);
-    connect(timer,SIGNAL(timeout()),this, SLOT(udpBroadcastRequestIP()));
-    connect(udpSocket,SIGNAL(readyRead()),this,SLOT(udpProcessPendingDatagrams()));
-    qDebug()<<"INIT CONNECTOR OK";
+	timer = new QTimer(this);
+	connect(timer,SIGNAL(timeout()),this, SLOT(udpBroadcastRequestIP()));
+	connect(udpSocket,SIGNAL(readyRead()),this,SLOT(udpProcessPendingDatagrams()));
+	qDebug()<<"INIT CONNECTOR OK";
 }
 
 void ConnectorWorker::receiveMacArray(QString * macArray)
@@ -83,14 +83,13 @@ void ConnectorWorker::run(int N, QByteArray command)
 
 void ConnectorWorker::addIp(int id, QString ip)
 {
-    if(ip.contains(".")){
-        numIP[id] = ip;
-    }
-    else{
-         numIP[id] = "";
-    }
-    Settings s;
-    s.setValue(configKeyForRobotNum(id), ip);
+	if (ip.contains(".")) {
+		numIP[id] = ip;
+	} else {
+		 numIP[id] = "";
+	}
+	Settings s;
+	s.setValue(configKeyForRobotNum(id), ip);
 }
 
 void ConnectorWorker::udpProcessPendingDatagrams()
