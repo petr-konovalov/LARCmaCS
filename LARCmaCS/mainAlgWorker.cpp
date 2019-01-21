@@ -127,9 +127,9 @@ void MainAlgWorker::run(PacketSSL packetssl)
 	memcpy(mxGetPr(fmldata.Yellow), packetssl.robots_yellow, TEAM_COUNT_d);
 	memcpy(mxGetPr(fmldata.ballInside), &mIsBallInside, sizeof(double));
 
-    engPutVariable(fmldata.ep, "Balls", fmldata.Ball);
-    engPutVariable(fmldata.ep, "Blues", fmldata.Blue);
-    engPutVariable(fmldata.ep, "Yellows", fmldata.Yellow);
+	engPutVariable(fmldata.ep, "Balls", fmldata.Ball);
+	engPutVariable(fmldata.ep, "Blues", fmldata.Blue);
+	engPutVariable(fmldata.ep, "Yellows", fmldata.Yellow);
 	engPutVariable(fmldata.ep, "ballInside", fmldata.ballInside);
 
 	engEvalString(fmldata.ep, fmldata.config.file_of_matlab);
