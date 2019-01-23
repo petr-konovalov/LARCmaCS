@@ -197,10 +197,12 @@ void LARCmaCS::on_pushButton_SetMLdir_clicked()
 	static const char * key = "MLScriptsDir";
 	QString  dir = settings.value(key, QCoreApplication::applicationDirPath()).toString();
 	dir = QFileDialog::getExistingDirectory(Q_NULLPTR, QString(), dir);
-	settings.setValue(key, dir);
-	QString  s = "cd "+ dir;
-	qDebug() << "New Matlab directory = " << s;
-	emit MLEvalString(s);
+	if (!dir.isEmpty()) {
+		settings.setValue(key, dir);
+		QString  s = "cd "+ dir;
+		qDebug() << "New Matlab directory = " << s;
+		emit MLEvalString(s);
+	}
 }
 
 void LARCmaCS::on_pushButton_RC_clicked()
