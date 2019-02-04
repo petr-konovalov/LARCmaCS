@@ -1,0 +1,24 @@
+clone_folder: C:\LARCmaCS
+shallow_clone: true
+
+environment:
+  global:
+    MATLAB_DIR: C:\MCR\extern
+    MSYS_DIR: C:\msys64    
+
+init:
+  - set PATH=%PATH%;%MSYS_DIR%\usr\bin
+  - echo %PATH%
+  - git clone https://github.com/IKhonakhbeeva/MCR_for_LARCmaCS C:\MCR
+  - pacman --noconfirm -Su mingw64/mingw-w64-x86_64-gcc
+  - pacman --noconfirm -Su mingw64/mingw-w64-x86_64-make
+  - pacman --noconfirm -Su mingw64/mingw-w64-x86_64-qt5
+  - pacman --noconfirm -Su mingw64/mingw-w64-x86_64-protobuf
+  
+build_script:
+  - set PATH=%MSYS_DIR%\mingw64\bin;%PATH%;
+  - mkdir C:\build_mingw_x64
+  - cd C:\build_mingw_x64
+  - qmake.exe C:\LARCmaCS\LARCmaCS.pro -spec win32-g++ "CONFIG+=release" "CONFIG+=qtquickcompiler" "MATLAB_DIR=%MATLAB_DIR%" "MSYS_DIR=%MSYS_DIR%" 
+  - mingw32-make.exe qmake_all
+  - mingw32-make.exe -j4
