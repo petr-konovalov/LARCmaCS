@@ -19,7 +19,7 @@ CONFIG += protobuf
 mingw {
   PROTO_DIR = $${MSYS_DIR}/mingw$${BIT}
   LIBS += -lprotobuf
-  PROTOC_DIR =
+  PROTOC_DIR = $${PROTO_DIR}/bin/
   DLLS += $$MSYS_DIR/mingw$${BIT}/bin/libprotobuf.dll
 }
 msvc:!amd64: PROTO_DIR = $${VCPKG_DIR}/installed/x86-windows
