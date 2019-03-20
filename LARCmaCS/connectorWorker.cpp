@@ -81,6 +81,21 @@ void ConnectorWorker::run(int N, QByteArray command)
 	udpSocket->writeDatagram(command, QHostAddress(numIP[N]), 10000);
 }
 
+void ConnectorWorker::runSim(QByteArray command)
+{
+	udpSocket->writeDatagram(command, QHostAddress(grSimIP), grSimPort);
+}
+
+void ConnectorWorker::changeGrSimIP(QString IP)
+{
+	grSimIP = IP;
+}
+
+void ConnectorWorker::changeGrSimPort(unsigned short port)
+{
+	grSimPort = port;
+}
+
 void ConnectorWorker::addIp(int id, QString ip)
 {
 	if (ip.contains(".")) {

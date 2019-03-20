@@ -6,6 +6,7 @@
 #include "client.h"
 
 #define MAX_NUM_ROBOTS 12
+#define MAX_ROBOTS_IN_TEAM 6
 
 using namespace std;
 #include <time.h>       /* clock_t, clock(), CLOCKS_PER_SEC */
@@ -22,10 +23,14 @@ struct MainAlgWorker : public QObject
 
 public:
 	MainAlgWorker();
+	static float fromPower2Speed(int input);
+	static float fromPower2Kick(bool input, int voltage);
+	bool isSimEnabledFlag = 0;
 	~MainAlgWorker();
 
 signals:
-	void sendToConnector(int N,QByteArray command);
+	void sendToConnector(int N, QByteArray command);
+	void sendToSimConnector(QByteArray command);
 	void sendToBTtransmitter(char * message);
 	void mainAlgFree();
 	void StatusMessage(QString message);
@@ -36,6 +41,7 @@ public slots:
 	void start();
 	void Send2BTChangeit(bool *send2BT_);
 	void stop();
+	void setEnableSimFlag(bool flag);
 	void run(PacketSSL packetssl);
 	void Pause();
 	void run_matlab();

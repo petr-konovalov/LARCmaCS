@@ -5,6 +5,9 @@
 #include "message.h"
 #include <QFileDialog>
 #include "settings.h"
+#include "grSim_Packet.pb.h"
+#include "grSim_Commands.pb.h"
+#include "grSim_Replacement.pb.h"
 
 LARCmaCS::LARCmaCS(QWidget *parent) :
 	QWidget(parent),
@@ -65,6 +68,8 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 	//simulator Enable
 	connect(this, SIGNAL(ChangeSimulatorMode(bool)), &receiver.worker, SLOT(ChangeSimulatorMode(bool)));
 	connect(&receiver.worker, SIGNAL(clearField()), this, SLOT(clearUIField()));
+	connect(this, SIGNAL(ChangeSimulatorMode(bool)), &mainalg.worker, SLOT(setEnableSimFlag(bool)));
+	connect(&mainalg.worker, SIGNAL(sendToSimConnector(QByteArray)), &connector.worker, SLOT(runSim(QByteArray)));
 
 	//fieldScene Update
 	connect(&receiver.worker,SIGNAL(activateGUI()),this,SLOT(fieldsceneUpdateRobots()), Qt::BlockingQueuedConnection);
@@ -86,44 +91,89 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 void LARCmaCS::remcontrolsender(int l, int r,int k, int b, bool kickUp)
 {
 	QString ip = ui->lineEditRobotIp->text();
-	Message data;
-	data.setSpeedX(l);
-	data.setSpeedY(r);
-	data.setSpeedR(k);
-	data.setSpeedDribbler(0);
-	data.setDribblerEnable(0);
+	QByteArray byteData;
+	bool simFlag = mainalg.worker.isSimEnabledFlag;
+	if (!simFlag) {
+		Message data;
+		data.setSpeedX(l);
+		data.setSpeedY(r);
+		data.setSpeedR(k);
+		data.setSpeedDribbler(0);
+		data.setDribblerEnable(0);
 
-	if(b!=-1) {
-		data.setKickVoltageLevel(4);
-		data.setKickerChargeEnable(1);
-		data.setKickUp(kickUp);
-		data.setKickForward(0);
+		if(b!=-1) {
+			data.setKickVoltageLevel(4);
+			data.setKickerChargeEnable(1);
+			data.setKickUp(kickUp);
+			data.setKickForward(0);
+		} else {
+			data.setKickVoltageLevel(0);
+			data.setKickerChargeEnable(0);
+			data.setKickUp(0);
+			data.setKickForward(0);
+		}
+
+		byteData = data.generateByteArray();
 	} else {
-		data.setKickVoltageLevel(0);
-		data.setKickerChargeEnable(0);
-		data.setKickUp(0);
-		data.setKickForward(0);
+
+		int numOfRobot = ip.toInt();
+		grSim_Packet packet;
+		bool yellow = false;
+		if (numOfRobot >= MAX_ROBOTS_IN_TEAM) {
+			yellow = true;
+		}
+		packet.mutable_commands()->set_isteamyellow(yellow);
+		packet.mutable_commands()->set_timestamp(0.0);
+		grSim_Robot_Command* controls = packet.mutable_commands()->add_robot_commands();
+
+		controls->set_id((numOfRobot - 1) % MAX_ROBOTS_IN_TEAM);
+
+		//we are not using wheel speed only directional speed!
+		controls->set_wheelsspeed(false);
+		controls->set_wheel1(0);
+		controls->set_wheel2(0);
+		controls->set_wheel3(0);
+		controls->set_wheel4(0);
+		controls->set_veltangent(MainAlgWorker::fromPower2Speed(r)); //speed on X axis
+		controls->set_velnormal(-MainAlgWorker::fromPower2Speed(l)); // speed on Y axis
+		controls->set_velangular(MainAlgWorker::fromPower2Speed(k)); // rotation Speed
+
+		controls->set_kickspeedx(0);
+		controls->set_kickspeedz(MainAlgWorker::fromPower2Kick(kickUp, 4));
+		controls->set_spinner(0); //spinner isn't used now
+
+		byteData.resize(packet.ByteSize());
+		packet.SerializeToArray(byteData.data(), byteData.size());
 	}
 
-	QByteArray byteData = data.generateByteArray();
-
 	if(socket.ConnectedState == QUdpSocket::ConnectedState) {
-		socket.writeDatagram(byteData, byteData.length(), QHostAddress(ip), 10000);
-	} else {
-		socket.connectToHost(ip, 10000);
-		if(socket.ConnectedState == QUdpSocket::ConnectedState) {
+		if (!simFlag) {
 			socket.writeDatagram(byteData, byteData.length(), QHostAddress(ip), 10000);
+		} else {
+			socket.writeDatagram(byteData, byteData.length(), QHostAddress(connector.worker.grSimIP), connector.worker.grSimPort);
+		}
+	} else {
+		if (!simFlag) {
+			socket.connectToHost(ip, 10000);
+			if(socket.ConnectedState == QUdpSocket::ConnectedState) {
+				socket.writeDatagram(byteData, byteData.length(), QHostAddress(ip), 10000);
+			}
+		} else {
+			socket.connectToHost(connector.worker.grSimIP, connector.worker.grSimPort);
+			if(socket.ConnectedState == QUdpSocket::ConnectedState) {
+				socket.writeDatagram(byteData, byteData.length(), QHostAddress(connector.worker.grSimIP), connector.worker.grSimPort);
+			}
 		}
 	}
 
 	return;
 
-	QByteArray command;
-	command.append(QString("rule ").toUtf8());
-	command.append(l);
-	command.append(r);
-	command.append(k);
-	command.append(b);
+	//QByteArray command;
+	//command.append(QString("rule ").toUtf8());
+	//command.append(l);
+	//command.append(r);
+	//command.append(k);
+	//command.append(b);
 }
 
 void LARCmaCS::fieldsceneUpdateRobots()
@@ -229,6 +279,9 @@ void LARCmaCS::on_checkBox_MlMaxFreq_stateChanged(int arg1)
 
 void LARCmaCS::on_checkBox_SimEnable_stateChanged(int arg1)
 {
+	//if (arg1 > 0) {
+	//	ui->lineEditSimIP
+	//}
 	emit ChangeSimulatorMode(arg1 > 0);
 }
 

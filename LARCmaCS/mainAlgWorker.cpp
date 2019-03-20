@@ -4,6 +4,10 @@
 #include <fstream>
 #include "QDebug"
 #include "message.h"
+#include "grSim_Packet.pb.h"
+#include "grSim_Commands.pb.h"
+#include "grSim_Replacement.pb.h"
+
 
 int initConfig(RCConfig *config){
 	ifstream configFile;
@@ -113,6 +117,11 @@ void MainAlgWorker::Send2BTChangeit(bool * send2BT_)
 	}
 }
 
+void MainAlgWorker::setEnableSimFlag(bool flag)
+{
+	isSimEnabledFlag = flag;
+}
+
 void MainAlgWorker::run(PacketSSL packetssl)
 {
 	if (shutdowncomp)
@@ -160,34 +169,84 @@ void MainAlgWorker::run(PacketSSL packetssl)
 			char * newmessage=new char[100];
 			memcpy(newmessage,newmess,100);
 			if ((newmess[1]>=0) && (newmess[1]<=MAX_NUM_ROBOTS) && ((newmess[1]==0) || (Send2BT[newmess[1]-1]==true)))
-				emit sendToBTtransmitter(newmessage);
+				emit sendToBTtransmitter(newmessage); //is never connected and used
+			QByteArray command;
+			int voltage = 12;
+			bool simFlag = isSimEnabledFlag;
+			if (!simFlag) {
+				Message msg;
+				msg.setKickVoltageLevel(voltage);
+				msg.setKickerChargeEnable(1);
 
-			Message msg;
-			msg.setKickVoltageLevel(12);
-			msg.setKickerChargeEnable(1);
+				if (!isPause) {
+					msg.setSpeedX(newmess[2]);
+					msg.setSpeedY(newmess[3]);
+					msg.setSpeedR(newmess[5]);
 
-			if (!isPause) {
-				msg.setSpeedX(newmess[2]);
-				msg.setSpeedY(newmess[3]);
-				msg.setSpeedR(newmess[5]);
+					msg.setKickForward(newmess[4]);
+					msg.setKickUp(newmess[6]);
+				} else {
+					msg.setSpeedX(0);
+					msg.setSpeedY(0);
+					msg.setSpeedR(0);
 
-				msg.setKickForward(newmess[4]);
-				msg.setKickUp(newmess[6]);
+					msg.setKickForward(0);
+					command = msg.generateByteArray();
+				}
 			} else {
-				msg.setSpeedX(0);
-				msg.setSpeedY(0);
-				msg.setSpeedR(0);
+				grSim_Packet packet;
+				bool yellow = false;
+				if (newmess[1] >= MAX_ROBOTS_IN_TEAM) {
+					yellow = true;
+				}
+				packet.mutable_commands()->set_isteamyellow(yellow);
+				packet.mutable_commands()->set_timestamp(0.0);
+				grSim_Robot_Command* controls = packet.mutable_commands()->add_robot_commands();
 
-				msg.setKickForward(0);
+				controls->set_id((newmess[1] - 1) % MAX_ROBOTS_IN_TEAM);
+
+				//we are not using wheel speed only directional speed!
+				controls->set_wheelsspeed(false);
+				controls->set_wheel1(0);
+				controls->set_wheel2(0);
+				controls->set_wheel3(0);
+				controls->set_wheel4(0);
+				if (!isPause) {
+					controls->set_veltangent(fromPower2Speed(newmess[3])); //speed on X axis(in sim axis x is horizontal to left of the robot)
+					controls->set_velnormal(-fromPower2Speed(newmess[2])); // speed on Y axis(in sim it looks as the robot looks)
+					controls->set_velangular(fromPower2Speed(newmess[5])); // rotation Speed
+
+					controls->set_kickspeedx(fromPower2Kick(newmess[4], voltage));
+					controls->set_kickspeedz(fromPower2Kick(newmess[6], voltage));
+				} else {
+					controls->set_veltangent(0); //speed on X axis
+					controls->set_velnormal(0); // speed on Y axis
+					controls->set_velangular(0); // rotation Speed
+
+					controls->set_kickspeedx(0);
+					controls->set_kickspeedz(0);
+				}
+				controls->set_spinner(0); //spinner isn't used now
+
+				command.resize(packet.ByteSize());
+				packet.SerializeToArray(command.data(), command.size());
 			}
 
-			QByteArray command = msg.generateByteArray();
-
 			if (newmess[1]==0)
-				for (int i=1; i<=MAX_NUM_ROBOTS; i++)
-					emit sendToConnector(i,command);
-			if ((newmess[1]>0) && (newmess[1]<=MAX_NUM_ROBOTS))
-				emit sendToConnector(newmess[1],command);
+				for (int i=1; i<=MAX_NUM_ROBOTS; i++) {
+					if (!simFlag) {
+						emit sendToConnector(i,command);
+					} else {
+						emit sendToSimConnector(command);
+					}
+				}
+			if ((newmess[1]>0) && (newmess[1]<=MAX_NUM_ROBOTS)) {
+				if (!simFlag) {
+					emit sendToConnector(newmess[1],command);
+				} else {
+					emit sendToSimConnector(command);
+				}
+			}
 		}
 	}
 
@@ -251,19 +310,53 @@ void MainAlgWorker::run(PacketSSL packetssl)
 	}
 
 	if (isPause) {
-		Message msg;
-		msg.setKickVoltageLevel(12);
-		msg.setKickerChargeEnable(1);
+		QByteArray command;
+		if (!isSimEnabledFlag) {
+			Message msg;
+			msg.setKickVoltageLevel(12);
+			msg.setKickerChargeEnable(1);
 
-		msg.setSpeedX(0);
-		msg.setSpeedY(0);
-		msg.setSpeedR(0);
+			msg.setSpeedX(0);
+			msg.setSpeedY(0);
+			msg.setSpeedR(0);
 
-		msg.setKickForward(0);
+			msg.setKickForward(0);
 
-		QByteArray command = msg.generateByteArray();
-		for (int i = 1; i <= 12; i++) {
-			emit sendToConnector(i, command);
+			command = msg.generateByteArray();
+			for (int i = 1; i <= 12; i++) {
+				emit sendToConnector(i, command);
+			}
+		} else {
+			for (int i = 0; i <= 12; i++) {
+				grSim_Packet packet;
+				bool yellow = false;
+				if (i >= MAX_ROBOTS_IN_TEAM) {
+					yellow = true;
+				}
+				packet.mutable_commands()->set_isteamyellow(yellow);
+				packet.mutable_commands()->set_timestamp(0.0);
+				grSim_Robot_Command* controls = packet.mutable_commands()->add_robot_commands();
+
+				controls->set_id(i % MAX_ROBOTS_IN_TEAM);
+
+				//we are not using wheel speed only directional speed!
+				controls->set_wheelsspeed(false);
+				controls->set_wheel1(0);
+				controls->set_wheel2(0);
+				controls->set_wheel3(0);
+				controls->set_wheel4(0);
+				controls->set_veltangent(0); //speed on X axis
+				controls->set_velnormal(0); // speed on Y axis
+				controls->set_velangular(0); // rotation Speed
+
+				controls->set_kickspeedx(0);
+				controls->set_kickspeedz(0);
+				controls->set_spinner(0); //spinner isn't used now
+
+				command.resize(packet.ByteSize());
+				packet.SerializeToArray(command.data(), command.size());
+				//emit sendToSimConnector(command); //for more power of remote control
+			}
 		}
 	}
 
@@ -273,6 +366,20 @@ void MainAlgWorker::run(PacketSSL packetssl)
 	emit mainAlgFree();
 //    qDebug()<<"MainAlg!";
 
+}
+
+float MainAlgWorker::fromPower2Kick(bool isKicked, int voltage)
+{
+	if (isKicked) {
+		return 2; //should be implemented after experiments
+	} else {
+		return 0;
+	}
+}
+
+float MainAlgWorker::fromPower2Speed(int power)
+{
+	return power / 100.0 * 6; //should be implemented after experiments
 }
 
 void MainAlgWorker::Pause()

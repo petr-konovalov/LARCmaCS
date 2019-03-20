@@ -23,6 +23,8 @@ public:
 	map<int const, QString> robotAddrMap;
 	int connectedAllSocketsFlag;
 	QMap<int,QString> numIP;
+	QString grSimIP = "127.0.0.1";
+	unsigned short grSimPort = 20011;
 	QMap<QString,QString> macIP;
 
 	QList<QString> macList;
@@ -50,7 +52,10 @@ public slots:
 	void init();
 	void start();
 	void stop();
+	void changeGrSimIP(QString IP);
+	void changeGrSimPort(unsigned short port);
 	void run(int N, QByteArray command);
+	void runSim(QByteArray command);
 	void udpProcessPendingDatagrams();
 	void receiveMacArray(QString*);
 	void addIp(int id, QString ip);
