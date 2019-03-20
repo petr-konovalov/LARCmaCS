@@ -62,9 +62,13 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 
 	QObject::connect(this, SIGNAL(addIp(int, QString)), &connector.worker, SLOT(addIp(int, QString)));
 
+	//simulator Enable
+	connect(this, SIGNAL(ChangeSimulatorMode(bool)), &receiver.worker, SLOT(ChangeSimulatorMode(bool)));
+	connect(&receiver.worker, SIGNAL(clearField()), this, SLOT(clearUIField()));
+
 	//fieldScene Update
-	connect(&receiver.worker,SIGNAL(activateGUI()),this,SLOT(fieldsceneUpdateRobots()));
-	connect(&receiver.worker, SIGNAL(updatefieldGeometry()), this, SLOT (fieldsceneUpdateField()));
+	connect(&receiver.worker,SIGNAL(activateGUI()),this,SLOT(fieldsceneUpdateRobots()), Qt::BlockingQueuedConnection);
+	connect(&receiver.worker, SIGNAL(updatefieldGeometry()), this, SLOT (fieldsceneUpdateField()), Qt::BlockingQueuedConnection);
 	connect(this,SIGNAL(updateRobots()),fieldscene,SLOT(update()));
 	connect(this, SIGNAL(updateGeometry()),fieldscene,SLOT(update()));
 	//    connect(&receiver.worker, SIGNAL(activateGUI(PacketSSL)), &sceneview.worker, SLOT(repaintScene(PacketSSL)));
@@ -191,6 +195,12 @@ void LARCmaCS::updateView()
 	}
 }
 
+void LARCmaCS::clearUIField()
+{
+	fieldscene->ClearField();
+	emit updateRobots();
+}
+
 void LARCmaCS::on_pushButton_SetMLdir_clicked()
 {
 	Settings settings;
@@ -215,6 +225,11 @@ void LARCmaCS::on_pushButton_RC_clicked()
 void LARCmaCS::on_checkBox_MlMaxFreq_stateChanged(int arg1)
 {
 	emit(ChangeMaxPacketFrequencyMod(arg1>0));
+}
+
+void LARCmaCS::on_checkBox_SimEnable_stateChanged(int arg1)
+{
+	emit ChangeSimulatorMode(arg1 > 0);
 }
 
 void LARCmaCS::on_pushButton_RemoteControl_clicked()

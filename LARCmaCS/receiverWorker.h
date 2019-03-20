@@ -5,6 +5,7 @@
 
 #include "packetSSL.h"
 #include "robocup_ssl_client.h"
+#include "robocup_grsim_client.h"
 
 #include <time.h>
 
@@ -21,6 +22,7 @@ public slots:
 
 public slots:
 	void ChangeMaxPacketFrequencyMod(bool state);
+	void ChangeSimulatorMode(bool flag);
 
 public:
 	SSL_DetectionFrame detection;
@@ -29,6 +31,7 @@ public:
 
 signals:
 	void activateGUI();
+	void clearField();
 	void activateMA(PacketSSL packetssl);
 	void updatefieldGeometry();
 	void UpdateSSLFPS(QString message);
@@ -41,7 +44,10 @@ private:
 private:
 	void run();
 	RoboCupSSLClient client;
+	RoboCupGrSimClient simClient;
 	SSL_WrapperPacket packet;
+	bool isSimEnabledFlag = 0;
+	bool enableSimFlag = 0;
 	bool NewPacket;
 	bool shutdownread;
 	bool mainalgisfree;

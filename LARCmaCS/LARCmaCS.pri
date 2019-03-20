@@ -41,6 +41,7 @@ INCLUDEPATH += \
 SOURCES +=  \
   $${SHARED_DIR}/net/netraw.cpp \
   $${SHARED_DIR}/net/robocup_ssl_client.cpp \
+  $${SHARED_DIR}/net/robocup_grSim_client.cpp \
 
 SOURCES += \
 	$$PWD/main.cpp \
@@ -68,6 +69,7 @@ SOURCES += \
 HEADERS  += \
   $${SHARED_DIR}/net/netraw.h \
   $${SHARED_DIR}/net/robocup_ssl_client.h \
+  $${SHARED_DIR}/net/robocup_grSim_client.h \
   $${SHARED_DIR}/net/Pipe.h \
   $${SHARED_DIR}/util/timer.h \
   $${SHARED_DIR}/util/field_default_constants.h \

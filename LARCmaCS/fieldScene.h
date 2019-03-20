@@ -23,6 +23,7 @@ public:
 	void UpdateGeometry(SSL_GeometryFieldSize fieldSize);
 	void LoadFieldGeometry();
 	void LoadFieldGeometry ( SSL_GeometryFieldSize &fieldSize );
+	void ClearField();
 
 private:
 

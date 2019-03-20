@@ -177,6 +177,26 @@ int FieldScene::UpdateBalls(QVector<QPointF> &_balls, int cameraID)
 	return balls;
 }
 
+void FieldScene::ClearField()
+{
+    LoadFieldGeometry();
+    this->removeItem ( fieldItem );
+    field_arcs.clear();
+    field_lines.clear();
+    ConstructField();
+    fieldItem = this->addPath ( *field,*fieldLinePen,*fieldBrush );
+    for (int i = 0; i < robots.size(); i++) {
+        this->removeItem(robots[i]);
+    }
+    robots.clear();
+    for (int i = 0; i < ballItems.size(); i++) {
+        for (int j = 0; j < ballItems[i].size(); j++) {
+            this->removeItem(ballItems[i][j]);
+        }
+    }
+    ballItems.clear();
+}
+
 void FieldScene::ConstructField()
 {
 	//scene->removeItem(fieldItem);
