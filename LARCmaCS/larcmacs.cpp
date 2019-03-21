@@ -70,6 +70,8 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 	connect(&receiver.worker, SIGNAL(clearField()), this, SLOT(clearUIField()));
 	connect(this, SIGNAL(ChangeSimulatorMode(bool)), &mainalg.worker, SLOT(setEnableSimFlag(bool)));
 	connect(&mainalg.worker, SIGNAL(sendToSimConnector(QByteArray)), &connector.worker, SLOT(runSim(QByteArray)));
+	connect(this, SIGNAL(changeGrSimIP(QString)), &connector.worker, SLOT(changeGrSimIP(QString)));
+	connect(this, SIGNAL(changeGrSimPort(unsigned short)), &connector.worker, SLOT(changeGrSimPort(unsigned short)));
 
 	//fieldScene Update
 	connect(&receiver.worker,SIGNAL(activateGUI()),this,SLOT(fieldsceneUpdateRobots()), Qt::BlockingQueuedConnection);
@@ -279,9 +281,10 @@ void LARCmaCS::on_checkBox_MlMaxFreq_stateChanged(int arg1)
 
 void LARCmaCS::on_checkBox_SimEnable_stateChanged(int arg1)
 {
-	//if (arg1 > 0) {
-	//	ui->lineEditSimIP
-	//}
+	if (arg1 > 0) {
+		emit changeGrSimIP(ui->lineEditSimIP->text());
+		emit changeGrSimPort(ui->lineEditSimPort->text().toInt());
+	}
 	emit ChangeSimulatorMode(arg1 > 0);
 }
 

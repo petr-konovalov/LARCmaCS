@@ -68,6 +68,8 @@ private slots:
 
 signals:
 	void sendToConnectorRM(int N,QByteArray command);
+	void changeGrSimIP(QString IP);
+	void changeGrSimPort(unsigned short port);
 	void ChangeSimulatorMode(bool state);
 	void receiveMacArray(QString*);
 	void ChangeMaxPacketFrequencyMod(bool state);
