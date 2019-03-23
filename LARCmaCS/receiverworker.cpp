@@ -26,6 +26,8 @@ void ReceiverWorker::start()
 	NewPacket=false;
 	MaxPacketFrequencyMod=false;
 	cout << "Receiver worker start" << endl;
+	connect(this, SIGNAL(clientOpen()), &client, SLOT(open()));
+	connect(this, SIGNAL(clientClose()), &client, SLOT(close()));
 	run();
 }
 
@@ -58,7 +60,7 @@ void ReceiverWorker::run()
 
 	int idCam = 0;
 
-	client.open(false);
+	emit clientOpen();
 	simClient.open(false);
 
 	int packetsNum = 0;
@@ -72,16 +74,16 @@ void ReceiverWorker::run()
 			emit clearField();
 		}
 		if (isSimEnabledFlag) {
-			packetReceived = simClient.receive(packet);
+			packetReceived = simClient.receive(*packet);
 		} else {
-			packetReceived = client.receive(packet);
+			packetReceived = client.receive(&packet);
 		}
 		if (packetReceived) {
-			if (packet.has_geometry()) {
-				fieldsize = packet.geometry().field();
+			if (packet->has_geometry()) {
+				fieldsize = packet->geometry().field();
 				emit updatefieldGeometry();
 			}
-			if (packet.has_detection()) {
+			if (packet->has_detection()) {
 				Time_count++;
 				packetsNum++;
 				//cout << "Num RECEIVER:" << packetsNum << endl;
@@ -89,7 +91,7 @@ void ReceiverWorker::run()
 
 				qRegisterMetaType<PacketSSL>("PacketSSL"); // for queueing arguments between threads
 
-				detection = packet.detection();
+				detection = packet->detection();
 
 				idCam = detection.camera_id() + 1;
 				balls_n = detection.balls_size();
@@ -164,6 +166,6 @@ void ReceiverWorker::run()
 		QApplication::processEvents();
 	}
 
-	client.close();
+	emit clientClose();
 	simClient.close();
 }

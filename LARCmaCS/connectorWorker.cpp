@@ -56,7 +56,7 @@ void ConnectorWorker::init()
 	}
 
 	timer = new QTimer(this);
-	connect(timer,SIGNAL(timeout()),this, SLOT(udpBroadcastRequestIP()));
+	//connect(timer,SIGNAL(timeout()),this, SLOT(udpBroadcastRequestIP()));
 	connect(udpSocket,SIGNAL(readyRead()),this,SLOT(udpProcessPendingDatagrams()));
 	qDebug()<<"INIT CONNECTOR OK";
 }

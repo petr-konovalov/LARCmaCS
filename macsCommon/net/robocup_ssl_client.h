@@ -23,6 +23,7 @@
 #include "netraw.h"
 #include <string>
 #include <QMutex>
+#include <QUdpSocket>
 #include "messages_robocup_ssl_detection.pb.h"
 #include "messages_robocup_ssl_geometry.pb.h"
 #include "messages_robocup_ssl_wrapper.pb.h"
@@ -32,13 +33,18 @@ using namespace std;
 	@author Author Name
 */
 
-class RoboCupSSLClient{
+class RoboCupSSLClient : public QObject {
 protected:
   static const int MaxDataGramSize = 65536;
   char * in_buffer;
   Net::UDP mc; // multicast client
+  QUdpSocket socket;
+  QHostAddress groupAddress;
   QMutex mutex;
+  SSL_WrapperPacket *outputPacket;
   int _port;
+  bool newPacket = false;
+  SSL_WrapperPacket *packet;
   string _net_address;
   string _net_interface;
 public:
@@ -51,9 +57,13 @@ public:
                      string net_ref_interface="");
 
     ~RoboCupSSLClient();
-    bool open(bool blocking=false);
-    void close();
-    bool receive(SSL_WrapperPacket & packet);
+	void init();
+	bool receive(SSL_WrapperPacket ** packet);
+
+private slots:
+	void processPendingDatagrams();
+	bool open();
+	void close();
 
 };
 
