@@ -1,59 +1,61 @@
+// Copyright 2019 Dmitrii Iarosh
+
 #include "robocup_grsim_client.h"
 
-RoboCupGrSimClient::RoboCupGrSimClient(int port,
-                     string net_address,
-                     string net_interface)
+RoboCupGrSimClient::RoboCupGrSimClient(unsigned short port)
+	: groupAddress(QStringLiteral("224.5.23.2"))
 {
-  _port=port;
-  _net_address=net_address;
-  _net_interface=net_interface;
-  in_buffer=new char[65536];
+	_port = port;
+	in_buffer = new char[65536];
+	packet = new SSL_WrapperPacket();
 }
 
 
 RoboCupGrSimClient::~RoboCupGrSimClient()
 {
-  delete[] in_buffer;
+	delete[] in_buffer;
 }
 
 void RoboCupGrSimClient::close() {
-  mc.close();
+	socket.close();
 }
 
-bool RoboCupGrSimClient::open(bool blocking) {
-  close();
-  if(!mc.open(_port,true,true,blocking)) {
-    fprintf(stderr,"Unable to open UDP network port: %d\n",_port);
-    fflush(stderr);
-    return(false);
-  }
-
-  Net::Address multiaddr,interface_;
-  multiaddr.setHost(_net_address.c_str(),_port);
-  if(_net_interface.length() > 0){
-    interface_.setHost(_net_interface.c_str(),_port);
-  }else{
-    interface_.setAny();
-  }
-
-  if(!mc.addMulticast(multiaddr,interface_)) {
-    fprintf(stderr,"Unable to setup UDP multicast\n");
-    fflush(stderr);
-    return(false);
-  }
-
-  return(true);
+bool RoboCupGrSimClient::open()
+{
+	close();
+	socket.bind(QHostAddress::AnyIPv4, _port, QUdpSocket::ShareAddress);
+	socket.joinMulticastGroup(groupAddress);
+	connect(&socket, SIGNAL(readyRead()), this, SLOT(processPendingDatagrams()));
+	return true;
 }
 
-bool RoboCupGrSimClient::receive(SSL_WrapperPacket & packet) {
-  Net::Address src;
-  int r=0;
-  r = mc.recv(in_buffer,MaxDataGramSize,src);
-  if (r>0) {
-    fflush(stdout);
-    //decode packet:
-    bool tmp =  packet.ParseFromArray(in_buffer,r);
-    return tmp;
-  }
-  return false;
+void RoboCupGrSimClient::processPendingDatagrams()
+{
+	cout << "@@\n";
+	QByteArray datagram;
+	int datagramSize;
+	while (socket.hasPendingDatagrams()) {
+		datagram.resize(int(socket.pendingDatagramSize()));
+		datagramSize = int(socket.pendingDatagramSize());
+		socket.readDatagram(datagram.data(), datagram.size());
+		packet->ParseFromArray(datagram.data(), datagramSize);
+		mutex.lock();
+		newPacket = true;
+		outputPacket = packet;
+		mutex.unlock();
+		packet = new SSL_WrapperPacket();
+	}
+}
+
+
+bool RoboCupGrSimClient::receive(SSL_WrapperPacket ** packet) {
+	mutex.lock();
+	if (newPacket) {
+		*packet = outputPacket;
+		newPacket = false;
+		mutex.unlock();
+		return true;
+	}
+	mutex.unlock();
+	return false;
 }

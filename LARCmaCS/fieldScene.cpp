@@ -42,7 +42,7 @@ void FieldScene::UpdateField(SSL_GeometryFieldSize field) {
 }
 #endif
 
-void FieldScene::UpdateRobots(SSL_DetectionFrame &detection)
+void FieldScene::UpdateRobots(SSL_DetectionFrame const &detection)
 {
 	int robots_blue_n =  detection.robots_blue_size();
 	int robots_yellow_n =  detection.robots_yellow_size();

@@ -28,6 +28,8 @@ void ReceiverWorker::start()
 	cout << "Receiver worker start" << endl;
 	connect(this, SIGNAL(clientOpen()), &client, SLOT(open()));
 	connect(this, SIGNAL(clientClose()), &client, SLOT(close()));
+	connect(this, SIGNAL(simClientOpen()), &simClient, SLOT(open()));
+	connect(this, SIGNAL(simClientClose()), &simClient, SLOT(close()));
 	run();
 }
 
@@ -61,7 +63,7 @@ void ReceiverWorker::run()
 	int idCam = 0;
 
 	emit clientOpen();
-	simClient.open(false);
+	emit simClientOpen();
 
 	int packetsNum = 0;
 
@@ -74,7 +76,7 @@ void ReceiverWorker::run()
 			emit clearField();
 		}
 		if (isSimEnabledFlag) {
-			packetReceived = simClient.receive(*packet);
+			packetReceived = simClient.receive(&packet);
 		} else {
 			packetReceived = client.receive(&packet);
 		}
@@ -148,7 +150,7 @@ void ReceiverWorker::run()
 			}
 		} else {
 			// no messages...
-			Sleep(1);
+			//Sleep(1);
 		}
 
 		if (clock()-timer_m>CLOCKS_PER_SEC) {
@@ -167,5 +169,5 @@ void ReceiverWorker::run()
 	}
 
 	emit clientClose();
-	simClient.close();
+	emit simClientClose();
 }

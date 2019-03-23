@@ -74,8 +74,8 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 	connect(this, SIGNAL(changeGrSimPort(unsigned short)), &connector.worker, SLOT(changeGrSimPort(unsigned short)));
 
 	//fieldScene Update
-	connect(&receiver.worker,SIGNAL(activateGUI()),this,SLOT(fieldsceneUpdateRobots()), Qt::BlockingQueuedConnection);
-	connect(&receiver.worker, SIGNAL(updatefieldGeometry()), this, SLOT (fieldsceneUpdateField()), Qt::BlockingQueuedConnection);
+	connect(&receiver.worker,SIGNAL(activateGUI()),this, SLOT(fieldsceneUpdateRobots()));
+	connect(&receiver.worker, SIGNAL(updatefieldGeometry()), this, SLOT (fieldsceneUpdateField()));
 	connect(this,SIGNAL(updateRobots()),fieldscene,SLOT(update()));
 	connect(this, SIGNAL(updateGeometry()),fieldscene,SLOT(update()));
 	//    connect(&receiver.worker, SIGNAL(activateGUI(PacketSSL)), &sceneview.worker, SLOT(repaintScene(PacketSSL)));
@@ -180,7 +180,7 @@ void LARCmaCS::remcontrolsender(int l, int r,int k, int b, bool kickUp)
 
 void LARCmaCS::fieldsceneUpdateRobots()
 {
-	fieldscene->UpdateRobots(receiver.worker.detection);
+	fieldscene->UpdateRobots(receiver.worker.packet->detection());
 	emit updateRobots();
 }
 
@@ -190,7 +190,7 @@ void LARCmaCS::fieldsceneUpdateField()
 	fieldscene->UpdateGeometry(receiver.worker.fieldsize);
 	emit updateGeometry();
 #else
-	fieldscene->UpdateField(receiver.worker.fieldsize);
+	fieldscene->UpdateField(receiver.worker.packet->geometry().field());
 	emit updateRobots();
 #endif
 }

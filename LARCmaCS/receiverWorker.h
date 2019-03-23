@@ -29,10 +29,14 @@ public:
 
 	SSL_GeometryFieldSize fieldsize;
 
+	SSL_WrapperPacket * packet;
+
 signals:
 	void activateGUI();
 	void clientOpen();
 	void clientClose();
+	void simClientOpen();
+	void simClientClose();
 	void clearField();
 	void activateMA(PacketSSL packetssl);
 	void updatefieldGeometry();
@@ -47,7 +51,7 @@ private:
 	void run();
 	RoboCupSSLClient client;
 	RoboCupGrSimClient simClient;
-	SSL_WrapperPacket * packet;
+
 	bool isSimEnabledFlag = 0;
 	bool enableSimFlag = 0;
 	bool NewPacket;

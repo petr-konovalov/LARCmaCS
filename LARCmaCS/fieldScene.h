@@ -13,7 +13,7 @@ public:
 	explicit FieldScene(QObject *parent = 0);
 
 	void AddRobot ( Robot* robot );
-	void UpdateRobots ( SSL_DetectionFrame &detection );
+	void UpdateRobots ( SSL_DetectionFrame const &detection );
 	int UpdateBalls ( QVector<QPointF> &_balls, int cameraID );
 
 #ifndef OLD_SSL_PROTO
