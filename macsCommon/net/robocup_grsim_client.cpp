@@ -31,7 +31,6 @@ bool RoboCupGrSimClient::open()
 
 void RoboCupGrSimClient::processPendingDatagrams()
 {
-	cout << "@@\n";
 	QByteArray datagram;
 	int datagramSize;
 	while (socket.hasPendingDatagrams()) {
