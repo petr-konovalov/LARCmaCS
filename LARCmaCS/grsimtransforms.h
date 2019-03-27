@@ -1,5 +1,6 @@
-#ifndef GRSIMTRANSFORMS_H
-#define GRSIMTRANSFORMS_H
+// Copyright 2019 Dmitrii Iarosh
+
+#pragma once
 
 #include <QByteArray>
 #include "grSim_Packet.pb.h"
@@ -17,5 +18,3 @@ private:
 	static float fromPower2Speed(int input);
 	static float fromPower2Kick(bool input, int voltage);
 };
-
-#endif // GRSIMTRANSFORMS_H

@@ -2,9 +2,12 @@
 
 #include <QGraphicsPathItem>
 #include "field_default_constants.h"
-#include "robocup_ssl_client.h"
+#include "messages_robocup_ssl_wrapper.pb.h"
+#include <vector>
 #include "timer.h"
 #include "robot.h"
+
+using namespace std;
 
 class FieldScene : public QGraphicsScene
 {

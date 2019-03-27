@@ -1,3 +1,5 @@
+// Copyright 2019 Dmitrii Iarosh
+
 #include "grsimtransforms.h"
 
 GrSimTransforms::GrSimTransforms(){}
