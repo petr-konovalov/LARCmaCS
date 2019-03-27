@@ -8,11 +8,14 @@
 
 using std::map;
 
-struct ConnectorWorker : QObject
+class ConnectorWorker : public QObject
 {
 Q_OBJECT
 public:
 	ConnectorWorker(){}
+
+	QString getGrSimIP();
+	unsigned short getGrSimPort();
 
 	int shutdownconnector;
 	char *curRuleArray;
@@ -23,8 +26,6 @@ public:
 	map<int const, QString> robotAddrMap;
 	int connectedAllSocketsFlag;
 	QMap<int,QString> numIP;
-	QString grSimIP = "127.0.0.1";
-	unsigned short grSimPort = 20011;
 	QMap<QString,QString> macIP;
 
 	QList<QString> macList;
@@ -37,6 +38,10 @@ public:
 	QByteArray command;
 
 	char dat[12];
+
+private:
+	QString grSimIP = "127.0.0.1";
+	unsigned short grSimPort = 20011;
 
 signals:
 	void receivedDatagram(QByteArray datagram);
@@ -52,10 +57,10 @@ public slots:
 	void init();
 	void start();
 	void stop();
-	void changeGrSimIP(QString IP);
+	void changeGrSimIP(const QString &IP);
 	void changeGrSimPort(unsigned short port);
-	void run(int N, QByteArray command);
-	void runSim(QByteArray command);
+	void run(int N, const QByteArray &command);
+	void runSim(const QByteArray &command);
 	void udpProcessPendingDatagrams();
 	void receiveMacArray(QString*);
 	void addIp(int id, QString ip);

@@ -10,6 +10,7 @@
 #include <QtNetwork>
 #include <QTimer>
 #include <QMap>
+#define REAL_ROBOT_PORT 10000
 
 #include "connectorWorker.h"
 

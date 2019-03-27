@@ -4,10 +4,6 @@
 #include <fstream>
 #include "QDebug"
 #include "message.h"
-#include "grSim_Packet.pb.h"
-#include "grSim_Commands.pb.h"
-#include "grSim_Replacement.pb.h"
-
 
 int initConfig(RCConfig *config){
 	ifstream configFile;
@@ -117,6 +113,11 @@ void MainAlgWorker::Send2BTChangeit(bool * send2BT_)
 	}
 }
 
+bool MainAlgWorker::getIsSimEnabledFlag()
+{
+	return isSimEnabledFlag;
+}
+
 void MainAlgWorker::setEnableSimFlag(bool flag)
 {
 	isSimEnabledFlag = flag;
@@ -165,13 +166,15 @@ void MainAlgWorker::run(PacketSSL packetssl)
 		for (int j = 0; j < fmldata.config.RULE_LENGTH; j++) {
 			newmess[j]=ruleArray[j * fmldata.config.RULE_AMOUNT + i];
 		}
-		if (newmess[0]==1) {
+		if (newmess[0] == 1) {
 			char * newmessage=new char[100];
-			memcpy(newmessage,newmess,100);
-			if ((newmess[1]>=0) && (newmess[1]<=MAX_NUM_ROBOTS) && ((newmess[1]==0) || (Send2BT[newmess[1]-1]==true)))
+			memcpy(newmessage,newmess, 100);
+			if ((newmess[1] >= 0) && (newmess[1] <= MAX_NUM_ROBOTS) && ((newmess[1] == 0) || (Send2BT[newmess[1] - 1] == true)))
 				emit sendToBTtransmitter(newmessage); //is never connected and used
 			QByteArray command;
-			int voltage = 12;
+
+			int voltage = 12; //fixed while we don't have abilities to change it from algos
+
 			bool simFlag = isSimEnabledFlag;
 			if (!simFlag) {
 				Message msg;
@@ -194,55 +197,24 @@ void MainAlgWorker::run(PacketSSL packetssl)
 					command = msg.generateByteArray();
 				}
 			} else {
-				grSim_Packet packet;
-				bool yellow = false;
-				if (newmess[1] >= MAX_ROBOTS_IN_TEAM) {
-					yellow = true;
-				}
-				packet.mutable_commands()->set_isteamyellow(yellow);
-				packet.mutable_commands()->set_timestamp(0.0);
-				grSim_Robot_Command* controls = packet.mutable_commands()->add_robot_commands();
-
-				controls->set_id((newmess[1] - 1) % MAX_ROBOTS_IN_TEAM);
-
-				//we are not using wheel speed only directional speed!
-				controls->set_wheelsspeed(false);
-				controls->set_wheel1(0);
-				controls->set_wheel2(0);
-				controls->set_wheel3(0);
-				controls->set_wheel4(0);
 				if (!isPause) {
-					controls->set_veltangent(fromPower2Speed(newmess[3])); //speed on X axis(in sim axis x is horizontal to left of the robot)
-					controls->set_velnormal(-fromPower2Speed(newmess[2])); // speed on Y axis(in sim it looks as the robot looks)
-					controls->set_velangular(fromPower2Speed(newmess[5])); // rotation Speed
-
-					controls->set_kickspeedx(fromPower2Kick(newmess[4], voltage));
-					controls->set_kickspeedz(fromPower2Kick(newmess[6], voltage));
+					GrSimTransforms::formGrSimControlPacket(command, newmess[1], newmess[3], newmess[2], newmess[5], newmess[6], newmess[4], voltage, 0);
 				} else {
-					controls->set_veltangent(0); //speed on X axis
-					controls->set_velnormal(0); // speed on Y axis
-					controls->set_velangular(0); // rotation Speed
-
-					controls->set_kickspeedx(0);
-					controls->set_kickspeedz(0);
+					GrSimTransforms::formGrSimControlPacket(command, newmess[1], 0, 0, 0, 0, 0, voltage, 0);
 				}
-				controls->set_spinner(0); //spinner isn't used now
-
-				command.resize(packet.ByteSize());
-				packet.SerializeToArray(command.data(), command.size());
 			}
 
-			if (newmess[1]==0)
-				for (int i=1; i<=MAX_NUM_ROBOTS; i++) {
+			if (newmess[1] == 0)
+				for (int i = 1; i <= MAX_NUM_ROBOTS; i++) {
 					if (!simFlag) {
-						emit sendToConnector(i,command);
+						emit sendToConnector(i, command);
 					} else {
 						emit sendToSimConnector(command);
 					}
 				}
-			if ((newmess[1]>0) && (newmess[1]<=MAX_NUM_ROBOTS)) {
+			if ((newmess[1] > 0) && (newmess[1] <= MAX_NUM_ROBOTS)) {
 				if (!simFlag) {
-					emit sendToConnector(newmess[1],command);
+					emit sendToConnector(newmess[1], command);
 				} else {
 					emit sendToSimConnector(command);
 				}
@@ -328,33 +300,7 @@ void MainAlgWorker::run(PacketSSL packetssl)
 			}
 		} else {
 			for (int i = 0; i <= 12; i++) {
-				grSim_Packet packet;
-				bool yellow = false;
-				if (i >= MAX_ROBOTS_IN_TEAM) {
-					yellow = true;
-				}
-				packet.mutable_commands()->set_isteamyellow(yellow);
-				packet.mutable_commands()->set_timestamp(0.0);
-				grSim_Robot_Command* controls = packet.mutable_commands()->add_robot_commands();
-
-				controls->set_id(i % MAX_ROBOTS_IN_TEAM);
-
-				//we are not using wheel speed only directional speed!
-				controls->set_wheelsspeed(false);
-				controls->set_wheel1(0);
-				controls->set_wheel2(0);
-				controls->set_wheel3(0);
-				controls->set_wheel4(0);
-				controls->set_veltangent(0); //speed on X axis
-				controls->set_velnormal(0); // speed on Y axis
-				controls->set_velangular(0); // rotation Speed
-
-				controls->set_kickspeedx(0);
-				controls->set_kickspeedz(0);
-				controls->set_spinner(0); //spinner isn't used now
-
-				command.resize(packet.ByteSize());
-				packet.SerializeToArray(command.data(), command.size());
+				GrSimTransforms::formGrSimControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
 				//emit sendToSimConnector(command); //for more power of remote control
 			}
 		}
@@ -366,20 +312,6 @@ void MainAlgWorker::run(PacketSSL packetssl)
 	emit mainAlgFree();
 //    qDebug()<<"MainAlg!";
 
-}
-
-float MainAlgWorker::fromPower2Kick(bool isKicked, int voltage)
-{
-	if (isKicked) {
-		return 2; //should be implemented after experiments
-	} else {
-		return 0;
-	}
-}
-
-float MainAlgWorker::fromPower2Speed(int power)
-{
-	return power / 100.0 * 6; //should be implemented after experiments
 }
 
 void MainAlgWorker::Pause()

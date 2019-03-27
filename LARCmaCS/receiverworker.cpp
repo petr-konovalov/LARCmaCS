@@ -6,6 +6,14 @@ ReceiverWorker::ReceiverWorker()
 	mainalgisfree=true;
 	timer_m=clock();
 	Time_count=0;
+	client = new RoboCupVisionClient(SSL_VISION_PORT);
+	simClient = new RoboCupVisionClient(SIM_VISION_PORT);
+}
+
+ReceiverWorker::~ReceiverWorker()
+{
+	delete client;
+	delete simClient;
 }
 
 void ReceiverWorker::MainAlgFree()
@@ -26,10 +34,10 @@ void ReceiverWorker::start()
 	NewPacket=false;
 	MaxPacketFrequencyMod=false;
 	cout << "Receiver worker start" << endl;
-	connect(this, SIGNAL(clientOpen()), &client, SLOT(open()));
-	connect(this, SIGNAL(clientClose()), &client, SLOT(close()));
-	connect(this, SIGNAL(simClientOpen()), &simClient, SLOT(open()));
-	connect(this, SIGNAL(simClientClose()), &simClient, SLOT(close()));
+	connect(this, SIGNAL(clientOpen()), client, SLOT(open()));
+	connect(this, SIGNAL(clientClose()), client, SLOT(close()));
+	connect(this, SIGNAL(simClientOpen()), simClient, SLOT(open()));
+	connect(this, SIGNAL(simClientClose()), simClient, SLOT(close()));
 	run();
 }
 
@@ -40,8 +48,8 @@ void ReceiverWorker::stop()
 
 void ReceiverWorker::ChangeMaxPacketFrequencyMod(bool state)
 {
-	MaxPacketFrequencyMod=state;
-	cout<<"MaxPacketFrequencyMod = "<<state<<endl;
+	MaxPacketFrequencyMod = state;
+	cout << "MaxPacketFrequencyMod = " << state << endl;
 }
 
 void ReceiverWorker::ChangeSimulatorMode(bool flag)
@@ -76,16 +84,15 @@ void ReceiverWorker::run()
 			emit clearField();
 		}
 		if (isSimEnabledFlag) {
-			packetReceived = simClient.receive(&packet);
+			packetReceived = simClient->receive(&packet);
 		} else {
-			packetReceived = client.receive(&packet);
+			packetReceived = client->receive(&packet);
 		}
 		if (packetReceived) {
 			if (packet->has_geometry()) {
-				fieldsize = packet->geometry().field();
-				emit updatefieldGeometry();
+				emit updatefieldGeometry(packet);
 			}
-			if (packet->has_detection()) {
+			else if (packet->has_detection()) {
 				Time_count++;
 				packetsNum++;
 				//cout << "Num RECEIVER:" << packetsNum << endl;
@@ -141,11 +148,11 @@ void ReceiverWorker::run()
 					mainalgisfree=false;
 					NewPacket=false;
 					emit activateMA(packetssl);
-					emit activateGUI();
+					emit activateGUI(packet);
 				} else {
 					NewPacket=true;
 					if (MaxPacketFrequencyMod)
-						emit activateGUI();
+						emit activateGUI(packet);
 				}
 			}
 		} else {

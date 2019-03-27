@@ -1,26 +1,22 @@
 // Copyright 2019 Dmitrii Iarosh
 
-#include "robocup_ssl_client.h"
+#include "robocup_vision_client.h"
 
-RoboCupSSLClient::RoboCupSSLClient(unsigned short port)
-	: groupAddress(QStringLiteral("224.5.23.2"))
+RoboCupVisionClient::RoboCupVisionClient(unsigned short port)
+	: groupAddress(visionIP)
 {
 	_port = port;
-	in_buffer = new char[65536];
 	packet = new SSL_WrapperPacket();
 }
 
+RoboCupVisionClient::~RoboCupVisionClient(){}
 
-RoboCupSSLClient::~RoboCupSSLClient()
-{
-	delete[] in_buffer;
-}
-
-void RoboCupSSLClient::close() {
+void RoboCupVisionClient::close() {
 	socket.close();
 }
 
-bool RoboCupSSLClient::open() {
+bool RoboCupVisionClient::open()
+{
 	close();
 	socket.bind(QHostAddress::AnyIPv4, _port, QUdpSocket::ShareAddress);
 	socket.joinMulticastGroup(groupAddress);
@@ -28,7 +24,7 @@ bool RoboCupSSLClient::open() {
 	return true;
 }
 
-void RoboCupSSLClient::processPendingDatagrams()
+void RoboCupVisionClient::processPendingDatagrams()
 {
 	QByteArray datagram;
 	int datagramSize;
@@ -45,7 +41,8 @@ void RoboCupSSLClient::processPendingDatagrams()
 	}
 }
 
-bool RoboCupSSLClient::receive(SSL_WrapperPacket ** packet) {
+
+bool RoboCupVisionClient::receive(SSL_WrapperPacket ** packet) {
 	mutex.lock();
 	if (newPacket) {
 		*packet = outputPacket;
@@ -56,4 +53,3 @@ bool RoboCupSSLClient::receive(SSL_WrapperPacket ** packet) {
 	mutex.unlock();
 	return false;
 }
-

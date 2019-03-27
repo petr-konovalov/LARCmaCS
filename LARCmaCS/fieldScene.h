@@ -12,17 +12,17 @@ class FieldScene : public QGraphicsScene
 public:
 	explicit FieldScene(QObject *parent = 0);
 
-	void AddRobot ( Robot* robot );
-	void UpdateRobots ( SSL_DetectionFrame const &detection );
-	int UpdateBalls ( QVector<QPointF> &_balls, int cameraID );
+	void AddRobot (Robot* robot);
+	void UpdateRobots (SSL_WrapperPacket * packet);
+	int UpdateBalls (QVector<QPointF> &_balls, int cameraID);
 
 #ifndef OLD_SSL_PROTO
-	void UpdateField(SSL_GeometryFieldSize field);
+	void UpdateField(SSL_WrapperPacket * packet);
 #endif
 
 	void UpdateGeometry(SSL_GeometryFieldSize fieldSize);
 	void LoadFieldGeometry();
-	void LoadFieldGeometry ( SSL_GeometryFieldSize &fieldSize );
+	void LoadFieldGeometry (const SSL_GeometryFieldSize &fieldSize);
 	void ClearField();
 
 private:

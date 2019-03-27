@@ -4,6 +4,7 @@
 #include "packetSSL.h"
 #include "mlData.h"
 #include "client.h"
+#include "grsimtransforms.h"
 
 #define MAX_NUM_ROBOTS 12
 #define MAX_ROBOTS_IN_TEAM 6
@@ -23,9 +24,7 @@ struct MainAlgWorker : public QObject
 
 public:
 	MainAlgWorker();
-	static float fromPower2Speed(int input);
-	static float fromPower2Kick(bool input, int voltage);
-	bool isSimEnabledFlag = 0;
+	bool getIsSimEnabledFlag();
 	~MainAlgWorker();
 
 signals:
@@ -51,6 +50,7 @@ public slots:
 
 private:
 	void init();
+	bool isSimEnabledFlag = 0;
 	char m_buffer[256]; // matlab buffer
 	MlData fmldata;
 	bool fmtlab;

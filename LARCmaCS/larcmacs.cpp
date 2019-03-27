@@ -5,9 +5,7 @@
 #include "message.h"
 #include <QFileDialog>
 #include "settings.h"
-#include "grSim_Packet.pb.h"
-#include "grSim_Commands.pb.h"
-#include "grSim_Replacement.pb.h"
+#include "grsimtransforms.h"
 
 LARCmaCS::LARCmaCS(QWidget *parent) :
 	QWidget(parent),
@@ -47,7 +45,7 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 
 	//send command to robots
 //    connect(this,SIGNAL(receiveMacArray(QString*)),&connector.worker,SLOT(receiveMacArray(QString*)));
-	connect(&mainalg.worker, SIGNAL(sendToConnector(int,QByteArray)), &connector.worker, SLOT(run(int,QByteArray)));
+	connect(&mainalg.worker, SIGNAL(sendToConnector(int, const QByteArray &)), &connector.worker, SLOT(run(int, const QByteArray &)));
 
 	//gui connector
 	connect(&sceneview.worker, SIGNAL(updateView()), this, SLOT(updateView()));
@@ -61,7 +59,7 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 	//remotecontrol
 	connect(&remotecontol,SIGNAL(RC_control(int,int,int,int, bool)),
 			this,SLOT(remcontrolsender(int, int,int, int, bool)));
-	connect(this,SIGNAL(sendToConnectorRM(int,QByteArray)),&connector.worker,SLOT(run(int,QByteArray)));
+	connect(this,SIGNAL(sendToConnectorRM(int, const QByteArray &)),&connector.worker,SLOT(run(int, const QByteArray &)));
 
 	QObject::connect(this, SIGNAL(addIp(int, QString)), &connector.worker, SLOT(addIp(int, QString)));
 
@@ -69,13 +67,13 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 	connect(this, SIGNAL(ChangeSimulatorMode(bool)), &receiver.worker, SLOT(ChangeSimulatorMode(bool)));
 	connect(&receiver.worker, SIGNAL(clearField()), this, SLOT(clearUIField()));
 	connect(this, SIGNAL(ChangeSimulatorMode(bool)), &mainalg.worker, SLOT(setEnableSimFlag(bool)));
-	connect(&mainalg.worker, SIGNAL(sendToSimConnector(QByteArray)), &connector.worker, SLOT(runSim(QByteArray)));
-	connect(this, SIGNAL(changeGrSimIP(QString)), &connector.worker, SLOT(changeGrSimIP(QString)));
+	connect(&mainalg.worker, SIGNAL(sendToSimConnector(const QByteArray &)), &connector.worker, SLOT(runSim(const QByteArray &)));
+	connect(this, SIGNAL(changeGrSimIP(const QString &)), &connector.worker, SLOT(changeGrSimIP(const QString &)));
 	connect(this, SIGNAL(changeGrSimPort(unsigned short)), &connector.worker, SLOT(changeGrSimPort(unsigned short)));
 
 	//fieldScene Update
-	connect(&receiver.worker,SIGNAL(activateGUI()),this, SLOT(fieldsceneUpdateRobots()));
-	connect(&receiver.worker, SIGNAL(updatefieldGeometry()), this, SLOT (fieldsceneUpdateField()));
+	connect(&receiver.worker,SIGNAL(activateGUI(SSL_WrapperPacket *)),this, SLOT(fieldsceneUpdateRobots(SSL_WrapperPacket *)));
+	connect(&receiver.worker, SIGNAL(updatefieldGeometry(SSL_WrapperPacket *)), this, SLOT (fieldsceneUpdateField(SSL_WrapperPacket *)));
 	connect(this,SIGNAL(updateRobots()),fieldscene,SLOT(update()));
 	connect(this, SIGNAL(updateGeometry()),fieldscene,SLOT(update()));
 	//    connect(&receiver.worker, SIGNAL(activateGUI(PacketSSL)), &sceneview.worker, SLOT(repaintScene(PacketSSL)));
@@ -94,7 +92,7 @@ void LARCmaCS::remcontrolsender(int l, int r,int k, int b, bool kickUp)
 {
 	QString ip = ui->lineEditRobotIp->text();
 	QByteArray byteData;
-	bool simFlag = mainalg.worker.isSimEnabledFlag;
+	bool simFlag = mainalg.worker.getIsSimEnabledFlag();
 	if (!simFlag) {
 		Message data;
 		data.setSpeedX(l);
@@ -103,7 +101,7 @@ void LARCmaCS::remcontrolsender(int l, int r,int k, int b, bool kickUp)
 		data.setSpeedDribbler(0);
 		data.setDribblerEnable(0);
 
-		if(b!=-1) {
+		if(b != -1) {
 			data.setKickVoltageLevel(4);
 			data.setKickerChargeEnable(1);
 			data.setKickUp(kickUp);
@@ -117,80 +115,45 @@ void LARCmaCS::remcontrolsender(int l, int r,int k, int b, bool kickUp)
 
 		byteData = data.generateByteArray();
 	} else {
-
 		int numOfRobot = ip.toInt();
-		grSim_Packet packet;
-		bool yellow = false;
-		if (numOfRobot >= MAX_ROBOTS_IN_TEAM) {
-			yellow = true;
-		}
-		packet.mutable_commands()->set_isteamyellow(yellow);
-		packet.mutable_commands()->set_timestamp(0.0);
-		grSim_Robot_Command* controls = packet.mutable_commands()->add_robot_commands();
+		GrSimTransforms::formGrSimControlPacket(byteData, numOfRobot, r, l, k, kickUp, 0, 4, 0);
+	}
 
-		controls->set_id((numOfRobot - 1) % MAX_ROBOTS_IN_TEAM);
-
-		//we are not using wheel speed only directional speed!
-		controls->set_wheelsspeed(false);
-		controls->set_wheel1(0);
-		controls->set_wheel2(0);
-		controls->set_wheel3(0);
-		controls->set_wheel4(0);
-		controls->set_veltangent(MainAlgWorker::fromPower2Speed(r)); //speed on X axis
-		controls->set_velnormal(-MainAlgWorker::fromPower2Speed(l)); // speed on Y axis
-		controls->set_velangular(MainAlgWorker::fromPower2Speed(k)); // rotation Speed
-
-		controls->set_kickspeedx(0);
-		controls->set_kickspeedz(MainAlgWorker::fromPower2Kick(kickUp, 4));
-		controls->set_spinner(0); //spinner isn't used now
-
-		byteData.resize(packet.ByteSize());
-		packet.SerializeToArray(byteData.data(), byteData.size());
+	unsigned short port;
+	QString IP;
+	if (!simFlag) {
+		IP = ip;
+		port = REAL_ROBOT_PORT;
+	} else {
+		IP = connector.worker.getGrSimIP();
+		port = connector.worker.getGrSimPort();
 	}
 
 	if(socket.ConnectedState == QUdpSocket::ConnectedState) {
-		if (!simFlag) {
-			socket.writeDatagram(byteData, byteData.length(), QHostAddress(ip), 10000);
-		} else {
-			socket.writeDatagram(byteData, byteData.length(), QHostAddress(connector.worker.grSimIP), connector.worker.grSimPort);
-		}
+		socket.writeDatagram(byteData, byteData.length(), QHostAddress(IP), port);
 	} else {
-		if (!simFlag) {
-			socket.connectToHost(ip, 10000);
-			if(socket.ConnectedState == QUdpSocket::ConnectedState) {
-				socket.writeDatagram(byteData, byteData.length(), QHostAddress(ip), 10000);
-			}
-		} else {
-			socket.connectToHost(connector.worker.grSimIP, connector.worker.grSimPort);
-			if(socket.ConnectedState == QUdpSocket::ConnectedState) {
-				socket.writeDatagram(byteData, byteData.length(), QHostAddress(connector.worker.grSimIP), connector.worker.grSimPort);
-			}
+		socket.connectToHost(IP, port);
+		if (socket.ConnectedState == QUdpSocket::ConnectedState) {
+			socket.writeDatagram(byteData, byteData.length(), QHostAddress(IP), port);
 		}
 	}
 
 	return;
-
-	//QByteArray command;
-	//command.append(QString("rule ").toUtf8());
-	//command.append(l);
-	//command.append(r);
-	//command.append(k);
-	//command.append(b);
 }
 
-void LARCmaCS::fieldsceneUpdateRobots()
+void LARCmaCS::fieldsceneUpdateRobots(SSL_WrapperPacket * packet)
 {
-	fieldscene->UpdateRobots(receiver.worker.packet->detection());
+	fieldscene->UpdateRobots(packet);
 	emit updateRobots();
 }
 
-void LARCmaCS::fieldsceneUpdateField()
+void LARCmaCS::fieldsceneUpdateField(SSL_WrapperPacket * packet)
 {
 #ifdef OLD_SSL_PROTO
 	fieldscene->UpdateGeometry(receiver.worker.fieldsize);
 	emit updateGeometry();
 #else
-	fieldscene->UpdateField(receiver.worker.packet->geometry().field());
+	fieldscene->UpdateField(packet);
 	emit updateRobots();
 #endif
 }
@@ -238,10 +201,10 @@ void LARCmaCS::updateView()
 //  {
 //    return;
 //  }
-	if ( scalingRequested ) {
-		qreal factor = ui->fieldView->matrix().scale ( drawscale, drawscale ).mapRect ( QRectF ( 0, 0, 1, 1 ) ).width();
-		if ( factor > 0.07 && factor < 100.0 )
-			ui->fieldView->scale ( drawscale, drawscale );
+	if (scalingRequested) {
+		qreal factor = ui->fieldView->matrix().scale (drawscale, drawscale).mapRect (QRectF ( 0, 0, 1, 1 )).width();
+		if (factor > 0.07 && factor < 100.0)
+			ui->fieldView->scale (drawscale, drawscale);
 		scalingRequested = false;
 		ui->fieldView->viewport()->update();
 	}
@@ -274,18 +237,18 @@ void LARCmaCS::on_pushButton_RC_clicked()
 	remotecontol.TimerStart();
 }
 
-void LARCmaCS::on_checkBox_MlMaxFreq_stateChanged(int arg1)
+void LARCmaCS::on_checkBox_MlMaxFreq_stateChanged(int state)
 {
-	emit(ChangeMaxPacketFrequencyMod(arg1>0));
+	emit(ChangeMaxPacketFrequencyMod(state > 0));
 }
 
-void LARCmaCS::on_checkBox_SimEnable_stateChanged(int arg1)
+void LARCmaCS::on_checkBox_SimEnable_stateChanged(int state)
 {
-	if (arg1 > 0) {
+	if (state > 0) {
 		emit changeGrSimIP(ui->lineEditSimIP->text());
 		emit changeGrSimPort(ui->lineEditSimPort->text().toInt());
 	}
-	emit ChangeSimulatorMode(arg1 > 0);
+	emit ChangeSimulatorMode(state > 0);
 }
 
 void LARCmaCS::on_pushButton_RemoteControl_clicked()

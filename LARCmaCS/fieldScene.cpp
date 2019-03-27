@@ -37,13 +37,15 @@ void FieldScene::AddRobot(Robot *robot)
 }
 
 #ifndef OLD_SSL_PROTO
-void FieldScene::UpdateField(SSL_GeometryFieldSize field) {
-	LoadFieldGeometry(field);
+void FieldScene::UpdateField(SSL_WrapperPacket * packet) {
+	LoadFieldGeometry(packet->geometry().field());
+	delete packet;
 }
 #endif
 
-void FieldScene::UpdateRobots(SSL_DetectionFrame const &detection)
+void FieldScene::UpdateRobots(SSL_WrapperPacket * packet)
 {
+	SSL_DetectionFrame detection = packet->detection();
 	int robots_blue_n =  detection.robots_blue_size();
 	int robots_yellow_n =  detection.robots_yellow_size();
 	//cout << robots_blue_n << " " << robots_yellow_n << endl;
@@ -137,6 +139,9 @@ void FieldScene::UpdateRobots(SSL_DetectionFrame const &detection)
 		ballItems[cameraID][i]->setPos ( detection.balls(i).x()/ksize-6,detection.balls(i).y()/ksize-6 );
 
 	}
+
+	delete packet;
+
 	return;
 }
 
@@ -180,11 +185,11 @@ int FieldScene::UpdateBalls(QVector<QPointF> &_balls, int cameraID)
 void FieldScene::ClearField()
 {
 	LoadFieldGeometry();
-	this->removeItem ( fieldItem );
+	this->removeItem (fieldItem);
 	field_arcs.clear();
 	field_lines.clear();
 	ConstructField();
-	fieldItem = this->addPath ( *field,*fieldLinePen,*fieldBrush );
+	fieldItem = this->addPath (*field, *fieldLinePen, *fieldBrush);
 	for (int i = 0; i < robots.size(); i++) {
 		this->removeItem(robots[i]);
 	}
@@ -338,7 +343,7 @@ void FieldScene::LoadFieldGeometry()
 #endif
 }
 
-void FieldScene::LoadFieldGeometry ( SSL_GeometryFieldSize &fieldSize )
+void FieldScene::LoadFieldGeometry (const SSL_GeometryFieldSize &fieldSize)
 {
 #ifdef OLD_SSL_PROTO
 	this->line_width = fieldSize.line_width();
@@ -374,5 +379,5 @@ void FieldScene::LoadFieldGeometry ( SSL_GeometryFieldSize &fieldSize )
 
 	this->removeItem ( fieldItem );
 	ConstructField();
-	fieldItem = this->addPath ( *field,*fieldLinePen,*fieldBrush );
+	fieldItem = this->addPath (*field, *fieldLinePen, *fieldBrush);
 }

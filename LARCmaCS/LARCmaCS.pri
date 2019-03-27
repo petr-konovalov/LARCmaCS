@@ -39,10 +39,10 @@ INCLUDEPATH += \
   $${MATLAB_DIR}/include \
 
 SOURCES +=  \
-  $${SHARED_DIR}/net/robocup_ssl_client.cpp \
-  $${SHARED_DIR}/net/robocup_grSim_client.cpp \
+  $${SHARED_DIR}/net/robocup_vision_client.cpp \
 
 SOURCES += \
+	$$PWD/grsimtransforms.cpp \
 	$$PWD/main.cpp \
 	$$PWD/larcmacs.cpp \
 	$$PWD/fieldScene.cpp \
@@ -66,8 +66,7 @@ SOURCES += \
         $$PWD/robotReceiver.cpp \
 
 HEADERS  += \
-  $${SHARED_DIR}/net/robocup_ssl_client.h \
-  $${SHARED_DIR}/net/robocup_grSim_client.h \
+  $${SHARED_DIR}/net/robocup_vision_client.h \
   $${SHARED_DIR}/net/Pipe.h \
   $${SHARED_DIR}/util/timer.h \
   $${SHARED_DIR}/util/field_default_constants.h \
@@ -92,6 +91,7 @@ HEADERS  += \
         $$PWD/connectorWorker.h \
         $$PWD/settings.h \
         $$PWD/robotReceiver.h \
+	$$PWD/grsimtransforms.h \
 
 FORMS += \
 	$$PWD/larcmacs.ui \

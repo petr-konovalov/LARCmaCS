@@ -4,16 +4,19 @@
 #include <QObject>
 
 #include "packetSSL.h"
-#include "robocup_ssl_client.h"
-#include "robocup_grsim_client.h"
+#include "robocup_vision_client.h"
 
 #include <time.h>
+
+#define SSL_VISION_PORT 10006
+#define SIM_VISION_PORT 10020
 
 struct ReceiverWorker : public QObject
 {
 	Q_OBJECT
 public:
 	explicit ReceiverWorker();
+	~ReceiverWorker();
 
 public slots:
 	void MainAlgFree();
@@ -27,19 +30,17 @@ public slots:
 public:
 	SSL_DetectionFrame detection;
 
-	SSL_GeometryFieldSize fieldsize;
-
 	SSL_WrapperPacket * packet;
 
 signals:
-	void activateGUI();
+	void activateGUI(SSL_WrapperPacket * packet);
 	void clientOpen();
 	void clientClose();
 	void simClientOpen();
 	void simClientClose();
 	void clearField();
 	void activateMA(PacketSSL packetssl);
-	void updatefieldGeometry();
+	void updatefieldGeometry(SSL_WrapperPacket * packet);
 	void UpdateSSLFPS(QString message);
 
 private:
@@ -49,8 +50,8 @@ private:
 
 private:
 	void run();
-	RoboCupSSLClient client;
-	RoboCupGrSimClient simClient;
+	RoboCupVisionClient * client;
+	RoboCupVisionClient * simClient;
 
 	bool isSimEnabledFlag = 0;
 	bool enableSimFlag = 0;

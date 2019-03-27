@@ -56,7 +56,6 @@ void ConnectorWorker::init()
 	}
 
 	timer = new QTimer(this);
-	//connect(timer,SIGNAL(timeout()),this, SLOT(udpBroadcastRequestIP()));
 	connect(udpSocket,SIGNAL(readyRead()),this,SLOT(udpProcessPendingDatagrams()));
 	qDebug()<<"INIT CONNECTOR OK";
 }
@@ -76,17 +75,27 @@ void ConnectorWorker::receiveMacArray(QString * macArray)
 	connectedAllSocketsFlag = true;
 }
 
-void ConnectorWorker::run(int N, QByteArray command)
+QString ConnectorWorker::getGrSimIP()
+{
+	return grSimIP;
+}
+
+unsigned short ConnectorWorker::getGrSimPort()
+{
+	return grSimPort;
+}
+
+void ConnectorWorker::run(int N, const QByteArray &command)
 {
 	udpSocket->writeDatagram(command, QHostAddress(numIP[N]), 10000);
 }
 
-void ConnectorWorker::runSim(QByteArray command)
+void ConnectorWorker::runSim(const QByteArray &command)
 {
 	udpSocket->writeDatagram(command, QHostAddress(grSimIP), grSimPort);
 }
 
-void ConnectorWorker::changeGrSimIP(QString IP)
+void ConnectorWorker::changeGrSimIP(const QString &IP)
 {
 	grSimIP = IP;
 }

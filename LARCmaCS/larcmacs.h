@@ -46,8 +46,8 @@ private:
 	RobotReceiver robotReceiver;
 
 private slots:
-	void fieldsceneUpdateRobots();
-	void fieldsceneUpdateField();
+	void fieldsceneUpdateRobots(SSL_WrapperPacket * packet);
+	void fieldsceneUpdateField(SSL_WrapperPacket * packet);
 	void UpdateSSLFPS(QString message);
 	void UpdateStatusBar(QString message);
 	void UpdatePauseState(QString message);
