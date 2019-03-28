@@ -25,12 +25,8 @@ public slots:
 
 public slots:
 	void ChangeMaxPacketFrequencyMod(bool state);
+	void processPacket(SSL_WrapperPacket * packet);
 	void ChangeSimulatorMode(bool flag);
-
-public:
-	SSL_DetectionFrame detection;
-
-	SSL_WrapperPacket * packet;
 
 signals:
 	void activateGUI(SSL_WrapperPacket * packet);
@@ -49,12 +45,11 @@ private:
 	int Time_count;
 
 private:
-	void run();
+
 	RoboCupVisionClient * client;
 	RoboCupVisionClient * simClient;
 
 	bool isSimEnabledFlag = 0;
-	bool enableSimFlag = 0;
 	bool NewPacket;
 	bool shutdownread;
 	bool mainalgisfree;

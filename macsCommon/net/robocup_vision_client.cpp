@@ -6,12 +6,23 @@ RoboCupVisionClient::RoboCupVisionClient(unsigned short port)
 	: groupAddress(visionIP)
 {
 	_port = port;
-	packet = new SSL_WrapperPacket();
+	for (int i = 0; i < NUM_OF_CAMERAS; i++) {
+		newPacket[i] = false;
+	}
+	inputPacket = new SSL_WrapperPacket();
+	timer = new QTimer();
+	connect(timer, SIGNAL(timeout()), this, SLOT(processFrame()));
 }
 
-RoboCupVisionClient::~RoboCupVisionClient(){}
+RoboCupVisionClient::~RoboCupVisionClient()
+{
+	timer->stop();
+	delete timer;
+}
 
-void RoboCupVisionClient::close() {
+void RoboCupVisionClient::close()
+{
+	timer->stop();
 	socket.close();
 }
 
@@ -21,35 +32,47 @@ bool RoboCupVisionClient::open()
 	socket.bind(QHostAddress::AnyIPv4, _port, QUdpSocket::ShareAddress);
 	socket.joinMulticastGroup(groupAddress);
 	connect(&socket, SIGNAL(readyRead()), this, SLOT(processPendingDatagrams()));
+	timer->start();
 	return true;
 }
 
 void RoboCupVisionClient::processPendingDatagrams()
 {
+	unsigned int camID = 0;
 	QByteArray datagram;
 	int datagramSize;
 	while (socket.hasPendingDatagrams()) {
 		datagram.resize(int(socket.pendingDatagramSize()));
 		datagramSize = int(socket.pendingDatagramSize());
 		socket.readDatagram(datagram.data(), datagram.size());
-		packet->ParseFromArray(datagram.data(), datagramSize);
+		inputPacket->ParseFromArray(datagram.data(), datagramSize);
+
+		if(inputPacket->has_detection()) {
+			camID = inputPacket->detection().camera_id();
+		} else {
+			camID = 0;
+		}
+
 		mutex.lock();
-		newPacket = true;
-		outputPacket = packet;
+		newPacket[camID] = true;
+		outputPacket[camID] = inputPacket;
 		mutex.unlock();
-		packet = new SSL_WrapperPacket();
+		inputPacket = new SSL_WrapperPacket();
 	}
 }
 
-
-bool RoboCupVisionClient::receive(SSL_WrapperPacket ** packet) {
-	mutex.lock();
-	if (newPacket) {
-		*packet = outputPacket;
-		newPacket = false;
-		mutex.unlock();
-		return true;
+void RoboCupVisionClient::processFrame()
+{
+	SSL_WrapperPacket * procPacket;
+	for (int i = 0; i < NUM_OF_CAMERAS; i++) {
+		mutex.lock();
+		if (newPacket[i]) {
+			procPacket = outputPacket[i];
+			newPacket[i] = false;
+			mutex.unlock();
+			emit processPacket(procPacket);
+		} else {
+			mutex.unlock();
+		}
 	}
-	mutex.unlock();
-	return false;
 }

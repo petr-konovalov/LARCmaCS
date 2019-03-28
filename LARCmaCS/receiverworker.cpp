@@ -12,6 +12,8 @@ ReceiverWorker::ReceiverWorker()
 
 ReceiverWorker::~ReceiverWorker()
 {
+	emit clientClose();
+	emit simClientClose();
 	delete client;
 	delete simClient;
 }
@@ -22,7 +24,6 @@ void ReceiverWorker::MainAlgFree()
 		mainalgisfree=false;
 		NewPacket=false;
 		emit activateMA(packetssl);
-		//emit activateGUI();
 	} else
 		mainalgisfree=true;
 }
@@ -38,7 +39,8 @@ void ReceiverWorker::start()
 	connect(this, SIGNAL(clientClose()), client, SLOT(close()));
 	connect(this, SIGNAL(simClientOpen()), simClient, SLOT(open()));
 	connect(this, SIGNAL(simClientClose()), simClient, SLOT(close()));
-	run();
+	connect(client, SIGNAL(processPacket(SSL_WrapperPacket *)), this, SLOT(processPacket(SSL_WrapperPacket *)));
+	emit clientOpen();
 }
 
 void ReceiverWorker::stop()
@@ -54,15 +56,29 @@ void ReceiverWorker::ChangeMaxPacketFrequencyMod(bool state)
 
 void ReceiverWorker::ChangeSimulatorMode(bool flag)
 {
-	enableSimFlag = flag;
+	if (flag != isSimEnabledFlag) {
+		isSimEnabledFlag = flag;
+		if (isSimEnabledFlag) {
+			disconnect(client, SIGNAL(processPacket(SSL_WrapperPacket *)), this, SLOT(run(SSL_WrapperPacket *)));
+			emit clientClose();
+			emit clearField();
+			connect(simClient, SIGNAL(processPacket(SSL_WrapperPacket *)), this, SLOT(run(SSL_WrapperPacket *)));
+			emit simClientOpen();
+		} else {
+			disconnect(simClient, SIGNAL(processPacket(SSL_WrapperPacket *)), this, SLOT(run(SSL_WrapperPacket *)));
+			emit simClientClose();
+			emit clearField();
+			connect(client, SIGNAL(processPacket(SSL_WrapperPacket *)), this, SLOT(run(SSL_WrapperPacket *)));
+			emit clientOpen();
+		}
+	}
 }
 
-void ReceiverWorker::run()
+void ReceiverWorker::processPacket(SSL_WrapperPacket * packet)
 {
-	QPointF p;
-
 	int balls_n = 0;
 	SSL_DetectionBall ball;
+	SSL_DetectionFrame detection;
 
 	int robots_blue_n = 0;
 	int robots_yellow_n = 0;
@@ -75,106 +91,84 @@ void ReceiverWorker::run()
 
 	int packetsNum = 0;
 
-	cout << "Run?" << endl;
-	bool packetReceived = 0;
-
-	while (!shutdownread) {
-		if (enableSimFlag != isSimEnabledFlag) {
-			isSimEnabledFlag = enableSimFlag;
-			emit clearField();
-		}
-		if (isSimEnabledFlag) {
-			packetReceived = simClient->receive(&packet);
-		} else {
-			packetReceived = client->receive(&packet);
-		}
-		if (packetReceived) {
-			if (packet->has_geometry()) {
-				emit updatefieldGeometry(packet);
-			}
-			else if (packet->has_detection()) {
-				Time_count++;
-				packetsNum++;
-				//cout << "Num RECEIVER:" << packetsNum << endl;
+	if (packet->has_geometry()) {
+		emit updatefieldGeometry(packet);
+	}
+	else if (packet->has_detection()) {
+		Time_count++;
+		packetsNum++;
+		//cout << "Num RECEIVER:" << packetsNum << endl;
 
 
-				qRegisterMetaType<PacketSSL>("PacketSSL"); // for queueing arguments between threads
+		qRegisterMetaType<PacketSSL>("PacketSSL"); // for queueing arguments between threads
 
-				detection = packet->detection();
+		detection = packet->detection();
 
-				idCam = detection.camera_id() + 1;
-				balls_n = detection.balls_size();
+		idCam = detection.camera_id() + 1;
+		balls_n = detection.balls_size();
 
-				// [Start] Ball info
-				if (balls_n != 0) {
-					packetssl.balls[0] = idCam;
-					ball = detection.balls(0);
-					packetssl.balls[1] = ball.x();
-					packetssl.balls[2] = ball.y();
-				} else
-					packetssl.balls[0] = 0;
+		// [Start] Ball info
+		if (balls_n != 0) {
+			packetssl.balls[0] = idCam;
+			ball = detection.balls(0);
+			packetssl.balls[1] = ball.x();
+			packetssl.balls[2] = ball.y();
+		} else
+			packetssl.balls[0] = 0;
 
-				robots_blue_n = detection.robots_blue_size();
-				robots_yellow_n = detection.robots_yellow_size();
-				// [End] Ball info
+		robots_blue_n = detection.robots_blue_size();
+		robots_yellow_n = detection.robots_yellow_size();
+		// [End] Ball info
 
-				// [Start] Robot info
-				for (int i = 0; i < TEAM_COUNT / 4; i++)
-					if(packetssl.robots_blue[i] == idCam)
-						packetssl.robots_blue[i] = 0;
+		// [Start] Robot info
+		for (int i = 0; i < TEAM_COUNT / 4; i++)
+			if(packetssl.robots_blue[i] == idCam)
+				packetssl.robots_blue[i] = 0;
 
-				for (int i = 0; i < robots_blue_n; i++) {
-					robot = detection.robots_blue(i);
-					packetssl.robots_blue[robot.robot_id()] = idCam;
-					packetssl.robots_blue[robot.robot_id() + 12] = robot.x();
-					packetssl.robots_blue[robot.robot_id() + 24] = robot.y();
-					packetssl.robots_blue[robot.robot_id() + 36] = robot.orientation();
-				}
-
-				for (int i = 0; i < TEAM_COUNT / 4; i++)
-					if(packetssl.robots_yellow[i] == idCam)
-						packetssl.robots_yellow[i] = 0;
-
-				for (int i = 0; i < robots_yellow_n; i++) {
-					robot = detection.robots_yellow(i);
-					packetssl.robots_yellow[robot.robot_id()] = idCam;
-					packetssl.robots_yellow[robot.robot_id() + 12] = robot.x();
-					packetssl.robots_yellow[robot.robot_id() + 24] = robot.y();
-					packetssl.robots_yellow[robot.robot_id() + 36] = robot.orientation();
-				}
-				// [End] Ball info
-				QApplication::processEvents();
-				if (mainalgisfree) {
-					mainalgisfree=false;
-					NewPacket=false;
-					emit activateMA(packetssl);
-					emit activateGUI(packet);
-				} else {
-					NewPacket=true;
-					if (MaxPacketFrequencyMod)
-						emit activateGUI(packet);
-				}
-			}
-		} else {
-			// no messages...
-			//Sleep(1);
+		for (int i = 0; i < robots_blue_n; i++) {
+			robot = detection.robots_blue(i);
+			packetssl.robots_blue[robot.robot_id()] = idCam;
+			packetssl.robots_blue[robot.robot_id() + 12] = robot.x();
+			packetssl.robots_blue[robot.robot_id() + 24] = robot.y();
+			packetssl.robots_blue[robot.robot_id() + 36] = robot.orientation();
 		}
 
-		if (clock()-timer_m>CLOCKS_PER_SEC) {
-			timer_m=clock();
-			QString temp;
-			QString ToStatus="FPS=";
-			temp.setNum(Time_count);
-			ToStatus=ToStatus+temp;
-			ToStatus=ToStatus+"; Count=";
-			temp.setNum(packetsNum);
-			ToStatus=ToStatus+temp;
-			Time_count=0;
-			emit UpdateSSLFPS(ToStatus);
+		for (int i = 0; i < TEAM_COUNT / 4; i++)
+			if(packetssl.robots_yellow[i] == idCam)
+				packetssl.robots_yellow[i] = 0;
+
+		for (int i = 0; i < robots_yellow_n; i++) {
+			robot = detection.robots_yellow(i);
+			packetssl.robots_yellow[robot.robot_id()] = idCam;
+			packetssl.robots_yellow[robot.robot_id() + 12] = robot.x();
+			packetssl.robots_yellow[robot.robot_id() + 24] = robot.y();
+			packetssl.robots_yellow[robot.robot_id() + 36] = robot.orientation();
 		}
+		// [End] Ball info
 		QApplication::processEvents();
+		if (mainalgisfree) {
+			mainalgisfree=false;
+			NewPacket=false;
+			emit activateMA(packetssl);
+			emit activateGUI(packet);
+		} else {
+			NewPacket=true;
+			//if (MaxPacketFrequencyMod) //why this was an option? maybe we lost smth important
+				emit activateGUI(packet);
+		}
 	}
 
-	emit clientClose();
-	emit simClientClose();
+	if (clock()-timer_m>CLOCKS_PER_SEC) {
+		timer_m=clock();
+		QString temp;
+		QString ToStatus="FPS=";
+		temp.setNum(Time_count);
+		ToStatus=ToStatus+temp;
+		ToStatus=ToStatus+"; Count=";
+		temp.setNum(packetsNum);
+		ToStatus=ToStatus+temp;
+		Time_count=0;
+		emit UpdateSSLFPS(ToStatus);
+	}
+	QApplication::processEvents();
 }
