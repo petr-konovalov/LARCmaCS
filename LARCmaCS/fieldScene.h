@@ -3,7 +3,6 @@
 #include <QGraphicsPathItem>
 #include "field_default_constants.h"
 #include "messages_robocup_ssl_wrapper.pb.h"
-#include <vector>
 #include "timer.h"
 #include "robot.h"
 
@@ -16,8 +15,7 @@ public:
 	explicit FieldScene(QObject *parent = 0);
 
 	void AddRobot (Robot* robot);
-	void UpdateRobots (SSL_WrapperPacket * packet);
-	int UpdateBalls (QVector<QPointF> &_balls, int cameraID);
+	void UpdateRobots(SSL_WrapperPacket * packet);
 
 #ifndef OLD_SSL_PROTO
 	void UpdateField(SSL_WrapperPacket * packet);
@@ -25,7 +23,7 @@ public:
 
 	void UpdateGeometry(SSL_GeometryFieldSize fieldSize);
 	void LoadFieldGeometry();
-	void LoadFieldGeometry (const SSL_GeometryFieldSize &fieldSize);
+	void LoadFieldGeometry(const SSL_GeometryFieldSize &fieldSize);
 	void ClearField();
 
 private:
@@ -58,8 +56,8 @@ private:
 	double penalty_spot_from_field_line_dist;
 	double penalty_line_from_spot_dist;
 #else
-	vector<SSL_FieldLineSegment> field_lines;
-	vector<SSL_FieldCicularArc> field_arcs;
+	QVector<SSL_FieldLineSegment> field_lines;
+	QVector<SSL_FieldCicularArc> field_arcs;
 	double penalty_area_width;
 	double penalty_area_depth;
 #endif

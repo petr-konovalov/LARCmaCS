@@ -92,6 +92,7 @@ HEADERS  += \
         $$PWD/settings.h \
         $$PWD/robotReceiver.h \
 	$$PWD/grsimtransforms.h \
+    $$PWD/constants.h
 
 FORMS += \
 	$$PWD/larcmacs.ui \

@@ -1,16 +1,24 @@
 // Copyright 2019 Dmitrii Iarosh
 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+
+// http://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #include "grsimtransforms.h"
 
 GrSimTransforms::GrSimTransforms(){}
 
 float GrSimTransforms::fromPower2Kick(bool isKicked, int voltage)
 {
-	if (isKicked) {
-		return 2; //should be implemented after experiments
-	} else {
-		return 0;
-	}
+	return isKicked ? 2 : 0; //should be implemented after experiments
 }
 
 float GrSimTransforms::fromPower2Speed(int power)
@@ -18,18 +26,18 @@ float GrSimTransforms::fromPower2Speed(int power)
 	return power / 100.0 * 6; //should be implemented after experiments
 }
 
-void GrSimTransforms::formGrSimControlPacket(QByteArray& command, int numOfRobot, int speedX, int speedY, int speedR, bool kickUp, bool kickForward, int kickVoltage, bool enableSpinner)
+void GrSimTransforms::formGrSimControlPacket(QByteArray & command, int numOfRobot, int speedX, int speedY, int speedR, bool kickUp, bool kickForward, int kickVoltage, bool enableSpinner)
 {
 	grSim_Packet packet;
 	bool yellow = false;
-	if (numOfRobot >= MAX_ROBOTS_IN_TEAM) {
+	if (numOfRobot >= Constants::maxRobotsInTeam) {
 		yellow = true;
 	}
 	packet.mutable_commands()->set_isteamyellow(yellow);
 	packet.mutable_commands()->set_timestamp(0.0);
 	grSim_Robot_Command* controls = packet.mutable_commands()->add_robot_commands();
 
-	controls->set_id(numOfRobot % MAX_ROBOTS_IN_TEAM);
+	controls->set_id(numOfRobot % Constants::maxRobotsInTeam);
 
 	//we are not using wheel speed only directional speed!
 	controls->set_wheelsspeed(false);

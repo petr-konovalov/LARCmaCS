@@ -123,7 +123,7 @@ void LARCmaCS::remcontrolsender(int l, int r,int k, int b, bool kickUp)
 	QString IP;
 	if (!simFlag) {
 		IP = ip;
-		port = REAL_ROBOT_PORT;
+		port = Connector::robotPort;
 	} else {
 		IP = connector.worker.getGrSimIP();
 		port = connector.worker.getGrSimPort();

@@ -22,18 +22,15 @@ public slots:
 	void MainAlgFree();
 	void start();
 	void stop();
-
-public slots:
 	void ChangeMaxPacketFrequencyMod(bool state);
 	void processPacket(SSL_WrapperPacket * packet);
 	void ChangeSimulatorMode(bool flag);
+	void socketClosed();
 
 signals:
 	void activateGUI(SSL_WrapperPacket * packet);
-	void clientOpen();
+	void clientOpen(unsigned short port);
 	void clientClose();
-	void simClientOpen();
-	void simClientClose();
 	void clearField();
 	void activateMA(PacketSSL packetssl);
 	void updatefieldGeometry(SSL_WrapperPacket * packet);
@@ -43,13 +40,8 @@ private:
 	PacketSSL packetssl;
 	clock_t timer_m;
 	int Time_count;
-
-private:
-
 	RoboCupVisionClient * client;
-	RoboCupVisionClient * simClient;
-
-	bool isSimEnabledFlag = 0;
+	bool isSimEnabledFlag = false;
 	bool NewPacket;
 	bool shutdownread;
 	bool mainalgisfree;

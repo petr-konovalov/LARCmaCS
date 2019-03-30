@@ -10,7 +10,6 @@
 #include <QtNetwork>
 #include <QTimer>
 #include <QMap>
-#define REAL_ROBOT_PORT 10000
 
 #include "connectorWorker.h"
 
@@ -28,6 +27,8 @@ public:
 
 	explicit Connector();
 	~Connector();
+
+	static const unsigned short robotPort = 10000;
 
 	void init();
 	void start();

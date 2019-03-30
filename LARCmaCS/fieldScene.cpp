@@ -149,47 +149,14 @@ void FieldScene::UpdateGeometry(SSL_GeometryFieldSize fieldSize) {
 	LoadFieldGeometry(fieldSize);
 }
 
-int FieldScene::UpdateBalls(QVector<QPointF> &_balls, int cameraID)
-{
-	QVector<QGraphicsEllipseItem*> tmp;
-	while(cameraID+1>ballItems.size())
-		ballItems.append(tmp);
-
-	if ( ballItems[cameraID].size() < _balls.size() ) {
-		//need to allocate some space for the new balls
-		QPen pen ( QColor ( 0xcd,0x59,0x00,0xff ) );
-		pen.setWidth ( 2 );
-		QBrush brush ( QColor ( 0xff,0x81,0x00,0xff ),Qt::SolidPattern );
-		while(_balls.size()>ballItems[cameraID].size()) {
-			ballItems[cameraID].append ( this->addEllipse ( 0,0,12,12,pen,brush ) );
-			ballItems[cameraID][ballItems[cameraID].size()-1]->setZValue(2);
-		}
-	} else if ( ballItems[cameraID].size() >_balls.size() ) {
-	//need to delete some balls
-		while(ballItems[cameraID].size()>_balls.size()){
-		this->removeItem ( ballItems[cameraID][0] );
-		ballItems[cameraID].remove(0);
-		}
-	}
-
-	for ( int i=0;i<_balls.size();i++ ) {
-	//Let's update the ball positions now
-//      cout << _balls[i].x()/ksize << " " << _balls[i].y()/ksize << endl;
-		ballItems[cameraID][i]->setPos ( _balls[i].x()/ksize-6,_balls[i].y()/ksize-6 );
-	}
-
-	int balls = ballItems[cameraID].size();
-	return balls;
-}
-
 void FieldScene::ClearField()
 {
 	LoadFieldGeometry();
-	this->removeItem (fieldItem);
+	this->removeItem(fieldItem);
 	field_arcs.clear();
 	field_lines.clear();
 	ConstructField();
-	fieldItem = this->addPath (*field, *fieldLinePen, *fieldBrush);
+	fieldItem = this->addPath(*field, *fieldLinePen, *fieldBrush);
 	for (int i = 0; i < robots.size(); i++) {
 		this->removeItem(robots[i]);
 	}
@@ -215,45 +182,45 @@ void FieldScene::ConstructField()
 	field->addText(QPoint(field_length/(2*ksize)+100/ksize, -field_width/(2*ksize)-100/ksize), qfont , "(" + QString::number(field_length / 2) + ", " + QString::number(field_width / 2) + ")");
 
 #ifdef OLD_SSL_PROTO
-	field->moveTo ( 0,-field_width/(2*ksize) );
-	field->lineTo ( 0,field_width/(2*ksize) );
+	field->moveTo(0, -field_width / (2 * ksize));
+	field->lineTo(0, field_width / (2 * ksize));
 
-	field->addEllipse ( -2*center_circle_radius/(2*ksize),-center_circle_radius/ksize,
-						4*center_circle_radius/(2*ksize),2*center_circle_radius/ksize );
+	field->addEllipse(-2 * center_circle_radius / (2 * ksize), -center_circle_radius / ksize,
+						4 * center_circle_radius / (2 * ksize), 2 * center_circle_radius / ksize);
 
-	field->moveTo ( field_length/(2*ksize),-field_width/(2*ksize) );
-	field->lineTo ( field_length/(2*ksize),field_width/(2*ksize) );
+	field->moveTo(field_length / (2 * ksize), -field_width / (2 * ksize));
+	field->lineTo(field_length / (2 * ksize), field_width / (2 * ksize));
 
-	field->moveTo ( -field_length/(2*ksize),-field_width/(2*ksize) );
-	field->lineTo ( -field_length/(2*ksize),field_width/(2*ksize) );
+	field->moveTo(-field_length / (2 * ksize), -field_width / (2 * ksize));
+	field->lineTo(-field_length / (2 * ksize), field_width / (2 * ksize));
 
-	field->moveTo ( -field_length/(2*ksize),-field_width/(2*ksize) );
-	field->lineTo ( field_length/(2*ksize),-field_width/(2*ksize) );
+	field->moveTo(-field_length / (2 * ksize), -field_width / (2 * ksize));
+	field->lineTo(field_length / (2 * ksize), -field_width / (2 * ksize));
 
-	field->moveTo ( -field_length/(2*ksize),field_width/(2*ksize) );
-	field->lineTo ( field_length/(2*ksize),field_width/(2*ksize) );
+	field->moveTo(-field_length / (2 * ksize), field_width / (2 * ksize));
+	field->lineTo(field_length / (2 * ksize), field_width / (2 * ksize));
 
-	field->moveTo ( field_length/(2*ksize),goal_width/(2*ksize) );
-	field->lineTo ( ( field_length/(2*ksize)+goal_depth/ksize ),goal_width/(2*ksize) );
-	field->lineTo ( ( field_length/(2*ksize)+goal_depth/ksize ),-goal_width/(2*ksize) );
-	field->lineTo ( field_length/(2*ksize),-goal_width/(2*ksize) );
-	field->moveTo ( ( field_length/(2*ksize)-defense_radius/ksize ),defense_stretch/(2*ksize) );
-	field->lineTo ( ( field_length/(2*ksize)-defense_radius/ksize ),-defense_stretch/(2*ksize) );
-	field->moveTo ( ( field_length/(2*ksize)-defense_radius/ksize ),defense_stretch/(2*ksize) );
-	field->arcTo ( ( field_length/(2*ksize)-defense_radius/ksize ),- ( defense_radius/ksize-defense_stretch/(2*ksize) ),2*defense_radius/ksize,2*defense_radius/ksize,180,90 );
-	field->moveTo ( ( field_length/(2*ksize)-defense_radius/ksize ),-defense_stretch/(2*ksize) );
-	field->arcTo ( ( field_length/(2*ksize)-defense_radius/ksize ),- ( defense_radius/ksize+defense_stretch/(2*ksize) ),2*defense_radius/ksize,2*defense_radius/ksize,180,-90 );
+	field->moveTo(field_length / (2 * ksize), goal_width / (2 * ksize));
+	field->lineTo((field_length / (2 * ksize) + goal_depth/ksize), goal_width / (2 * ksize));
+	field->lineTo((field_length / (2 * ksize) + goal_depth / ksize), -goal_width / (2 * ksize));
+	field->lineTo(field_length / (2 * ksize), -goal_width / (2 * ksize));
+	field->moveTo((field_length / (2 * ksize) - defense_radius / ksize), defense_stretch / (2 * ksize));
+	field->lineTo((field_length / (2 * ksize) - defense_radius / ksize), -defense_stretch / (2 * ksize));
+	field->moveTo((field_length / (2 * ksize) - defense_radius / ksize), defense_stretch / (2 * ksize));
+	field->arcTo((field_length / (2 * ksize) - defense_radius / ksize), -(defense_radius / ksize - defense_stretch / (2 * ksize)), 2 * defense_radius / ksize, 2 * defense_radius / ksize, 180, 90);
+	field->moveTo((field_length / (2 * ksize) - defense_radius / ksize), -defense_stretch / (2 * ksize));
+	field->arcTo((field_length / (2 * ksize) - defense_radius / ksize), -(defense_radius / ksize + defense_stretch / (2 * ksize)), 2 * defense_radius / ksize, 2 * defense_radius / ksize, 180, -90);
 
-	field->moveTo ( -field_length/(2*ksize),goal_width/(2*ksize) );
-	field->lineTo ( - ( field_length/(2*ksize)+goal_depth/ksize ),goal_width/(2*ksize) );
-	field->lineTo ( - ( field_length/(2*ksize)+goal_depth/ksize ),-goal_width/(2*ksize) );
-	field->lineTo ( -field_length/(2*ksize),-goal_width/(2*ksize) );
-	field->moveTo ( - ( field_length/(2*ksize)-defense_radius/ksize ),defense_stretch/(2*ksize) );
-	field->lineTo ( - ( field_length/(2*ksize)-defense_radius/ksize ),-defense_stretch/(2*ksize) );
-	field->moveTo ( - ( field_length/(2*ksize)-defense_radius/ksize ),defense_stretch/(2*ksize) );
-	field->arcTo ( - ( field_length/(2*ksize)+defense_radius/ksize ),- (defense_radius/ksize-defense_stretch/(2*ksize) ),2*defense_radius/ksize,2*defense_radius/ksize,0,-90 );
-	field->moveTo ( - ( field_length/(2*ksize)-defense_radius/ksize ),-defense_stretch/(2*ksize) );
-	field->arcTo ( - ( field_length/(2*ksize)+defense_radius/ksize ),- ( defense_radius/ksize+defense_stretch/(2*ksize) ),2*defense_radius/ksize,2*defense_radius/ksize,0,90 );
+	field->moveTo( -field_length/(2*ksize),goal_width/(2*ksize) );
+	field->lineTo( - ( field_length/(2*ksize)+goal_depth/ksize ),goal_width/(2*ksize) );
+	field->lineTo( - ( field_length/(2*ksize)+goal_depth/ksize ),-goal_width/(2*ksize) );
+	field->lineTo( -field_length/(2*ksize),-goal_width/(2*ksize) );
+	field->moveTo( - ( field_length/(2*ksize)-defense_radius/ksize ),defense_stretch/(2*ksize) );
+	field->lineTo( - ( field_length/(2*ksize)-defense_radius/ksize ),-defense_stretch/(2*ksize) );
+	field->moveTo( - ( field_length/(2*ksize)-defense_radius/ksize ),defense_stretch/(2*ksize) );
+	field->arcTo( - ( field_length/(2*ksize)+defense_radius/ksize ),- (defense_radius/ksize-defense_stretch/(2*ksize) ),2*defense_radius/ksize,2*defense_radius/ksize,0,-90 );
+	field->moveTo( - ( field_length/(2*ksize)-defense_radius/ksize ),-defense_stretch/(2*ksize) );
+	field->arcTo( - ( field_length/(2*ksize)+defense_radius/ksize ),- ( defense_radius/ksize+defense_stretch/(2*ksize) ),2*defense_radius/ksize,2*defense_radius/ksize,0,90 );
 #else
 	if (field_lines.empty() || field_arcs.empty()) {
 		field->moveTo ( 0,-field_width/(2*ksize) );
@@ -343,7 +310,7 @@ void FieldScene::LoadFieldGeometry()
 #endif
 }
 
-void FieldScene::LoadFieldGeometry (const SSL_GeometryFieldSize &fieldSize)
+void FieldScene::LoadFieldGeometry(const SSL_GeometryFieldSize & fieldSize)
 {
 #ifdef OLD_SSL_PROTO
 	this->line_width = fieldSize.line_width();
@@ -360,10 +327,10 @@ void FieldScene::LoadFieldGeometry (const SSL_GeometryFieldSize &fieldSize)
 	field_lines.clear();
 	field_arcs.clear();
 	for (int i = 0; i < fieldSize.field_lines_size(); i++) {
-		field_lines.push_back(fieldSize.field_lines(i));
+		field_lines.append(fieldSize.field_lines(i));
 	}
 	for (int i = 0; i < fieldSize.field_arcs_size(); i++) {
-		field_arcs.push_back(fieldSize.field_arcs(i));
+		field_arcs.append(fieldSize.field_arcs(i));
 	}
 
 	this->penalty_area_depth = FieldConstantsRoboCup2018A::kPenaltyAreaDepth;

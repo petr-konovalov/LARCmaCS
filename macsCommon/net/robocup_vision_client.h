@@ -1,5 +1,17 @@
 // Copyright 2019 Dmitrii Iarosh
 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+
+// http://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #pragma once
 
 #define NUM_OF_CAMERAS 4
@@ -11,30 +23,33 @@
 #include "messages_robocup_ssl_wrapper.pb.h"
 using namespace std;
 
-static const QString visionIP = QStringLiteral("224.5.23.2");
+
 
 class RoboCupVisionClient : public QObject {
     Q_OBJECT
 private:
-	QTimer * timer;
-protected:
+	static const QString visionIP;
+	QTimer mTimer;
     static const int MaxDataGramSize = 65536;
-    QUdpSocket socket;
-    QHostAddress groupAddress;
-    QMutex mutex;
-	SSL_WrapperPacket * outputPacket[NUM_OF_CAMERAS];
-    unsigned short _port;
-	bool newPacket[NUM_OF_CAMERAS];
-	SSL_WrapperPacket * inputPacket;
+	QUdpSocket mSocket;
+	QHostAddress mGroupAddress;
+	QMutex mMutex;
+	QVector<SSL_WrapperPacket *> mOutputPacket;
+	SSL_WrapperPacket * mGeometryPacket;
+	bool mNewPacket[NUM_OF_CAMERAS];
+	bool mNewGeometryPacket = false;
+	SSL_WrapperPacket * mInputPacket;
 public:
-    RoboCupVisionClient(unsigned short port);
+	RoboCupVisionClient();
     ~RoboCupVisionClient();
 
 private slots:
     void processPendingDatagrams();
-	bool open();
+	bool open(unsigned short port);
 	void processFrame();
+	void clearOutput();
     void close();
 signals:
+	void socketClosed();
 	void processPacket(SSL_WrapperPacket * packet);
 };

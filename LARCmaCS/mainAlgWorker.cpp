@@ -85,9 +85,9 @@ MainAlgWorker::MainAlgWorker()
 	auto allAddrs = in.readAll().split("\n", QString::SkipEmptyParts).filter(QRegExp("^[^#;]"));
 	client.initFromList(allAddrs);
 
-	for (int i=0; i<MAX_NUM_ROBOTS; i++)
+	for (int i = 0; i < Constants::maxNumOfRobots; i++)
 	{
-		Send2BT[i]=true;
+		Send2BT[i] = true;
 	}
 	mIsBallInside = false;
 }
@@ -108,8 +108,8 @@ void MainAlgWorker::stop()
 
 void MainAlgWorker::Send2BTChangeit(bool * send2BT_)
 {
-	for (int i=0; i<MAX_NUM_ROBOTS; i++) {
-		Send2BT[i]=send2BT_[i];
+	for (int i = 0; i < Constants::maxNumOfRobots; i++) {
+		Send2BT[i] = send2BT_[i];
 	}
 }
 
@@ -169,7 +169,7 @@ void MainAlgWorker::run(PacketSSL packetssl)
 		if (newmess[0] == 1) {
 			char * newmessage=new char[100];
 			memcpy(newmessage,newmess, 100);
-			if ((newmess[1] >= 0) && (newmess[1] <= MAX_NUM_ROBOTS) && ((newmess[1] == 0) || (Send2BT[newmess[1] - 1] == true)))
+			if ((newmess[1] >= 0) && (newmess[1] <= Constants::maxNumOfRobots) && ((newmess[1] == 0) || (Send2BT[newmess[1] - 1] == true)))
 				emit sendToBTtransmitter(newmessage); //is never connected and used
 			QByteArray command;
 
@@ -205,14 +205,14 @@ void MainAlgWorker::run(PacketSSL packetssl)
 			}
 
 			if (newmess[1] == 0)
-				for (int i = 1; i <= MAX_NUM_ROBOTS; i++) {
+				for (int i = 1; i <= Constants::maxNumOfRobots; i++) {
 					if (!simFlag) {
 						emit sendToConnector(i, command);
 					} else {
 						emit sendToSimConnector(command);
 					}
 				}
-			if ((newmess[1] > 0) && (newmess[1] <= MAX_NUM_ROBOTS)) {
+			if ((newmess[1] > 0) && (newmess[1] <= Constants::maxNumOfRobots)) {
 				if (!simFlag) {
 					emit sendToConnector(newmess[1], command);
 				} else {

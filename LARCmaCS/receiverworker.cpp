@@ -6,16 +6,13 @@ ReceiverWorker::ReceiverWorker()
 	mainalgisfree=true;
 	timer_m=clock();
 	Time_count=0;
-	client = new RoboCupVisionClient(SSL_VISION_PORT);
-	simClient = new RoboCupVisionClient(SIM_VISION_PORT);
+	client = new RoboCupVisionClient();
 }
 
 ReceiverWorker::~ReceiverWorker()
 {
 	emit clientClose();
-	emit simClientClose();
 	delete client;
-	delete simClient;
 }
 
 void ReceiverWorker::MainAlgFree()
@@ -35,17 +32,22 @@ void ReceiverWorker::start()
 	NewPacket=false;
 	MaxPacketFrequencyMod=false;
 	cout << "Receiver worker start" << endl;
-	connect(this, SIGNAL(clientOpen()), client, SLOT(open()));
+	connect(this, SIGNAL(clientOpen(unsigned short)), client, SLOT(open(unsigned short)));
 	connect(this, SIGNAL(clientClose()), client, SLOT(close()));
-	connect(this, SIGNAL(simClientOpen()), simClient, SLOT(open()));
-	connect(this, SIGNAL(simClientClose()), simClient, SLOT(close()));
 	connect(client, SIGNAL(processPacket(SSL_WrapperPacket *)), this, SLOT(processPacket(SSL_WrapperPacket *)));
-	emit clientOpen();
+	connect(client, SIGNAL(socketClosed()), this, SLOT(socketClosed()));
+	connect(client, SIGNAL(socketClosed()), client, SLOT(clearOutput()));
+	emit clientOpen(SSL_VISION_PORT);
 }
 
 void ReceiverWorker::stop()
 {
 	shutdownread = true;
+}
+
+void ReceiverWorker::socketClosed()
+{
+	emit clearField();
 }
 
 void ReceiverWorker::ChangeMaxPacketFrequencyMod(bool state)
@@ -59,17 +61,11 @@ void ReceiverWorker::ChangeSimulatorMode(bool flag)
 	if (flag != isSimEnabledFlag) {
 		isSimEnabledFlag = flag;
 		if (isSimEnabledFlag) {
-			disconnect(client, SIGNAL(processPacket(SSL_WrapperPacket *)), this, SLOT(run(SSL_WrapperPacket *)));
 			emit clientClose();
-			emit clearField();
-			connect(simClient, SIGNAL(processPacket(SSL_WrapperPacket *)), this, SLOT(run(SSL_WrapperPacket *)));
-			emit simClientOpen();
+			emit clientOpen(SIM_VISION_PORT);
 		} else {
-			disconnect(simClient, SIGNAL(processPacket(SSL_WrapperPacket *)), this, SLOT(run(SSL_WrapperPacket *)));
-			emit simClientClose();
-			emit clearField();
-			connect(client, SIGNAL(processPacket(SSL_WrapperPacket *)), this, SLOT(run(SSL_WrapperPacket *)));
-			emit clientOpen();
+			emit clientClose();
+			emit clientOpen(SSL_VISION_PORT);
 		}
 	}
 }
@@ -85,9 +81,6 @@ void ReceiverWorker::processPacket(SSL_WrapperPacket * packet)
 	SSL_DetectionRobot robot;
 
 	int idCam = 0;
-
-	emit clientOpen();
-	emit simClientOpen();
 
 	int packetsNum = 0;
 

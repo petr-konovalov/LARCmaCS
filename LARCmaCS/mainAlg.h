@@ -12,8 +12,6 @@
 #include "client.h"
 #include "mainAlgWorker.h"
 
-#define MAX_NUM_ROBOTS 12
-
 using namespace std;
 #include <time.h>       /* clock_t, clock(), CLOCKS_PER_SEC */
 

@@ -5,9 +5,7 @@
 #include "mlData.h"
 #include "client.h"
 #include "grsimtransforms.h"
-
-#define MAX_NUM_ROBOTS 12
-#define MAX_ROBOTS_IN_TEAM 6
+#include "constants.h"
 
 using namespace std;
 #include <time.h>       /* clock_t, clock(), CLOCKS_PER_SEC */
@@ -17,7 +15,7 @@ struct MainAlgWorker : public QObject
 	Q_OBJECT
 	clock_t timer,timer_s,timer_m,timer_max;
 	int Time_count;
-	bool Send2BT[MAX_NUM_ROBOTS];
+	bool Send2BT[Constants::maxNumOfRobots];
 	Client client;
 	bool isPause;
 	double mIsBallInside;

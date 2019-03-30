@@ -1,39 +1,64 @@
 // Copyright 2019 Dmitrii Iarosh
 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+
+// http://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #include "robocup_vision_client.h"
 
-RoboCupVisionClient::RoboCupVisionClient(unsigned short port)
-	: groupAddress(visionIP)
+const QString RoboCupVisionClient::visionIP = QStringLiteral("224.5.23.2");
+
+RoboCupVisionClient::RoboCupVisionClient()
+	: mGroupAddress(visionIP)
 {
-	_port = port;
+	mOutputPacket.resize(NUM_OF_CAMERAS);
 	for (int i = 0; i < NUM_OF_CAMERAS; i++) {
-		newPacket[i] = false;
+		mNewPacket[i] = false;
 	}
-	inputPacket = new SSL_WrapperPacket();
-	timer = new QTimer();
-	connect(timer, SIGNAL(timeout()), this, SLOT(processFrame()));
+	mInputPacket = new SSL_WrapperPacket();
+	connect(&mTimer, SIGNAL(timeout()), this, SLOT(processFrame()));
+	mTimer.setInterval(UPDATE_INTERVAL);
+	connect(&mSocket, SIGNAL(readyRead()), this, SLOT(processPendingDatagrams()));
 }
 
 RoboCupVisionClient::~RoboCupVisionClient()
 {
-	timer->stop();
-	delete timer;
+	mTimer.stop();
 }
 
 void RoboCupVisionClient::close()
 {
-	timer->stop();
-	socket.close();
+	mTimer.stop();
+	mSocket.close();
+	emit socketClosed();
 }
 
-bool RoboCupVisionClient::open()
+void RoboCupVisionClient::clearOutput()
+{
+	for (int i = 0; i < NUM_OF_CAMERAS; i++) {
+		mOutputPacket[i] = nullptr;
+		mNewPacket[i] = false;
+	}
+	mGeometryPacket = nullptr;
+	mNewGeometryPacket = false;
+}
+
+bool RoboCupVisionClient::open(unsigned short port)
 {
 	close();
-	socket.bind(QHostAddress::AnyIPv4, _port, QUdpSocket::ShareAddress);
-	socket.joinMulticastGroup(groupAddress);
-	connect(&socket, SIGNAL(readyRead()), this, SLOT(processPendingDatagrams()));
-	timer->start();
-	return true;
+	if (mSocket.bind(QHostAddress::AnyIPv4, port, QUdpSocket::ShareAddress) && mSocket.joinMulticastGroup(mGroupAddress)) {
+		mTimer.start();
+		return true;
+	}
+	return false;
 }
 
 void RoboCupVisionClient::processPendingDatagrams()
@@ -41,38 +66,48 @@ void RoboCupVisionClient::processPendingDatagrams()
 	unsigned int camID = 0;
 	QByteArray datagram;
 	int datagramSize;
-	while (socket.hasPendingDatagrams()) {
-		datagram.resize(int(socket.pendingDatagramSize()));
-		datagramSize = int(socket.pendingDatagramSize());
-		socket.readDatagram(datagram.data(), datagram.size());
-		inputPacket->ParseFromArray(datagram.data(), datagramSize);
+	while (mSocket.hasPendingDatagrams()) {
+		datagramSize = static_cast<int>(mSocket.pendingDatagramSize());
+		datagram.resize(datagramSize);
+		mSocket.readDatagram(datagram.data(), datagram.size());
+		mInputPacket->ParseFromArray(datagram.data(), datagramSize);
 
-		if(inputPacket->has_detection()) {
-			camID = inputPacket->detection().camera_id();
+		if (mInputPacket->has_detection()) {
+			camID = mInputPacket->detection().camera_id();
+			mMutex.lock();
+			mNewPacket[camID] = true;
+			mOutputPacket[camID] = mInputPacket;
+			mMutex.unlock();
 		} else {
-			camID = 0;
-		}
-
-		mutex.lock();
-		newPacket[camID] = true;
-		outputPacket[camID] = inputPacket;
-		mutex.unlock();
-		inputPacket = new SSL_WrapperPacket();
+			mMutex.lock();
+			mNewGeometryPacket = true;
+			mGeometryPacket = mInputPacket;
+			mMutex.unlock();
+		}		
+		mInputPacket = new SSL_WrapperPacket();
 	}
 }
 
 void RoboCupVisionClient::processFrame()
 {
-	SSL_WrapperPacket * procPacket;
 	for (int i = 0; i < NUM_OF_CAMERAS; i++) {
-		mutex.lock();
-		if (newPacket[i]) {
-			procPacket = outputPacket[i];
-			newPacket[i] = false;
-			mutex.unlock();
+		mMutex.lock();
+		if (mNewPacket[i]) {
+			SSL_WrapperPacket * procPacket = mOutputPacket[i];
+			mNewPacket[i] = false;
+			mMutex.unlock();
 			emit processPacket(procPacket);
 		} else {
-			mutex.unlock();
+			mMutex.unlock();
 		}
+	}
+	mMutex.lock();
+	if (mNewGeometryPacket) {
+		SSL_WrapperPacket * procPacket = mGeometryPacket;
+		mNewGeometryPacket = false;
+		mMutex.unlock();
+		emit processPacket(procPacket);
+	} else {
+		mMutex.unlock();
 	}
 }
