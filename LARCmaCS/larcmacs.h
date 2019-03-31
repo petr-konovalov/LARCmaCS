@@ -60,7 +60,6 @@ private slots:
 	void on_pushButton_SetMLdir_clicked();
 	void on_pushButton_RC_clicked();
 	void remcontrolsender(int l, int r,int k, int b, bool kickUp);
-	void on_checkBox_MlMaxFreq_stateChanged(int state);
 	void on_checkBox_SimEnable_stateChanged(int state);
 	void on_pushButton_RemoteControl_clicked();
 	void on_pushButton_SetupIP_clicked();
@@ -72,7 +71,6 @@ signals:
 	void changeGrSimPort(unsigned short port);
 	void ChangeSimulatorMode(bool state);
 	void receiveMacArray(QString*);
-	void ChangeMaxPacketFrequencyMod(bool state);
 	//void MatlabPause();
 	void MLEvalString(QString s);
 	void updateRobots();

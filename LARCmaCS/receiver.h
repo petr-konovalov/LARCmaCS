@@ -16,6 +16,9 @@ using namespace std;
 struct Receiver : public QObject
 {
 	Q_OBJECT
+private:
+	QTimer statisticTimer;
+
 public:
 	ReceiverWorker worker;
 	QThread thread;
@@ -27,7 +30,14 @@ public:
 	void start();
 	void stop();
 
+public slots:
+	void receiveRequestFromMainAlg();
+	void formStatistics();
+	void VisionDataReady(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > detection, QSharedPointer<SSL_WrapperPacket> geometry);
+
 signals:
 	void wstart();
+	void UpdateSSLFPS(QString status);
+	void sendDataToMainAlg(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > detection, QSharedPointer<SSL_WrapperPacket> geometry);
 	void wstop();
 };

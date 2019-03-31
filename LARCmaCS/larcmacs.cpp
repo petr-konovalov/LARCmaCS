@@ -40,8 +40,6 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 	//connect(this, SIGNAL(MatlabPause()), &mainalg.worker, SLOT(Pause()));
 	connect(&receiver.worker, SIGNAL(activateMA(PacketSSL)), &mainalg.worker, SLOT(run(PacketSSL)));
 	connect(&mainalg.worker, SIGNAL(mainAlgFree()), &receiver.worker, SLOT(MainAlgFree()));
-	//reciever
-	connect(this,SIGNAL(ChangeMaxPacketFrequencyMod(bool)),&receiver.worker,SLOT(ChangeMaxPacketFrequencyMod(bool)));
 
 	//send command to robots
 //    connect(this,SIGNAL(receiveMacArray(QString*)),&connector.worker,SLOT(receiveMacArray(QString*)));
@@ -52,9 +50,9 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 	connect(ui->sceneslider, SIGNAL(valueChanged(int)), this, SLOT(scaleView(int)));
 
 	//info GUI
-	connect(&mainalg.worker,SIGNAL(UpdatePauseState(QString)),this,SLOT(UpdatePauseState(QString)));
-	connect(&mainalg.worker, SIGNAL(StatusMessage(QString)), this, SLOT(UpdateStatusBar(QString)));
-	connect(&receiver.worker, SIGNAL(UpdateSSLFPS(QString)), this, SLOT(UpdateSSLFPS(QString)));
+	connect(&mainalg,SIGNAL(UpdatePauseState(QString)),this,SLOT(UpdatePauseState(QString)));
+	connect(&mainalg, SIGNAL(StatusMessage(QString)), this, SLOT(UpdateStatusBar(QString)));
+	connect(&receiver, SIGNAL(UpdateSSLFPS(QString)), this, SLOT(UpdateSSLFPS(QString)));
 
 	//remotecontrol
 	connect(&remotecontol,SIGNAL(RC_control(int,int,int,int, bool)),
@@ -70,6 +68,11 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 	connect(&mainalg.worker, SIGNAL(sendToSimConnector(const QByteArray &)), &connector.worker, SLOT(runSim(const QByteArray &)));
 	connect(this, SIGNAL(changeGrSimIP(const QString &)), &connector.worker, SLOT(changeGrSimIP(const QString &)));
 	connect(this, SIGNAL(changeGrSimPort(unsigned short)), &connector.worker, SLOT(changeGrSimPort(unsigned short)));
+
+	//vision data way to main alg
+	connect(&receiver, SLOT(receiveRequestFromMainAlg()), &mainalg, SIGNAL(askReceiverForData()), Qt::DirectConnection);
+	connect(&mainalg, SLOT(receiveVisionData(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket>)),
+			&receiver, SIGNAL(sendDataToMainAlg(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket>)), Qt::DirectConnection);
 
 	//fieldScene Update
 	connect(&receiver.worker,SIGNAL(activateGUI(SSL_WrapperPacket *)),this, SLOT(fieldsceneUpdateRobots(SSL_WrapperPacket *)));
@@ -235,11 +238,6 @@ void LARCmaCS::on_pushButton_RC_clicked()
 	remotecontol.hide();
 	remotecontol.show();
 	remotecontol.TimerStart();
-}
-
-void LARCmaCS::on_checkBox_MlMaxFreq_stateChanged(int state)
-{
-	emit(ChangeMaxPacketFrequencyMod(state > 0));
 }
 
 void LARCmaCS::on_checkBox_SimEnable_stateChanged(int state)

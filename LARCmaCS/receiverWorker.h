@@ -11,39 +11,32 @@
 #define SSL_VISION_PORT 10006
 #define SIM_VISION_PORT 10020
 
-struct ReceiverWorker : public QObject
+class ReceiverWorker : public QObject
 {
 	Q_OBJECT
 public:
 	explicit ReceiverWorker();
 	~ReceiverWorker();
+	int getTotalPacketsNum();
+	int getPacketsPerSecond();
+	void askForSwapDataVectors();
 
 public slots:
-	void MainAlgFree();
 	void start();
-	void stop();
-	void ChangeMaxPacketFrequencyMod(bool state);
-	void processPacket(SSL_WrapperPacket * packet);
 	void ChangeSimulatorMode(bool flag);
 	void socketClosed();
+	void newVisionData(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > detection, QSharedPointer<SSL_WrapperPacket> geometry);
 
 signals:
-	void activateGUI(SSL_WrapperPacket * packet);
 	void clientOpen(unsigned short port);
 	void clientClose();
+	void swapDataVectors();
 	void clearField();
-	void activateMA(PacketSSL packetssl);
 	void updatefieldGeometry(SSL_WrapperPacket * packet);
 	void UpdateSSLFPS(QString message);
+	void VisionDataReady(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > detection, QSharedPointer<SSL_WrapperPacket> geometry);
 
 private:
-	PacketSSL packetssl;
-	clock_t timer_m;
-	int Time_count;
 	RoboCupVisionClient * client;
 	bool isSimEnabledFlag = false;
-	bool NewPacket;
-	bool shutdownread;
-	bool mainalgisfree;
-	bool MaxPacketFrequencyMod;
 };

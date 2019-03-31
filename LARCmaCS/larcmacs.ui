@@ -285,7 +285,7 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_15" stretch="10,10,4,1">
+    <layout class="QHBoxLayout" name="horizontalLayout_15" stretch="10,10,1">
      <item>
       <widget class="QLabel" name="StatusLabel">
        <property name="frameShape">
@@ -309,13 +309,6 @@
        </property>
        <property name="text">
         <string/>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="checkBox_MlMaxFreq">
-       <property name="text">
-        <string>MaxMLPacketFrequencyMod</string>
        </property>
       </widget>
      </item>

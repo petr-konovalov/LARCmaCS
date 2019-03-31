@@ -10,11 +10,10 @@
 using namespace std;
 #include <time.h>       /* clock_t, clock(), CLOCKS_PER_SEC */
 
-struct MainAlgWorker : public QObject
+class MainAlgWorker : public QObject
 {
 	Q_OBJECT
-	clock_t timer,timer_s,timer_m,timer_max;
-	int Time_count;
+private:
 	bool Send2BT[Constants::maxNumOfRobots];
 	Client client;
 	bool isPause;
@@ -28,21 +27,21 @@ public:
 signals:
 	void sendToConnector(int N, QByteArray command);
 	void sendToSimConnector(QByteArray command);
-	void sendToBTtransmitter(char * message);
-	void mainAlgFree();
-	void StatusMessage(QString message);
-	void UpdatePauseState(QString message);
+	void newPauseState(QString state);
+	void startIteration();
+	void getDataFromReceiver();
 
 public slots:
-
 	void start();
+	void updatePauseState();
 	void Send2BTChangeit(bool *send2BT_);
 	void stop();
 	void setEnableSimFlag(bool flag);
-	void run(PacketSSL packetssl);
+	void processPacket(PacketSSL & packetssl);
 	void Pause();
 	void run_matlab();
 	void stop_matlab();
+	void getPacketFromReceiver();
 	void EvalString(QString s);
 	void changeBallStatus(bool ballStatus);
 

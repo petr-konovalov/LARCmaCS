@@ -19,11 +19,11 @@ const QString RoboCupVisionClient::visionIP = QStringLiteral("224.5.23.2");
 RoboCupVisionClient::RoboCupVisionClient()
 	: mGroupAddress(visionIP)
 {
-	mOutputPacket.resize(NUM_OF_CAMERAS);
-	for (int i = 0; i < NUM_OF_CAMERAS; i++) {
-		mNewPacket[i] = false;
-	}
-	mInputPacket = new SSL_WrapperPacket();
+	mDetectionPacket = QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >(new QVector<QSharedPointer<SSL_WrapperPacket> >);
+	mOutputDetectionPacket = QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >(new QVector<QSharedPointer<SSL_WrapperPacket> >);
+	mDetectionPacket->resize(NUM_OF_CAMERAS);
+	mOutputDetectionPacket->resize(NUM_OF_CAMERAS);
+	mInputPacket = QSharedPointer<SSL_WrapperPacket>(new SSL_WrapperPacket());
 	connect(&mTimer, SIGNAL(timeout()), this, SLOT(processFrame()));
 	mTimer.setInterval(UPDATE_INTERVAL);
 	connect(&mSocket, SIGNAL(readyRead()), this, SLOT(processPendingDatagrams()));
@@ -44,11 +44,9 @@ void RoboCupVisionClient::close()
 void RoboCupVisionClient::clearOutput()
 {
 	for (int i = 0; i < NUM_OF_CAMERAS; i++) {
-		mOutputPacket[i] = nullptr;
-		mNewPacket[i] = false;
+		mDetectionPacket->replace(i, QSharedPointer<SSL_WrapperPacket>());
 	}
-	mGeometryPacket = nullptr;
-	mNewGeometryPacket = false;
+	mGeometryPacket = QSharedPointer<SSL_WrapperPacket>();
 }
 
 bool RoboCupVisionClient::open(unsigned short port)
@@ -61,6 +59,36 @@ bool RoboCupVisionClient::open(unsigned short port)
 	return false;
 }
 
+void RoboCupVisionClient::swapDataVectors()
+{
+	QSharedPointer<SSL_WrapperPacket> tmpGeometry = mOutputGeometryPacket;
+	QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > tmpDetection = mOutputDetectionPacket;
+	mMutex.lock();
+	mOutputGeometryPacket = mGeometryPacket;
+	mOutputDetectionPacket = mDetectionPacket;
+	mDetectionPacket = tmpDetection;
+	mGeometryPacket = tmpGeometry;
+	mMutex.unlock();
+	emit newVisionData(mOutputDetectionPacket, mOutputGeometryPacket);
+}
+
+int RoboCupVisionClient::getTotalPacketsNum()
+{
+	statisticMutex.lock();
+	int tmp = totalPacketsNum;
+	statisticMutex.unlock();
+	return tmp;
+}
+
+int RoboCupVisionClient::getPacketsPerSecond()
+{
+	statisticMutex.lock();
+	int tmp = packetsPerSecond;
+	packetsPerSecond = 0;
+	statisticMutex.unlock();
+	return tmp;
+}
+
 void RoboCupVisionClient::processPendingDatagrams()
 {
 	unsigned int camID = 0;
@@ -71,43 +99,20 @@ void RoboCupVisionClient::processPendingDatagrams()
 		datagram.resize(datagramSize);
 		mSocket.readDatagram(datagram.data(), datagram.size());
 		mInputPacket->ParseFromArray(datagram.data(), datagramSize);
-
 		if (mInputPacket->has_detection()) {
 			camID = mInputPacket->detection().camera_id();
 			mMutex.lock();
-			mNewPacket[camID] = true;
-			mOutputPacket[camID] = mInputPacket;
+			mDetectionPacket->replace(camID, mInputPacket);
 			mMutex.unlock();
 		} else {
 			mMutex.lock();
-			mNewGeometryPacket = true;
 			mGeometryPacket = mInputPacket;
 			mMutex.unlock();
-		}		
-		mInputPacket = new SSL_WrapperPacket();
-	}
-}
-
-void RoboCupVisionClient::processFrame()
-{
-	for (int i = 0; i < NUM_OF_CAMERAS; i++) {
-		mMutex.lock();
-		if (mNewPacket[i]) {
-			SSL_WrapperPacket * procPacket = mOutputPacket[i];
-			mNewPacket[i] = false;
-			mMutex.unlock();
-			emit processPacket(procPacket);
-		} else {
-			mMutex.unlock();
 		}
-	}
-	mMutex.lock();
-	if (mNewGeometryPacket) {
-		SSL_WrapperPacket * procPacket = mGeometryPacket;
-		mNewGeometryPacket = false;
-		mMutex.unlock();
-		emit processPacket(procPacket);
-	} else {
-		mMutex.unlock();
+		statisticMutex.lock();
+		totalPacketsNum++;
+		packetsPerSecond++;
+		statisticMutex.unlock();
+		mInputPacket = QSharedPointer<SSL_WrapperPacket>(new SSL_WrapperPacket());
 	}
 }

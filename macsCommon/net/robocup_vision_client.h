@@ -34,22 +34,28 @@ private:
 	QUdpSocket mSocket;
 	QHostAddress mGroupAddress;
 	QMutex mMutex;
-	QVector<SSL_WrapperPacket *> mOutputPacket;
-	SSL_WrapperPacket * mGeometryPacket;
-	bool mNewPacket[NUM_OF_CAMERAS];
-	bool mNewGeometryPacket = false;
-	SSL_WrapperPacket * mInputPacket;
+	QMutex statisticMutex;
+	QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > mDetectionPacket;
+	QSharedPointer<SSL_WrapperPacket> mGeometryPacket;
+	QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > mOutputDetectionPacket;
+	QSharedPointer<SSL_WrapperPacket> mOutputGeometryPacket;
+	QSharedPointer<SSL_WrapperPacket> mInputPacket;
+	int totalPacketsNum = 0;
+	int packetsPerSecond = 0;
 public:
 	RoboCupVisionClient();
+	int getTotalPacketsNum();
+	int getPacketsPerSecond();
     ~RoboCupVisionClient();
 
 private slots:
     void processPendingDatagrams();
+	void swapDataVectors();
 	bool open(unsigned short port);
-	void processFrame();
 	void clearOutput();
     void close();
 signals:
+	void newVisionData(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > detection, QSharedPointer<SSL_WrapperPacket> geometry);
 	void socketClosed();
 	void processPacket(SSL_WrapperPacket * packet);
 };
