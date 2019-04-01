@@ -8,6 +8,7 @@
 FieldScene::FieldScene(QObject *parent) :
 	QGraphicsScene(parent)
 {
+	connect(this, SIGNAL(reDrawScene()), this, SLOT(update()));
 	setBackgroundBrush ( QBrush ( QColor ( 0,0x91,0x19,255 ),Qt::SolidPattern ) );
 	//drawMutex = _drawMutex;
 	shutdownSoccerView = false;
@@ -52,6 +53,7 @@ void FieldScene::UpdateField(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPa
 			UpdateRobots(detection->at(i));
 		}
 	}
+	emit reDrawScene();
 }
 
 void FieldScene::UpdateRobots(QSharedPointer<SSL_WrapperPacket> packet)

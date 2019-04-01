@@ -20,9 +20,12 @@ void Receiver::init()
 	connect(this, SIGNAL(wstart()), &worker, SLOT(start()));
 	connect(&worker, SIGNAL(VisionDataReady(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket>)), this, SLOT(VisionDataReady(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket>)), Qt::DirectConnection);
 	connect(&thread, SIGNAL(finished()), &worker, SLOT(deleteLater()));
-	statisticTimer.setInterval(1000);
-	connect(&statisticTimer, SIGNAL(timeout()), this, SLOT(formStatistics()));
-	statisticTimer.start();
+	mStatisticTimer.setInterval(1000);
+	mDisplayTimer.setInterval(33); //30 FPS
+	connect(&mStatisticTimer, SIGNAL(timeout()), this, SLOT(formStatistics()));
+	connect(&mDisplayTimer, SIGNAL(timeout()), this, SLOT(setDisplayFlag()));
+	mStatisticTimer.start();
+	mDisplayTimer.start();
 }
 
 void Receiver::receiveRequestFromMainAlg()
@@ -30,9 +33,18 @@ void Receiver::receiveRequestFromMainAlg()
 	worker.askForSwapDataVectors();
 }
 
+void Receiver::setDisplayFlag()
+{
+	mDisplayFlag = true;
+}
+
 void Receiver::VisionDataReady(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > detection, QSharedPointer<SSL_WrapperPacket> geometry)
 {
 	emit sendDataToMainAlg(detection, geometry);
+	if (mDisplayFlag) {
+		emit sendDataToDisplay(detection, geometry);
+		mDisplayFlag = false;
+	}
 }
 
 void Receiver::formStatistics()
@@ -56,5 +68,7 @@ void Receiver::start()
 
 void Receiver::stop()
 {
+	mDisplayTimer.stop();
+	mStatisticTimer.stop();
 	emit wstop();
 }

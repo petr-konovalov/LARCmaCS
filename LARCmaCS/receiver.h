@@ -17,7 +17,9 @@ struct Receiver : public QObject
 {
 	Q_OBJECT
 private:
-	QTimer statisticTimer;
+	QTimer mStatisticTimer;
+	QTimer mDisplayTimer;
+	bool mDisplayFlag = false;
 
 public:
 	ReceiverWorker worker;
@@ -33,11 +35,13 @@ public:
 public slots:
 	void receiveRequestFromMainAlg();
 	void formStatistics();
+	void setDisplayFlag();
 	void VisionDataReady(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > detection, QSharedPointer<SSL_WrapperPacket> geometry);
 
 signals:
 	void wstart();
 	void UpdateSSLFPS(QString status);
+	void sendDataToDisplay(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > detection, QSharedPointer<SSL_WrapperPacket> geometry);
 	void sendDataToMainAlg(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > detection, QSharedPointer<SSL_WrapperPacket> geometry);
 	void wstop();
 };

@@ -29,6 +29,9 @@ public:
 public slots:
 	void UpdateField(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > detection, QSharedPointer<SSL_WrapperPacket> geometry);
 
+signals:
+	void reDrawScene();
+
 private:
 	//Robots
 	QVector<Robot*> blueRobots,yellowRobots, robots;

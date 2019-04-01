@@ -75,7 +75,7 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 			&mainalg, SLOT(receiveVisionData(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket>)), Qt::DirectConnection);
 
 	//fieldScene Update
-	connect(&receiver, SIGNAL(sendDataToMainAlg(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket>)),
+	connect(&receiver, SIGNAL(sendDataToDisplay(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket>)),
 			fieldscene, SLOT(UpdateField(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket>)));
 	connect(this,SIGNAL(updateRobots()),fieldscene,SLOT(update()));
 	connect(this, SIGNAL(updateGeometry()),fieldscene,SLOT(update()));

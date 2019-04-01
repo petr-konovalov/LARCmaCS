@@ -151,7 +151,6 @@ bool MainAlgWorker::getIsSimEnabledFlag()
 void MainAlgWorker::setEnableSimFlag(bool flag)
 {
 	isSimEnabledFlag = flag;
-	cout << isSimEnabledFlag << " " << flag << endl;
 }
 
 void MainAlgWorker::getPacketFromReceiver() //run
