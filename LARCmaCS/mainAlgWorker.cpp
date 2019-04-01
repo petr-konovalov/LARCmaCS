@@ -250,30 +250,16 @@ void MainAlgWorker::processPacket(QSharedPointer<PacketSSL> packetssl)
 
 			bool simFlag = isSimEnabledFlag;
 			if (!simFlag) {
-				Message msg;
-				msg.setKickVoltageLevel(voltage);
-				msg.setKickerChargeEnable(1);
-
 				if (!isPause) {
-					msg.setSpeedX(newmess[2]);
-					msg.setSpeedY(newmess[3]);
-					msg.setSpeedR(newmess[5]);
-
-					msg.setKickForward(newmess[4]);
-					msg.setKickUp(newmess[6]);
+					DefaultRobot::formControlPacket(command, newmess[1], newmess[3], newmess[2], newmess[5], newmess[6], newmess[4], voltage, 0);
 				} else {
-					msg.setSpeedX(0);
-					msg.setSpeedY(0);
-					msg.setSpeedR(0);
-
-					msg.setKickForward(0);
-					command = msg.generateByteArray();
+					DefaultRobot::formControlPacket(command, newmess[1], 0, 0, 0, 0, 0, voltage, 0);
 				}
 			} else {
 				if (!isPause) {
-					GrSimTransforms::formGrSimControlPacket(command, newmess[1], newmess[3], newmess[2], newmess[5], newmess[6], newmess[4], voltage, 0);
+					GrSimRobot::formControlPacket(command, newmess[1], newmess[3], newmess[2], newmess[5], newmess[6], newmess[4], voltage, 0);
 				} else {
-					GrSimTransforms::formGrSimControlPacket(command, newmess[1], 0, 0, 0, 0, 0, voltage, 0);
+					GrSimRobot::formControlPacket(command, newmess[1], 0, 0, 0, 0, 0, voltage, 0);
 				}
 			}
 
@@ -298,32 +284,17 @@ void MainAlgWorker::processPacket(QSharedPointer<PacketSSL> packetssl)
 	if (isPause) { //TODO: add check of remote control
 		QByteArray command;
 		if (!isSimEnabledFlag) {
-			Message msg;
-			msg.setKickVoltageLevel(12);
-			msg.setKickerChargeEnable(1);
-
-			msg.setSpeedX(0);
-			msg.setSpeedY(0);
-			msg.setSpeedR(0);
-
-			msg.setKickForward(0);
-
-			command = msg.generateByteArray();
 			for (int i = 1; i <= 12; i++) {
+				DefaultRobot::formControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
 				emit sendToConnector(i, command);
 			}
 		} else {
 			for (int i = 0; i <= 12; i++) {
-				GrSimTransforms::formGrSimControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
+				GrSimRobot::formControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
 				//emit sendToSimConnector(command); //for more power of remote control
 			}
 		}
 	}
-
-	//next iteration
-//	if (!shutdowncomp) {
-//		emit startIteration();
-//	}
 }
 
 void MainAlgWorker::Pause()

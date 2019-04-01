@@ -33,16 +33,14 @@ TEMPLATE = app
 
 #directories of sources of the vision client
 INCLUDEPATH += \
-  $${SHARED_DIR}/net \
-  $${SHARED_DIR}/util \
-  $${SHARED_DIR}/rfprotocol \
-  $${MATLAB_DIR}/include \
+    $${SHARED_DIR}/net \
+    $${SHARED_DIR}/util \
+    $${SHARED_DIR}/rfprotocol \
+    $${MATLAB_DIR}/include \
+    $$PWD/robots \
 
 SOURCES +=  \
-  $${SHARED_DIR}/net/robocup_vision_client.cpp \
-
-SOURCES += \
-	$$PWD/grsimtransforms.cpp \
+    $${SHARED_DIR}/net/robocup_vision_client.cpp \
 	$$PWD/main.cpp \
 	$$PWD/larcmacs.cpp \
 	$$PWD/fieldScene.cpp \
@@ -62,13 +60,15 @@ SOURCES += \
 	$$PWD/mainAlgWorker.cpp \
 	$$PWD/connectorWorker.cpp \
 	$$PWD/packetSSL.cpp \
-        $$PWD/settings.cpp \
-        $$PWD/robotReceiver.cpp \
+	$$PWD/settings.cpp \
+	$$PWD/robotReceiver.cpp \
+    $$PWD/robots/grSimRobot.cpp \
+    $$PWD/robots/defaultRobot.cpp
 
 HEADERS  += \
-  $${SHARED_DIR}/net/robocup_vision_client.h \
-  $${SHARED_DIR}/util/timer.h \
-  $${SHARED_DIR}/util/field_default_constants.h \
+    $${SHARED_DIR}/net/robocup_vision_client.h \
+    $${SHARED_DIR}/util/timer.h \
+    $${SHARED_DIR}/util/field_default_constants.h \
 	$$PWD/larcmacs.h \
 	$$PWD/fieldScene.h \
 	$$PWD/sceneView.h \
@@ -89,8 +89,9 @@ HEADERS  += \
         $$PWD/connectorWorker.h \
         $$PWD/settings.h \
         $$PWD/robotReceiver.h \
-	$$PWD/grsimtransforms.h \
-    $$PWD/constants.h
+	$$PWD/constants.h \
+    $$PWD/robots/grSimRobot.h \
+    $$PWD/robots/defaultRobot.h
 
 FORMS += \
 	$$PWD/larcmacs.ui \

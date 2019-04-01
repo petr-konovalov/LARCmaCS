@@ -10,10 +10,7 @@ FieldScene::FieldScene(QObject *parent) :
 {
 	connect(this, SIGNAL(reDrawScene()), this, SLOT(update()));
 	setBackgroundBrush ( QBrush ( QColor ( 0,0x91,0x19,255 ),Qt::SolidPattern ) );
-	//drawMutex = _drawMutex;
 	shutdownSoccerView = false;
-	//    glWidget = new QGLWidget ( QGLFormat ( QGL::DoubleBuffer ) );
-	//    setViewport ( glWidget );
 	ksize = 10;
 	LoadFieldGeometry();
 
@@ -25,10 +22,6 @@ FieldScene::FieldScene(QObject *parent) :
 	fieldLinePen->setJoinStyle ( Qt::MiterJoin );
 	fieldItem = this->addPath ( *field,*fieldLinePen,*fieldBrush );
 	fieldItem->setZValue(0);
-	//    drawScale = 0.15;
-
-	//    connect(this, SIGNAL(scaleView(qreal)),rc,SLOT(scaleView(qreal)));
-	//    scalingRequested = true;
 }
 
 void FieldScene::AddRobot(Robot *robot)
@@ -46,7 +39,11 @@ void FieldScene::UpdateFieldGeometry(QSharedPointer<SSL_WrapperPacket> packet) {
 void FieldScene::UpdateField(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > detection, QSharedPointer<SSL_WrapperPacket> geometry)
 {
 	if (!geometry.isNull()) {
+#ifndef OLD_SSL_PROTO
 		UpdateFieldGeometry(geometry);
+#else
+		UpdateGeometry(geometry->geometry().field());
+#endif
 	}
 	for (int i = 0; i < detection->size(); i++) {
 		if (!detection->at(i).isNull()) {
@@ -182,6 +179,7 @@ void FieldScene::ClearField()
 		}
 	}
 	ballItems.clear();
+	emit reDrawScene();
 }
 
 void FieldScene::ConstructField()

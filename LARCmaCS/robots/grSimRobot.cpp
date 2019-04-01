@@ -12,21 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "grsimtransforms.h"
+#include "grSimRobot.h"
 
-GrSimTransforms::GrSimTransforms(){}
+GrSimRobot::GrSimRobot(){}
 
-float GrSimTransforms::fromPower2Kick(bool isKicked, int voltage)
+float GrSimRobot::fromPower2Kick(bool isKicked, int voltage)
 {
 	return isKicked ? 2 : 0; //should be implemented after experiments
 }
 
-float GrSimTransforms::fromPower2Speed(int power)
+float GrSimRobot::fromPower2Speed(int power)
 {
 	return power / 100.0 * 6; //should be implemented after experiments
 }
 
-void GrSimTransforms::formGrSimControlPacket(QByteArray & command, int numOfRobot, int speedX, int speedY, int speedR, bool kickUp, bool kickForward, int kickVoltage, bool enableSpinner)
+void GrSimRobot::formControlPacket(QByteArray & command, int numOfRobot, int speedX, int speedY, int speedR, bool kickUp, bool kickForward, int kickVoltage, bool enableSpinner, int spinnerSpeed)
 {
 	grSim_Packet packet;
 	bool yellow = false;

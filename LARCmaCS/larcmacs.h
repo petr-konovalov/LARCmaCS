@@ -46,12 +46,9 @@ private:
 	RobotReceiver robotReceiver;
 
 private slots:
-//	void fieldsceneUpdateRobots(SSL_WrapperPacket * packet);
-//	void fieldsceneUpdateField(SSL_WrapperPacket * packet);
 	void UpdateSSLFPS(QString message);
 	void UpdateStatusBar(QString message);
 	void UpdatePauseState(QString message);
-	void clearUIField();
 	void updateView();
 	void scaleView(int);
 
@@ -69,10 +66,8 @@ signals:
 	void changeGrSimIP(QString IP);
 	void changeGrSimPort(unsigned short port);
 	void ChangeSimulatorMode(bool state);
-	void receiveMacArray(QString*);
 	//void MatlabPause();
 	void MLEvalString(QString s);
 	void updateRobots();
-	void openPort(QString);
 	void addIp(int, QString);
 };

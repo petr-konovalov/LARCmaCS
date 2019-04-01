@@ -4,7 +4,8 @@
 #include "packetSSL.h"
 #include "mlData.h"
 #include "client.h"
-#include "grsimtransforms.h"
+#include "grSimRobot.h"
+#include "defaultRobot.h"
 #include "constants.h"
 
 using namespace std;
@@ -27,8 +28,8 @@ public:
 	~MainAlgWorker();
 
 signals:
-	void sendToConnector(int N, QByteArray command);
-	void sendToSimConnector(QByteArray command);
+	void sendToConnector(int N, const QByteArray & command);
+	void sendToSimConnector(const QByteArray & command);
 	void newPauseState(QString state);
 	void startIteration();
 	void getDataFromReceiver();

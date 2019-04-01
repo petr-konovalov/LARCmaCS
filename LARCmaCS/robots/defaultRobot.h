@@ -15,17 +15,11 @@
 #pragma once
 
 #include <QByteArray>
-#include "grSim_Packet.pb.h"
-#include "grSim_Commands.pb.h"
-#include "grSim_Replacement.pb.h"
-#include "constants.h"
+#include "../message.h"
 
-class GrSimTransforms
+class DefaultRobot
 {
 public:
-	GrSimTransforms();
-	static void formGrSimControlPacket(QByteArray & command, int numOfRobot, int speedX, int speedY, int speedR, bool kickUp, bool kickForward, int kickVoltage, bool enableSpinner);
-private:
-	static float fromPower2Speed(int power);
-	static float fromPower2Kick(bool isKicked, int voltage);
+	DefaultRobot();
+	static void formControlPacket(QByteArray & command, int numOfRobot, int speedX, int speedY, int speedR, bool kickUp, bool kickForward, int kickVoltage, bool enableSpinner, int spinnerSpeed = 0);
 };

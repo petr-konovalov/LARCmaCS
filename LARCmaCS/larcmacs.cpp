@@ -5,7 +5,7 @@
 #include "message.h"
 #include <QFileDialog>
 #include "settings.h"
-#include "grsimtransforms.h"
+#include "grSimRobot.h"
 
 LARCmaCS::LARCmaCS(QWidget *parent) :
 	QWidget(parent),
@@ -25,47 +25,34 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 	sceneview.init();
 	connector.init();
 
-//robots connect
-//    connect(&wifiform,SIGNAL(initRobots()),&connector.worker, SLOT(startBroadcast()));
-//    connect(&wifiform,SIGNAL(stopInit()),&connector.worker, SLOT(stopBroadcast()));
-//    connect(&connector.worker,SIGNAL(robotAdded(QString)),&wifiform,SLOT(addRobot(QString)));
-//    connect(&connector.worker,SIGNAL(allNeededRobotsEnabled()),&wifiform,SLOT(initEnded()));
-
-	// GUIS
-	connect(&connector.worker,SIGNAL(sendPortList(QStringList)),this,SLOT(displayPorts(QStringList)));
-	connect(this,SIGNAL(openPort(QString)),&connector.worker,SLOT(openPort(QString)));
-
 	//algorithm connect
-	connect(this, SIGNAL(MLEvalString(QString)),&mainalg.worker,SLOT(EvalString(QString)));
+	connect(this, SIGNAL(MLEvalString(QString)), &mainalg, SLOT(EvalString(QString)));
 	//connect(this, SIGNAL(MatlabPause()), &mainalg.worker, SLOT(Pause()));
-	connect(&receiver.worker, SIGNAL(activateMA(PacketSSL)), &mainalg.worker, SLOT(run(PacketSSL)));
-	connect(&mainalg.worker, SIGNAL(mainAlgFree()), &receiver.worker, SLOT(MainAlgFree()));
 
 	//send command to robots
-//    connect(this,SIGNAL(receiveMacArray(QString*)),&connector.worker,SLOT(receiveMacArray(QString*)));
-	connect(&mainalg.worker, SIGNAL(sendToConnector(int, const QByteArray &)), &connector.worker, SLOT(run(int, const QByteArray &)));
+	connect(&mainalg, SIGNAL(sendToConnector(int, const QByteArray &)), &connector.worker, SLOT(run(int, const QByteArray &)));
 
 	//gui connector
 	connect(&sceneview.worker, SIGNAL(updateView()), this, SLOT(updateView()));
 	connect(ui->sceneslider, SIGNAL(valueChanged(int)), this, SLOT(scaleView(int)));
 
 	//info GUI
-	connect(&mainalg,SIGNAL(UpdatePauseState(QString)),this,SLOT(UpdatePauseState(QString)));
+	connect(&mainalg, SIGNAL(UpdatePauseState(QString)), this, SLOT(UpdatePauseState(QString)));
 	connect(&mainalg, SIGNAL(StatusMessage(QString)), this, SLOT(UpdateStatusBar(QString)));
 	connect(&receiver, SIGNAL(UpdateSSLFPS(QString)), this, SLOT(UpdateSSLFPS(QString)));
 
 	//remotecontrol
-	connect(&remotecontol,SIGNAL(RC_control(int,int,int,int, bool)),
-			this,SLOT(remcontrolsender(int, int,int, int, bool)));
-	connect(this,SIGNAL(sendToConnectorRM(int, const QByteArray &)),&connector.worker,SLOT(run(int, const QByteArray &)));
+	connect(&remotecontol, SIGNAL(RC_control(int,int,int,int, bool)),
+			this, SLOT(remcontrolsender(int, int,int, int, bool)));
+	connect(this, SIGNAL(sendToConnectorRM(int, const QByteArray &)), &connector.worker, SLOT(run(int, const QByteArray &)));
 
-	QObject::connect(this, SIGNAL(addIp(int, QString)), &connector.worker, SLOT(addIp(int, QString)));
+	connect(this, SIGNAL(addIp(int, QString)), &connector.worker, SLOT(addIp(int, QString)));
 
 	//simulator Enable
-	connect(this, SIGNAL(ChangeSimulatorMode(bool)), &receiver.worker, SLOT(ChangeSimulatorMode(bool)));
-	connect(&receiver.worker, SIGNAL(clearField()), this, SLOT(clearUIField()));
-	connect(this, SIGNAL(ChangeSimulatorMode(bool)), &mainalg.worker, SLOT(setEnableSimFlag(bool)));
-	connect(&mainalg.worker, SIGNAL(sendToSimConnector(const QByteArray &)), &connector.worker, SLOT(runSim(const QByteArray &)));
+	connect(this, SIGNAL(ChangeSimulatorMode(bool)), &receiver, SLOT(ChangeSimulatorMode(bool)));
+	connect(&receiver, SIGNAL(clearField()), fieldscene, SLOT(ClearField()));
+	connect(this, SIGNAL(ChangeSimulatorMode(bool)), &mainalg, SLOT(setEnableSimFlag(bool)));
+	connect(&mainalg, SIGNAL(sendToSimConnector(const QByteArray &)), &connector.worker, SLOT(runSim(const QByteArray &)));
 	connect(this, SIGNAL(changeGrSimIP(const QString &)), &connector.worker, SLOT(changeGrSimIP(const QString &)));
 	connect(this, SIGNAL(changeGrSimPort(unsigned short)), &connector.worker, SLOT(changeGrSimPort(unsigned short)));
 
@@ -77,48 +64,27 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 	//fieldScene Update
 	connect(&receiver, SIGNAL(sendDataToDisplay(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket>)),
 			fieldscene, SLOT(UpdateField(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket>)));
-	connect(this,SIGNAL(updateRobots()),fieldscene,SLOT(update()));
-	connect(this, SIGNAL(updateGeometry()),fieldscene,SLOT(update()));
 
-	connect(&robotReceiver, SIGNAL(ballStatus(bool)), &mainalg.worker, SLOT(changeBallStatus(bool)));
+	connect(&robotReceiver, SIGNAL(ballStatus(bool)), &mainalg, SLOT(changeBallStatus(bool)));
 
 	sceneview.start();
 	receiver.start();
 	mainalg.start();
 	connector.start();
 	UpdateStatusBar("Waiting SSL connection...");
-	UpdateSSLFPS("FPS=0");
+	UpdateSSLFPS("FPS = 0");
 }
 
 void LARCmaCS::remcontrolsender(int l, int r,int k, int b, bool kickUp)
 {
 	QString ip = ui->lineEditRobotIp->text();
 	QByteArray byteData;
-	bool simFlag = mainalg.worker.getIsSimEnabledFlag();
+	bool simFlag = mainalg.getIsSimEnabledFlag();
 	if (!simFlag) {
-		Message data;
-		data.setSpeedX(l);
-		data.setSpeedY(r);
-		data.setSpeedR(k);
-		data.setSpeedDribbler(0);
-		data.setDribblerEnable(0);
-
-		if(b != -1) {
-			data.setKickVoltageLevel(4);
-			data.setKickerChargeEnable(1);
-			data.setKickUp(kickUp);
-			data.setKickForward(0);
-		} else {
-			data.setKickVoltageLevel(0);
-			data.setKickerChargeEnable(0);
-			data.setKickUp(0);
-			data.setKickForward(0);
-		}
-
-		byteData = data.generateByteArray();
+		DefaultRobot::formControlPacket(byteData, 0, r, l, k, kickUp, 0, 4, 0);
 	} else {
 		int numOfRobot = ip.toInt();
-		GrSimTransforms::formGrSimControlPacket(byteData, numOfRobot, r, l, k, kickUp, 0, 4, 0);
+		GrSimRobot::formControlPacket(byteData, numOfRobot, r, l, k, kickUp, 0, 4, 0);
 	}
 
 	unsigned short port;
@@ -142,23 +108,6 @@ void LARCmaCS::remcontrolsender(int l, int r,int k, int b, bool kickUp)
 
 	return;
 }
-
-//void LARCmaCS::fieldsceneUpdateRobots(SSL_WrapperPacket * packet)
-//{
-//	fieldscene->UpdateRobots(packet);
-//	emit updateRobots();
-//}
-
-//void LARCmaCS::fieldsceneUpdateField(SSL_WrapperPacket * packet)
-//{
-//#ifdef OLD_SSL_PROTO
-//	fieldscene->UpdateGeometry(receiver.worker.fieldsize);
-//	emit updateGeometry();
-//#else
-//	fieldscene->UpdateField(packet);
-//	emit updateRobots();
-//#endif
-//}
 
 LARCmaCS::~LARCmaCS()
 {
@@ -212,12 +161,6 @@ void LARCmaCS::updateView()
 	}
 }
 
-void LARCmaCS::clearUIField()
-{
-	fieldscene->ClearField();
-	emit updateRobots();
-}
-
 void LARCmaCS::on_pushButton_SetMLdir_clicked()
 {
 	Settings settings;
@@ -226,7 +169,7 @@ void LARCmaCS::on_pushButton_SetMLdir_clicked()
 	dir = QFileDialog::getExistingDirectory(Q_NULLPTR, QString(), dir);
 	if (!dir.isEmpty()) {
 		settings.setValue(key, dir);
-		QString  s = "cd "+ dir;
+		QString s = "cd " + dir;
 		qDebug() << "New Matlab directory = " << s;
 		emit MLEvalString(s);
 	}

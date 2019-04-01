@@ -34,17 +34,19 @@ RoboCupVisionClient::~RoboCupVisionClient(){}
 void RoboCupVisionClient::close()
 {
 	mSocket.close();
-	emit socketClosed();
+	emit clearField();
 	clearOutput();
 }
 
 void RoboCupVisionClient::clearOutput()
 {
+	mMutex.lock();
 	for (int i = 0; i < NUM_OF_CAMERAS; i++) {
 		mDetectionPacket->replace(i, QSharedPointer<SSL_WrapperPacket>());
 	}
 	mGeometryPacket = QSharedPointer<SSL_WrapperPacket>();
 	mClearFlag = true;
+	mMutex.unlock();
 }
 
 bool RoboCupVisionClient::open(unsigned short port)
@@ -67,7 +69,7 @@ void RoboCupVisionClient::swapDataVectors()
 		mDetectionPacket = tmpDetection;
 		mGeometryPacket = tmpGeometry;
 	} else {
-		emit socketClosed();
+		emit clearField();
 		mClearFlag = false;
 	}
 	mMutex.unlock();

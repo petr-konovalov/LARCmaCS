@@ -60,21 +60,6 @@ void ConnectorWorker::init()
 	qDebug()<<"INIT CONNECTOR OK";
 }
 
-void ConnectorWorker::receiveMacArray(QString * macArray)
-{
-	for (int i=0;i<12;++i) {
-		qDebug()<<macArray[i];
-		if (macArray[i].compare("")) { //if robot exists
-			if (macArray[i].contains("bro")) //if it's arduino
-				numIP[i+1] = macArray[i];
-			else
-				numIP[i+1] = macIP[macArray[i]]; //if it's TRIK
-		}
-	}
-	qDebug()<<numIP;
-	connectedAllSocketsFlag = true;
-}
-
 QString ConnectorWorker::getGrSimIP()
 {
 	return grSimIP;

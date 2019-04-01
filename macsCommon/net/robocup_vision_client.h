@@ -56,6 +56,6 @@ private slots:
     void close();
 signals:
 	void newVisionData(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > detection, QSharedPointer<SSL_WrapperPacket> geometry);
-	void socketClosed();
+	void clearField();
 	void processPacket(SSL_WrapperPacket * packet);
 };

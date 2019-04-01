@@ -24,10 +24,11 @@ public:
 	void UpdateGeometry(SSL_GeometryFieldSize fieldSize);
 	void LoadFieldGeometry();
 	void LoadFieldGeometry(const SSL_GeometryFieldSize &fieldSize);
-	void ClearField();
+
 
 public slots:
 	void UpdateField(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > detection, QSharedPointer<SSL_WrapperPacket> geometry);
+	void ClearField();
 
 signals:
 	void reDrawScene();

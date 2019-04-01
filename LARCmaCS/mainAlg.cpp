@@ -23,12 +23,16 @@ void MainAlg::init()
 {
 	worker.moveToThread(&thread);
 	cout << "Init mainAlg ok" << endl;
+	connect(this, SIGNAL(MLEvalString(QString)), &worker, SLOT(EvalString(QString)));
 	connect(this, SIGNAL(wstart()), &worker, SLOT(start()));
 	connect(this, SIGNAL(wstop()), &worker, SLOT(stop()));
 	connect(&worker, SIGNAL(newPauseState(QString)), this, SLOT(receivePauseState(QString)));
+	connect(&worker, SIGNAL(sendToConnector(int, const QByteArray &)), this, SLOT(moveToConnector(int, const QByteArray &)));
+	connect(&worker, SIGNAL(sendToSimConnector(const QByteArray &)), this, SLOT(moveToSimConnector(const QByteArray &)));
+	connect(this, SIGNAL(updateEnableSimFlag(bool)), &worker, SLOT(setEnableSimFlag(bool)));
+	connect(this, SIGNAL(updateBallStatus(bool)), &worker, SLOT(changeBallStatus(bool)));
 	connect(&worker, SIGNAL(getDataFromReceiver()), this, SLOT(getDataFromReceiver()), Qt::DirectConnection);
 	connect(this, SIGNAL(newIteration()), &worker, SLOT(getPacketFromReceiver()));
-	connect(this, SIGNAL(processPacket(PacketSSL &)), &worker, SLOT(processPacket(PacketSSL &)), Qt::DirectConnection);
 	connect(&thread, SIGNAL(finished()), &worker, SLOT(deleteLater()));
 	statisticTimer.setInterval(1000);
 	connect(&statisticTimer, SIGNAL(timeout()), this, SLOT(formStatistics()));
@@ -36,9 +40,39 @@ void MainAlg::init()
 	statisticTimer.start();
 }
 
+void MainAlg::changeBallStatus(bool status)
+{
+	emit updateBallStatus(status);
+}
+
+bool MainAlg::getIsSimEnabledFlag()
+{
+	return worker.getIsSimEnabledFlag();
+}
+
 void MainAlg::getDataFromReceiver()
 {
 	emit askReceiverForData();
+}
+
+void MainAlg::setEnableSimFlag(bool flag)
+{
+	emit updateEnableSimFlag(flag);
+}
+
+void MainAlg::EvalString(QString s)
+{
+	emit MLEvalString(s);
+}
+
+void MainAlg::moveToConnector(int N, const QByteArray & command)
+{
+	emit sendToConnector(N, command);
+}
+
+void MainAlg::moveToSimConnector(const QByteArray & command)
+{
+	emit sendToSimConnector(command);
 }
 
 void MainAlg::receiveVisionData(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > detectionPackets, QSharedPointer<SSL_WrapperPacket> geometryPackets)
@@ -109,7 +143,6 @@ void MainAlg::receiveVisionData(QSharedPointer<QVector<QSharedPointer<SSL_Wrappe
 	// [End] Ball info
 
 	worker.setPacketSSL(mPacketSSL);
-	//emit processPacket(packetssl);
 }
 
 void MainAlg::formStatistics()

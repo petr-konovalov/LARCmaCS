@@ -17,6 +17,7 @@ class ReceiverWorker : public QObject
 public:
 	explicit ReceiverWorker();
 	~ReceiverWorker();
+	RoboCupVisionClient * getClient();
 	int getTotalPacketsNum();
 	int getPacketsPerSecond();
 	void askForSwapDataVectors();
@@ -24,14 +25,12 @@ public:
 public slots:
 	void start();
 	void ChangeSimulatorMode(bool flag);
-	void socketClosed();
 	void newVisionData(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > detection, QSharedPointer<SSL_WrapperPacket> geometry);
 
 signals:
 	void clientOpen(unsigned short port);
 	void clientClose();
 	void swapDataVectors();
-	void clearField();
 	void updatefieldGeometry(SSL_WrapperPacket * packet);
 	void UpdateSSLFPS(QString message);
 	void VisionDataReady(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > detection, QSharedPointer<SSL_WrapperPacket> geometry);

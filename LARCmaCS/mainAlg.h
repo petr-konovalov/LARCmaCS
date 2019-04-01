@@ -28,6 +28,8 @@ public:
 	MainAlgWorker worker;
 	QThread thread;
 
+	bool getIsSimEnabledFlag();
+
 	explicit MainAlg();
 	~MainAlg();
 
@@ -37,16 +39,25 @@ public:
 
 public slots:
 	void getDataFromReceiver();
+	void EvalString(QString s);
 	void formStatistics();
+	void moveToConnector(int N, const QByteArray & command);
+	void moveToSimConnector(const QByteArray & command);
 	void receivePauseState(QString state);
+	void setEnableSimFlag(bool flag);
+	void changeBallStatus(bool status);
 	void receiveVisionData(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > detection, QSharedPointer<SSL_WrapperPacket> geometry);
 
 signals:
 	void newIteration();
+	void updateBallStatus(bool status);
+	void MLEvalString(QString s);
+	void sendToConnector(int N, const QByteArray & command);
+	void sendToSimConnector(const QByteArray & command);
+	void updateEnableSimFlag(bool flag);
 	void askReceiverForData();
 	void StatusMessage(QString status);
 	void UpdatePauseState(QString state);
-	void processPacket(PacketSSL & packetssl);
 	void wstart();
 	void wstop();
 };

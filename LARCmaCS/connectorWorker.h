@@ -62,6 +62,5 @@ public slots:
 	void run(int N, const QByteArray &command);
 	void runSim(const QByteArray &command);
 	void udpProcessPendingDatagrams();
-	void receiveMacArray(QString*);
 	void addIp(int id, QString ip);
 };

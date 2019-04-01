@@ -23,7 +23,9 @@ void Receiver::init()
 	mStatisticTimer.setInterval(1000);
 	mDisplayTimer.setInterval(33); //30 FPS
 	connect(&mStatisticTimer, SIGNAL(timeout()), this, SLOT(formStatistics()));
+	connect(worker.getClient(), SIGNAL(clearField()), this, SLOT(clearScene()));
 	connect(&mDisplayTimer, SIGNAL(timeout()), this, SLOT(setDisplayFlag()));
+	connect(this, SIGNAL(updateSimulatorMode(bool)), &worker, SLOT(ChangeSimulatorMode(bool)));
 	mStatisticTimer.start();
 	mDisplayTimer.start();
 }
@@ -45,6 +47,16 @@ void Receiver::VisionDataReady(QSharedPointer<QVector<QSharedPointer<SSL_Wrapper
 		emit sendDataToDisplay(detection, geometry);
 		mDisplayFlag = false;
 	}
+}
+
+void Receiver::ChangeSimulatorMode(bool mode)
+{
+	emit updateSimulatorMode(mode);
+}
+
+void Receiver::clearScene()
+{
+	emit clearField();
 }
 
 void Receiver::formStatistics()
