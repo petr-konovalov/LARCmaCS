@@ -38,7 +38,6 @@ void ReceiverWorker::start()
 	connect(this, SIGNAL(clientOpen(unsigned short)), client, SLOT(open(unsigned short)));
 	connect(this, SIGNAL(clientClose()), client, SLOT(close()));
 	connect(client, SIGNAL(socketClosed()), this, SLOT(socketClosed()));
-	connect(client, SIGNAL(socketClosed()), client, SLOT(clearOutput()));
 	connect(this, SIGNAL(swapDataVectors()), client, SLOT(swapDataVectors()), Qt::DirectConnection);
 	connect(client, SIGNAL(newVisionData(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket>)),
 			this, SLOT(newVisionData(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket>)), Qt::DirectConnection);

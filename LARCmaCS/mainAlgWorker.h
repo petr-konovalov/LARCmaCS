@@ -17,10 +17,12 @@ private:
 	bool Send2BT[Constants::maxNumOfRobots];
 	Client client;
 	bool isPause;
+	QSharedPointer<PacketSSL> mPacketSSL;
 	double mIsBallInside;
 
 public:
 	MainAlgWorker();
+	void setPacketSSL(QSharedPointer<PacketSSL> packetSSL);
 	bool getIsSimEnabledFlag();
 	~MainAlgWorker();
 
@@ -37,7 +39,7 @@ public slots:
 	void Send2BTChangeit(bool *send2BT_);
 	void stop();
 	void setEnableSimFlag(bool flag);
-	void processPacket(PacketSSL & packetssl);
+	void processPacket(QSharedPointer<PacketSSL> packetssl);
 	void Pause();
 	void run_matlab();
 	void stop_matlab();

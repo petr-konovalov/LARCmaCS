@@ -73,6 +73,7 @@ int initConfig(RCConfig *config){
 
 MainAlgWorker::MainAlgWorker()
 {
+	mPacketSSL = QSharedPointer<PacketSSL>();
 	QFile addrFile("gamepads.txt");
 	if (!addrFile.open(QIODevice::ReadOnly)) {
 		qDebug() << "File with addresses is not opened!!!";
@@ -150,11 +151,21 @@ bool MainAlgWorker::getIsSimEnabledFlag()
 void MainAlgWorker::setEnableSimFlag(bool flag)
 {
 	isSimEnabledFlag = flag;
+	cout << isSimEnabledFlag << " " << flag << endl;
 }
 
-void MainAlgWorker::getPacketFromReceiver()
+void MainAlgWorker::getPacketFromReceiver() //run
 {
-	emit getDataFromReceiver();
+	while (!shutdowncomp) {
+		emit getDataFromReceiver();
+		processPacket(mPacketSSL);
+		QApplication::processEvents();
+	}
+}
+
+void MainAlgWorker::setPacketSSL(QSharedPointer<PacketSSL> packetSSL)
+{
+	mPacketSSL = packetSSL;
 }
 
 void MainAlgWorker::updatePauseState()
@@ -193,14 +204,15 @@ void MainAlgWorker::updatePauseState()
 	}
 }
 
-void MainAlgWorker::processPacket(PacketSSL & packetssl)
+void MainAlgWorker::processPacket(QSharedPointer<PacketSSL> packetssl)
 {
 // Заполнение массивов Balls Blues и Yellows и запуск main-функции
 
-	memcpy(mxGetPr(fmldata.Ball), packetssl.balls, BALL_COUNT_d);
-	memcpy(mxGetPr(fmldata.Blue), packetssl.robots_blue, TEAM_COUNT_d);
-	memcpy(mxGetPr(fmldata.Yellow), packetssl.robots_yellow, TEAM_COUNT_d);
+	memcpy(mxGetPr(fmldata.Ball), packetssl->balls, BALL_COUNT_d);
+	memcpy(mxGetPr(fmldata.Blue), packetssl->robots_blue, TEAM_COUNT_d);
+	memcpy(mxGetPr(fmldata.Yellow), packetssl->robots_yellow, TEAM_COUNT_d);
 	memcpy(mxGetPr(fmldata.ballInside), &mIsBallInside, sizeof(double));
+
 
 	engPutVariable(fmldata.ep, "Balls", fmldata.Ball);
 	engPutVariable(fmldata.ep, "Blues", fmldata.Blue);
@@ -208,7 +220,6 @@ void MainAlgWorker::processPacket(PacketSSL & packetssl)
 	engPutVariable(fmldata.ep, "ballInside", fmldata.ballInside);
 
 	engEvalString(fmldata.ep, fmldata.config.file_of_matlab);
-
 // Забираем Rules и очищаем его в воркспейсе
 
 	fmldata.Rule = engGetVariable(fmldata.ep, "Rules");
@@ -311,9 +322,9 @@ void MainAlgWorker::processPacket(PacketSSL & packetssl)
 	}
 
 	//next iteration
-	if (!shutdowncomp) {
-		emit startIteration();
-	}
+//	if (!shutdowncomp) {
+//		emit startIteration();
+//	}
 }
 
 void MainAlgWorker::Pause()

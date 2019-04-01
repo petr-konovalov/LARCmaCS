@@ -29,9 +29,9 @@ class RoboCupVisionClient : public QObject {
     Q_OBJECT
 private:
 	static const QString visionIP;
-	QTimer mTimer;
     static const int MaxDataGramSize = 65536;
 	QUdpSocket mSocket;
+	bool mClearFlag = false;
 	QHostAddress mGroupAddress;
 	QMutex mMutex;
 	QMutex statisticMutex;

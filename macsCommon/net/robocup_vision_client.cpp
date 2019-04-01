@@ -19,26 +19,23 @@ const QString RoboCupVisionClient::visionIP = QStringLiteral("224.5.23.2");
 RoboCupVisionClient::RoboCupVisionClient()
 	: mGroupAddress(visionIP)
 {
+	qRegisterMetaType<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > >("QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >");
+	qRegisterMetaType<QSharedPointer<SSL_WrapperPacket> >("QSharedPointer<SSL_WrapperPacket>");
 	mDetectionPacket = QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >(new QVector<QSharedPointer<SSL_WrapperPacket> >);
 	mOutputDetectionPacket = QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >(new QVector<QSharedPointer<SSL_WrapperPacket> >);
 	mDetectionPacket->resize(NUM_OF_CAMERAS);
 	mOutputDetectionPacket->resize(NUM_OF_CAMERAS);
 	mInputPacket = QSharedPointer<SSL_WrapperPacket>(new SSL_WrapperPacket());
-	connect(&mTimer, SIGNAL(timeout()), this, SLOT(processFrame()));
-	mTimer.setInterval(UPDATE_INTERVAL);
 	connect(&mSocket, SIGNAL(readyRead()), this, SLOT(processPendingDatagrams()));
 }
 
-RoboCupVisionClient::~RoboCupVisionClient()
-{
-	mTimer.stop();
-}
+RoboCupVisionClient::~RoboCupVisionClient(){}
 
 void RoboCupVisionClient::close()
 {
-	mTimer.stop();
 	mSocket.close();
 	emit socketClosed();
+	clearOutput();
 }
 
 void RoboCupVisionClient::clearOutput()
@@ -47,13 +44,13 @@ void RoboCupVisionClient::clearOutput()
 		mDetectionPacket->replace(i, QSharedPointer<SSL_WrapperPacket>());
 	}
 	mGeometryPacket = QSharedPointer<SSL_WrapperPacket>();
+	mClearFlag = true;
 }
 
 bool RoboCupVisionClient::open(unsigned short port)
 {
 	close();
 	if (mSocket.bind(QHostAddress::AnyIPv4, port, QUdpSocket::ShareAddress) && mSocket.joinMulticastGroup(mGroupAddress)) {
-		mTimer.start();
 		return true;
 	}
 	return false;
@@ -66,8 +63,13 @@ void RoboCupVisionClient::swapDataVectors()
 	mMutex.lock();
 	mOutputGeometryPacket = mGeometryPacket;
 	mOutputDetectionPacket = mDetectionPacket;
-	mDetectionPacket = tmpDetection;
-	mGeometryPacket = tmpGeometry;
+	if (!mClearFlag) {
+		mDetectionPacket = tmpDetection;
+		mGeometryPacket = tmpGeometry;
+	} else {
+		emit socketClosed();
+		mClearFlag = false;
+	}
 	mMutex.unlock();
 	emit newVisionData(mOutputDetectionPacket, mOutputGeometryPacket);
 }

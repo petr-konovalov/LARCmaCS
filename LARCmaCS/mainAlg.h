@@ -20,7 +20,7 @@ struct MainAlg : public QObject
 {
 	Q_OBJECT
 private:
-	PacketSSL packetssl;
+	QSharedPointer<PacketSSL> mPacketSSL;
 	volatile int totalPacketsNum = 0;
 	volatile int packetsPerSecond = 0;
 	QTimer statisticTimer;
@@ -42,6 +42,7 @@ public slots:
 	void receiveVisionData(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > detection, QSharedPointer<SSL_WrapperPacket> geometry);
 
 signals:
+	void newIteration();
 	void askReceiverForData();
 	void StatusMessage(QString status);
 	void UpdatePauseState(QString state);

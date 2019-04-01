@@ -70,16 +70,15 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 	connect(this, SIGNAL(changeGrSimPort(unsigned short)), &connector.worker, SLOT(changeGrSimPort(unsigned short)));
 
 	//vision data way to main alg
-	connect(&receiver, SLOT(receiveRequestFromMainAlg()), &mainalg, SIGNAL(askReceiverForData()), Qt::DirectConnection);
-	connect(&mainalg, SLOT(receiveVisionData(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket>)),
-			&receiver, SIGNAL(sendDataToMainAlg(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket>)), Qt::DirectConnection);
+	connect(&mainalg, SIGNAL(askReceiverForData()), &receiver, SLOT(receiveRequestFromMainAlg()), Qt::DirectConnection);
+	connect(&receiver, SIGNAL(sendDataToMainAlg(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket>)),
+			&mainalg, SLOT(receiveVisionData(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket>)), Qt::DirectConnection);
 
 	//fieldScene Update
-	connect(&receiver.worker,SIGNAL(activateGUI(SSL_WrapperPacket *)),this, SLOT(fieldsceneUpdateRobots(SSL_WrapperPacket *)));
-	connect(&receiver.worker, SIGNAL(updatefieldGeometry(SSL_WrapperPacket *)), this, SLOT (fieldsceneUpdateField(SSL_WrapperPacket *)));
+	connect(&receiver, SIGNAL(sendDataToMainAlg(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket>)),
+			fieldscene, SLOT(UpdateField(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket>)));
 	connect(this,SIGNAL(updateRobots()),fieldscene,SLOT(update()));
 	connect(this, SIGNAL(updateGeometry()),fieldscene,SLOT(update()));
-	//    connect(&receiver.worker, SIGNAL(activateGUI(PacketSSL)), &sceneview.worker, SLOT(repaintScene(PacketSSL)));
 
 	connect(&robotReceiver, SIGNAL(ballStatus(bool)), &mainalg.worker, SLOT(changeBallStatus(bool)));
 
@@ -144,22 +143,22 @@ void LARCmaCS::remcontrolsender(int l, int r,int k, int b, bool kickUp)
 	return;
 }
 
-void LARCmaCS::fieldsceneUpdateRobots(SSL_WrapperPacket * packet)
-{
-	fieldscene->UpdateRobots(packet);
-	emit updateRobots();
-}
+//void LARCmaCS::fieldsceneUpdateRobots(SSL_WrapperPacket * packet)
+//{
+//	fieldscene->UpdateRobots(packet);
+//	emit updateRobots();
+//}
 
-void LARCmaCS::fieldsceneUpdateField(SSL_WrapperPacket * packet)
-{
-#ifdef OLD_SSL_PROTO
-	fieldscene->UpdateGeometry(receiver.worker.fieldsize);
-	emit updateGeometry();
-#else
-	fieldscene->UpdateField(packet);
-	emit updateRobots();
-#endif
-}
+//void LARCmaCS::fieldsceneUpdateField(SSL_WrapperPacket * packet)
+//{
+//#ifdef OLD_SSL_PROTO
+//	fieldscene->UpdateGeometry(receiver.worker.fieldsize);
+//	emit updateGeometry();
+//#else
+//	fieldscene->UpdateField(packet);
+//	emit updateRobots();
+//#endif
+//}
 
 LARCmaCS::~LARCmaCS()
 {
@@ -231,13 +230,6 @@ void LARCmaCS::on_pushButton_SetMLdir_clicked()
 		qDebug() << "New Matlab directory = " << s;
 		emit MLEvalString(s);
 	}
-}
-
-void LARCmaCS::on_pushButton_RC_clicked()
-{
-	remotecontol.hide();
-	remotecontol.show();
-	remotecontol.TimerStart();
 }
 
 void LARCmaCS::on_checkBox_SimEnable_stateChanged(int state)

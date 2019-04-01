@@ -49,7 +49,6 @@ void GrSimTransforms::formGrSimControlPacket(QByteArray & command, int numOfRobo
 	controls->set_veltangent(fromPower2Speed(speedX)); //speed on X axis
 	controls->set_velnormal(-fromPower2Speed(speedY)); // speed on Y axis
 	controls->set_velangular(fromPower2Speed(speedR)); // rotation Speed
-
 	controls->set_kickspeedx(fromPower2Kick(kickForward, kickVoltage));
 	controls->set_kickspeedz(fromPower2Kick(kickUp, kickVoltage));
 	controls->set_spinner(enableSpinner); //spinner isn't used now

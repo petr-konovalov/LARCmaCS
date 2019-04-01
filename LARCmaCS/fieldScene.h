@@ -15,10 +15,10 @@ public:
 	explicit FieldScene(QObject *parent = 0);
 
 	void AddRobot (Robot* robot);
-	void UpdateRobots(SSL_WrapperPacket * packet);
+	void UpdateRobots(QSharedPointer<SSL_WrapperPacket> packet);
 
 #ifndef OLD_SSL_PROTO
-	void UpdateField(SSL_WrapperPacket * packet);
+	void UpdateFieldGeometry(QSharedPointer<SSL_WrapperPacket> packet);
 #endif
 
 	void UpdateGeometry(SSL_GeometryFieldSize fieldSize);
@@ -26,8 +26,10 @@ public:
 	void LoadFieldGeometry(const SSL_GeometryFieldSize &fieldSize);
 	void ClearField();
 
-private:
+public slots:
+	void UpdateField(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > detection, QSharedPointer<SSL_WrapperPacket> geometry);
 
+private:
 	//Robots
 	QVector<Robot*> blueRobots,yellowRobots, robots;
 	//balls
