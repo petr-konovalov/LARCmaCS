@@ -56,7 +56,11 @@ void FieldScene::UpdateField(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPa
 void FieldScene::UpdateRobots(QSharedPointer<SSL_WrapperPacket> packet)
 {
 	if (packet->has_geometry()) {
+#ifndef OLD_SSL_PROTO
 		UpdateFieldGeometry(packet);
+#else
+		UpdateGeometry(packet->geometry().field());
+#endif
 	}
 	SSL_DetectionFrame detection = packet->detection();
 	int robots_blue_n = detection.robots_blue_size();
