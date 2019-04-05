@@ -75,7 +75,7 @@ void MainAlg::moveToSimConnector(const QByteArray & command)
 	emit sendToSimConnector(command);
 }
 
-void MainAlg::receiveVisionData(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > detectionPackets, QSharedPointer<SSL_WrapperPacket> geometryPackets)
+void MainAlg::receiveVisionData(QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<QVector<bool> > > > detectionPackets, QSharedPointer<pair<QSharedPointer<SSL_WrapperPacket>, bool> > geometryPackets)
 {
 	int balls_n = 0;
 	mPacketSSL = QSharedPointer<PacketSSL>(new PacketSSL());
@@ -88,8 +88,13 @@ void MainAlg::receiveVisionData(QSharedPointer<QVector<QSharedPointer<SSL_Wrappe
 			mPacketSSL->robots_yellow[i] = 0;
 	}
 	mPacketSSL->balls[0] = 0;
-	for (int i = 0; i < detectionPackets->size(); i++) {
-		packet = detectionPackets->at(i);
+    for (int i = 0; i < detectionPackets->first->size(); i++) {
+        if (detectionPackets->second->at(i)) {
+            continue;
+        } else {
+            detectionPackets->second->replace(i, true);
+        }
+        packet = detectionPackets->first->at(i);
 		if (packet.isNull()) {
 			continue;
 		}

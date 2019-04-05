@@ -58,8 +58,8 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 
 	//vision data way to main alg
 	connect(&mainalg, SIGNAL(askReceiverForData()), &receiver, SLOT(receiveRequestFromMainAlg()), Qt::DirectConnection);
-	connect(&receiver, SIGNAL(sendDataToMainAlg(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket>)),
-			&mainalg, SLOT(receiveVisionData(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket>)), Qt::DirectConnection);
+    connect(&receiver, SIGNAL(sendDataToMainAlg(QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<QVector<bool> > > >, QSharedPointer<pair<QSharedPointer<SSL_WrapperPacket>, bool> >)),
+            &mainalg, SLOT(receiveVisionData(QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<QVector<bool> > > >, QSharedPointer<pair<QSharedPointer<SSL_WrapperPacket>, bool> >)), Qt::DirectConnection);
 
 	//fieldScene Update
 	connect(&receiver, SIGNAL(sendDataToDisplay(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket>)),

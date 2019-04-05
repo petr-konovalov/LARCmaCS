@@ -18,7 +18,7 @@ void Receiver::init()
 	worker.moveToThread(&thread);
 	cout << "Init ok" << endl;
 	connect(this, SIGNAL(wstart()), &worker, SLOT(start()));
-	connect(&worker, SIGNAL(VisionDataReady(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket>)), this, SLOT(VisionDataReady(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket>)), Qt::DirectConnection);
+    connect(&worker, SIGNAL(VisionDataReady(QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<QVector<bool> > > >, QSharedPointer<pair<QSharedPointer<SSL_WrapperPacket>, bool> >)), this, SLOT(VisionDataReady(QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<QVector<bool> > > >, QSharedPointer<pair<QSharedPointer<SSL_WrapperPacket>, bool> >)), Qt::DirectConnection);
 	connect(&thread, SIGNAL(finished()), &worker, SLOT(deleteLater()));
 	mStatisticTimer.setInterval(1000);
 	mDisplayTimer.setInterval(33); //30 FPS
@@ -40,11 +40,11 @@ void Receiver::setDisplayFlag()
 	mDisplayFlag = true;
 }
 
-void Receiver::VisionDataReady(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > detection, QSharedPointer<SSL_WrapperPacket> geometry)
+void Receiver::VisionDataReady(QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<QVector<bool> > > > detection, QSharedPointer<pair<QSharedPointer<SSL_WrapperPacket>, bool> > geometry)
 {
 	emit sendDataToMainAlg(detection, geometry);
 	if (mDisplayFlag) {
-		emit sendDataToDisplay(detection, geometry);
+        emit sendDataToDisplay(detection->first, geometry->first);
 		mDisplayFlag = false;
 	}
 }

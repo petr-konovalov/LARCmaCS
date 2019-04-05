@@ -37,8 +37,8 @@ private:
 	QMutex statisticMutex;
 	QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > mDetectionPacket;
 	QSharedPointer<SSL_WrapperPacket> mGeometryPacket;
-	QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > mOutputDetectionPacket;
-	QSharedPointer<SSL_WrapperPacket> mOutputGeometryPacket;
+    QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<QVector<bool> > > > mOutputDetectionPacket;
+    QSharedPointer<pair<QSharedPointer<SSL_WrapperPacket>, bool> > mOutputGeometryPacket;
 	QSharedPointer<SSL_WrapperPacket> mInputPacket;
 	int totalPacketsNum = 0;
 	int packetsPerSecond = 0;
@@ -55,7 +55,7 @@ private slots:
 	void clearOutput();
     void close();
 signals:
-	void newVisionData(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > detection, QSharedPointer<SSL_WrapperPacket> geometry);
+    void newVisionData(QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<QVector<bool> > > > detection, QSharedPointer<pair<QSharedPointer<SSL_WrapperPacket>, bool> > geometry);
 	void clearField();
 	void processPacket(SSL_WrapperPacket * packet);
 };

@@ -46,7 +46,7 @@ public slots:
 	void receivePauseState(QString state);
 	void setEnableSimFlag(bool flag);
 	void changeBallStatus(bool status);
-	void receiveVisionData(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > detection, QSharedPointer<SSL_WrapperPacket> geometry);
+    void receiveVisionData(QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<QVector<bool> > > > detection, QSharedPointer<pair<QSharedPointer<SSL_WrapperPacket>, bool> > geometry);
 
 signals:
 	void newIteration();

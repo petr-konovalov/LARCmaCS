@@ -19,12 +19,23 @@ const QString RoboCupVisionClient::visionIP = QStringLiteral("224.5.23.2");
 RoboCupVisionClient::RoboCupVisionClient()
 	: mGroupAddress(visionIP)
 {
-	qRegisterMetaType<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > >("QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >");
-	qRegisterMetaType<QSharedPointer<SSL_WrapperPacket> >("QSharedPointer<SSL_WrapperPacket>");
+    qRegisterMetaType<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > >("QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >");
+    qRegisterMetaType<QSharedPointer<SSL_WrapperPacket> >("QSharedPointer<SSL_WrapperPacket>");
+    qRegisterMetaType<QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<QVector<bool> > > > >("QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<QVector<bool> > > >");
+    qRegisterMetaType<QSharedPointer<pair<QSharedPointer<SSL_WrapperPacket>, bool> > >("QSharedPointer<pair<QSharedPointer<SSL_WrapperPacket>, bool> >");
 	mDetectionPacket = QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >(new QVector<QSharedPointer<SSL_WrapperPacket> >);
-	mOutputDetectionPacket = QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >(new QVector<QSharedPointer<SSL_WrapperPacket> >);
-	mDetectionPacket->resize(NUM_OF_CAMERAS);
-	mOutputDetectionPacket->resize(NUM_OF_CAMERAS);
+    mOutputDetectionPacket = QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<QVector<bool> > > >(new pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<QVector<bool> > >);
+    mOutputDetectionPacket->first = QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >(new QVector<QSharedPointer<SSL_WrapperPacket> >);
+    QSharedPointer<QVector<bool> > falseVector(new QVector<bool>);
+    falseVector->resize(NUM_OF_CAMERAS);
+    for (int i = 0; i < falseVector->size(); i++) {
+        falseVector->replace(i, false);
+    }
+    mOutputDetectionPacket->second = falseVector;
+    mDetectionPacket->resize(NUM_OF_CAMERAS);
+    mOutputDetectionPacket->first->resize(NUM_OF_CAMERAS);
+    mOutputGeometryPacket = QSharedPointer<pair<QSharedPointer<SSL_WrapperPacket>, bool> >(new pair<QSharedPointer<SSL_WrapperPacket>, bool>);
+    mOutputGeometryPacket->second = false;
 	mInputPacket = QSharedPointer<SSL_WrapperPacket>(new SSL_WrapperPacket());
 	connect(&mSocket, SIGNAL(readyRead()), this, SLOT(processPendingDatagrams()));
 }
@@ -60,11 +71,17 @@ bool RoboCupVisionClient::open(unsigned short port)
 
 void RoboCupVisionClient::swapDataVectors()
 {
-	QSharedPointer<SSL_WrapperPacket> tmpGeometry = mOutputGeometryPacket;
-	QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > tmpDetection = mOutputDetectionPacket;
+    QSharedPointer<SSL_WrapperPacket> tmpGeometry = mOutputGeometryPacket->first;
+    QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > tmpDetection = mOutputDetectionPacket->first;
 	mMutex.lock();
-	mOutputGeometryPacket = mGeometryPacket;
-	mOutputDetectionPacket = mDetectionPacket;
+    mOutputGeometryPacket->first = mGeometryPacket;
+    mOutputGeometryPacket->second = false;
+    QSharedPointer<QVector<bool> > falseVector(new QVector<bool>);
+    falseVector->resize(NUM_OF_CAMERAS);
+    for (int i = 0; i < mOutputDetectionPacket->second->size(); i++) {
+        mOutputDetectionPacket->second->replace(i, false);
+    }
+    mOutputDetectionPacket->first = mDetectionPacket;
 	if (!mClearFlag) {
 		mDetectionPacket = tmpDetection;
 		mGeometryPacket = tmpGeometry;

@@ -25,7 +25,7 @@ public:
 public slots:
 	void start();
 	void ChangeSimulatorMode(bool flag);
-	void newVisionData(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > detection, QSharedPointer<SSL_WrapperPacket> geometry);
+    void newVisionData(QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<QVector<bool> > > > detection, QSharedPointer<pair<QSharedPointer<SSL_WrapperPacket>, bool> > geometry);
 
 signals:
 	void clientOpen(unsigned short port);
@@ -33,7 +33,7 @@ signals:
 	void swapDataVectors();
 	void updatefieldGeometry(SSL_WrapperPacket * packet);
 	void UpdateSSLFPS(QString message);
-	void VisionDataReady(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > detection, QSharedPointer<SSL_WrapperPacket> geometry);
+    void VisionDataReady(QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<QVector<bool> > > > detection, QSharedPointer<pair<QSharedPointer<SSL_WrapperPacket>, bool> > geometry);
 
 private:
 	RoboCupVisionClient * client;

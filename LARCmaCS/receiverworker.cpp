@@ -27,7 +27,7 @@ RoboCupVisionClient * ReceiverWorker::getClient()
 	return client;
 }
 
-void ReceiverWorker::newVisionData(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > detection, QSharedPointer<SSL_WrapperPacket> geometry)
+void ReceiverWorker::newVisionData(QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<QVector<bool> > > > detection, QSharedPointer<pair<QSharedPointer<SSL_WrapperPacket>, bool> > geometry)
 {
 	emit VisionDataReady(detection, geometry);
 }
@@ -43,8 +43,8 @@ void ReceiverWorker::start()
 	connect(this, SIGNAL(clientOpen(unsigned short)), client, SLOT(open(unsigned short)));
 	connect(this, SIGNAL(clientClose()), client, SLOT(close()));
 	connect(this, SIGNAL(swapDataVectors()), client, SLOT(swapDataVectors()), Qt::DirectConnection);
-	connect(client, SIGNAL(newVisionData(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket>)),
-			this, SLOT(newVisionData(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket>)), Qt::DirectConnection);
+    connect(client, SIGNAL(newVisionData(QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<QVector<bool> > > >, QSharedPointer<pair<QSharedPointer<SSL_WrapperPacket>, bool> >)),
+            this, SLOT(newVisionData(QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<QVector<bool> > > >, QSharedPointer<pair<QSharedPointer<SSL_WrapperPacket>, bool> >)), Qt::DirectConnection);
 	emit clientOpen(SSL_VISION_PORT);
 }
 
