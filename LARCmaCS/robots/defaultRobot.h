@@ -15,7 +15,7 @@
 #pragma once
 
 #include <QByteArray>
-#include "../message.h"
+#include "message.h"
 
 class DefaultRobot
 {

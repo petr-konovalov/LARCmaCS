@@ -18,7 +18,7 @@
 #include "grSim_Packet.pb.h"
 #include "grSim_Commands.pb.h"
 #include "grSim_Replacement.pb.h"
-#include "../constants.h"
+#include "constants.h"
 
 class GrSimRobot
 {

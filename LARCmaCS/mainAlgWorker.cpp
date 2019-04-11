@@ -82,29 +82,44 @@ MainAlgWorker::MainAlgWorker()
 	QTextStream in(&addrFile);
 	auto allAddrs = in.readAll().split("\n", QString::SkipEmptyParts).filter(QRegExp("^[^#;]"));
 	client.initFromList(allAddrs);
-
-	for (int i = 0; i < Constants::maxNumOfRobots; i++)
-	{
-		Send2BT[i] = true;
-	}
 	mIsBallInside = false;
+	mStatisticsTimer.setInterval(1000);
+	connect(&mStatisticsTimer, SIGNAL(timeout()), this, SLOT(formStatistics()));
+	connect(&mStatisticsTimer, SIGNAL(timeout()), this, SLOT(updatePauseState()));
+	mStatisticsTimer.start();
 }
 
-MainAlgWorker::~MainAlgWorker(){}
+MainAlgWorker::~MainAlgWorker()
+{
+	mStatisticsTimer.stop();
+}
 
 void MainAlgWorker::start()
 {
-	connect(this, SIGNAL(startIteration()), this, SLOT(getPacketFromReceiver()));
 	shutdowncomp = false;
 	cout << "MainAlg worker start" << endl;
 	init();
-	emit startIteration();
+	run();
 }
 
 void MainAlgWorker::stop()
 {
 	shutdowncomp = true;
 }
+
+void MainAlgWorker::formStatistics()
+{
+	QString tmp;
+	QString ToStatus = "Using Matlab: PacketsPerSec = ";
+	tmp.setNum(mPacketsPerSecond);
+	mPacketsPerSecond = 0;
+	ToStatus += tmp;
+	ToStatus += " Total packets = ";
+	tmp.setNum(mTotalPacketsNum);
+	ToStatus += tmp;
+	emit sendStatistics(ToStatus);
+}
+
 
 void MainAlgWorker::init(){
 	RCConfig rcconfig;
@@ -136,13 +151,6 @@ void MainAlgWorker::init(){
 	run_matlab();
 }
 
-void MainAlgWorker::Send2BTChangeit(bool * send2BT_)
-{
-	for (int i = 0; i < Constants::maxNumOfRobots; i++) {
-		Send2BT[i] = send2BT_[i];
-	}
-}
-
 bool MainAlgWorker::getIsSimEnabledFlag()
 {
 	return isSimEnabledFlag;
@@ -153,7 +161,7 @@ void MainAlgWorker::setEnableSimFlag(bool flag)
 	isSimEnabledFlag = flag;
 }
 
-void MainAlgWorker::getPacketFromReceiver() //run
+void MainAlgWorker::run()
 {
 	while (!shutdowncomp) {
 		emit getDataFromReceiver();
@@ -206,6 +214,8 @@ void MainAlgWorker::updatePauseState()
 void MainAlgWorker::processPacket(QSharedPointer<PacketSSL> packetssl)
 {
 // Заполнение массивов Balls Blues и Yellows и запуск main-функции
+	mPacketsPerSecond++;
+	mTotalPacketsNum++;
 
 	memcpy(mxGetPr(fmldata.Ball), packetssl->balls, BALL_COUNT_d);
 	memcpy(mxGetPr(fmldata.Blue), packetssl->robots_blue, TEAM_COUNT_d);
@@ -234,7 +244,7 @@ void MainAlgWorker::processPacket(QSharedPointer<PacketSSL> packetssl)
 	sprintf(sendString, "Rules=zeros(%d, %d);", fmldata.config.RULE_AMOUNT, fmldata.config.RULE_LENGTH);
 	engEvalString(fmldata.ep, sendString);
 
-// Разбор пришедшего пакета и переправка его строк на connector и BT
+// Разбор пришедшего пакета и переправка его строк на connector
 
 	for (int i = 0; i < fmldata.config.RULE_AMOUNT; i++) {
 		char newmess[100];
@@ -291,7 +301,7 @@ void MainAlgWorker::processPacket(QSharedPointer<PacketSSL> packetssl)
 		} else {
 			for (int i = 0; i <= 12; i++) {
 				GrSimRobot::formControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
-				//emit sendToSimConnector(command); //for more power of remote control
+				emit sendToSimConnector(command); //for more power of remote control
 			}
 		}
 	}

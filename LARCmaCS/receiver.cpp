@@ -15,38 +15,35 @@ Receiver::~Receiver()
 
 void Receiver::init()
 {
+	connect(this, SIGNAL(initWorker()), &worker, SLOT(init()));
 	worker.moveToThread(&thread);
+	emit initWorker();
 	cout << "Init ok" << endl;
 	connect(this, SIGNAL(wstart()), &worker, SLOT(start()));
-    connect(&worker, SIGNAL(VisionDataReady(QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<QVector<bool> > > >, QSharedPointer<pair<QSharedPointer<SSL_WrapperPacket>, bool> >)), this, SLOT(VisionDataReady(QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<QVector<bool> > > >, QSharedPointer<pair<QSharedPointer<SSL_WrapperPacket>, bool> >)), Qt::DirectConnection);
 	connect(&thread, SIGNAL(finished()), &worker, SLOT(deleteLater()));
-	mStatisticTimer.setInterval(1000);
-	mDisplayTimer.setInterval(33); //30 FPS
-	connect(&mStatisticTimer, SIGNAL(timeout()), this, SLOT(formStatistics()));
-	connect(worker.getClient(), SIGNAL(clearField()), this, SLOT(clearScene()));
-	connect(&mDisplayTimer, SIGNAL(timeout()), this, SLOT(setDisplayFlag()));
+	connect(&worker, SIGNAL(clearField()), this, SLOT(clearScene()));
+	connect(&worker, SIGNAL(UpdateSSLFPS(QString)), this, SLOT(sendStatistics(QString)));
 	connect(this, SIGNAL(updateSimulatorMode(bool)), &worker, SLOT(ChangeSimulatorMode(bool)));
-	mStatisticTimer.start();
-	mDisplayTimer.start();
 }
 
-void Receiver::receiveRequestFromMainAlg()
+void Receiver::sendStatistics(QString statistics)
 {
-	worker.askForSwapDataVectors();
+	emit UpdateSSLFPS(statistics);
+}
+
+QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket> > > Receiver::getVisionData()
+{
+	return worker.getVisionData();
+}
+
+void Receiver::swapDataVectors()
+{
+	worker.swapDataVectors();
 }
 
 void Receiver::setDisplayFlag()
 {
 	mDisplayFlag = true;
-}
-
-void Receiver::VisionDataReady(QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<QVector<bool> > > > detection, QSharedPointer<pair<QSharedPointer<SSL_WrapperPacket>, bool> > geometry)
-{
-	emit sendDataToMainAlg(detection, geometry);
-	if (mDisplayFlag) {
-        emit sendDataToDisplay(detection->first, geometry->first);
-		mDisplayFlag = false;
-	}
 }
 
 void Receiver::ChangeSimulatorMode(bool mode)
@@ -59,28 +56,13 @@ void Receiver::clearScene()
 	emit clearField();
 }
 
-void Receiver::formStatistics()
-{
-	QString tmp;
-	QString ToStatus = "FPS = ";
-	tmp.setNum(worker.getPacketsPerSecond());
-	ToStatus += tmp;
-	ToStatus += "; Total Packets = ";
-	tmp.setNum(worker.getTotalPacketsNum());
-	ToStatus += tmp;
-	emit UpdateSSLFPS(ToStatus);
-}
-
 void Receiver::start()
 {
 	thread.start();
-//        cout << "thread start" << endl;
 	emit wstart();
 }
 
 void Receiver::stop()
 {
-	mDisplayTimer.stop();
-	mStatisticTimer.stop();
 	emit wstop();
 }

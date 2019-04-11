@@ -15,9 +15,11 @@ class MainAlgWorker : public QObject
 {
 	Q_OBJECT
 private:
-	bool Send2BT[Constants::maxNumOfRobots];
 	Client client;
 	bool isPause;
+	int mTotalPacketsNum = 0;
+	int mPacketsPerSecond = 0;
+	QTimer mStatisticsTimer;
 	QSharedPointer<PacketSSL> mPacketSSL;
 	double mIsBallInside;
 
@@ -31,20 +33,20 @@ signals:
 	void sendToConnector(int N, const QByteArray & command);
 	void sendToSimConnector(const QByteArray & command);
 	void newPauseState(QString state);
-	void startIteration();
+	void sendStatistics(QString statistics);
 	void getDataFromReceiver();
 
 public slots:
 	void start();
+	void formStatistics();
 	void updatePauseState();
-	void Send2BTChangeit(bool *send2BT_);
 	void stop();
 	void setEnableSimFlag(bool flag);
 	void processPacket(QSharedPointer<PacketSSL> packetssl);
 	void Pause();
 	void run_matlab();
 	void stop_matlab();
-	void getPacketFromReceiver();
+	void run();
 	void EvalString(QString s);
 	void changeBallStatus(bool ballStatus);
 

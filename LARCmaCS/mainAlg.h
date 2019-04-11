@@ -11,6 +11,7 @@
 #include "mlData.h"
 #include "client.h"
 #include "mainAlgWorker.h"
+#include "receiver.h"
 #include "messages_robocup_ssl_wrapper.pb.h"
 
 using namespace std;
@@ -21,41 +22,33 @@ struct MainAlg : public QObject
 	Q_OBJECT
 private:
 	QSharedPointer<PacketSSL> mPacketSSL;
-	volatile int totalPacketsNum = 0;
-	volatile int packetsPerSecond = 0;
-	QTimer statisticTimer;
-public:
+	Receiver * mReceiver;
 	MainAlgWorker worker;
 	QThread thread;
-
+public:
 	bool getIsSimEnabledFlag();
-
 	explicit MainAlg();
 	~MainAlg();
-
-	void init();
+	void init(Receiver * receiver);
 	void start();
 	void stop();
 
 public slots:
-	void getDataFromReceiver();
 	void EvalString(QString s);
-	void formStatistics();
 	void moveToConnector(int N, const QByteArray & command);
 	void moveToSimConnector(const QByteArray & command);
 	void receivePauseState(QString state);
 	void setEnableSimFlag(bool flag);
 	void changeBallStatus(bool status);
-    void receiveVisionData(QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<QVector<bool> > > > detection, QSharedPointer<pair<QSharedPointer<SSL_WrapperPacket>, bool> > geometry);
+	void loadVisionData();
+	void sendStatistics(QString statistics);
 
 signals:
-	void newIteration();
 	void updateBallStatus(bool status);
 	void MLEvalString(QString s);
 	void sendToConnector(int N, const QByteArray & command);
 	void sendToSimConnector(const QByteArray & command);
 	void updateEnableSimFlag(bool flag);
-	void askReceiverForData();
 	void StatusMessage(QString status);
 	void UpdatePauseState(QString state);
 	void wstart();

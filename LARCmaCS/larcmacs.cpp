@@ -16,12 +16,13 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 {
 	ui->setupUi(this);
 	fieldscene = new FieldScene();
+	fieldscene->setReceiver(&receiver);
 	ui->fieldView->setScene(fieldscene);
 	scaleView(8);
 	macsArray = new QString[12];
 
 	receiver.init();
-	mainalg.init();
+	mainalg.init(&receiver);
 	sceneview.init();
 	connector.init();
 
@@ -56,21 +57,14 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 	connect(this, SIGNAL(changeGrSimIP(const QString &)), &connector.worker, SLOT(changeGrSimIP(const QString &)));
 	connect(this, SIGNAL(changeGrSimPort(unsigned short)), &connector.worker, SLOT(changeGrSimPort(unsigned short)));
 
-	//vision data way to main alg
-	connect(&mainalg, SIGNAL(askReceiverForData()), &receiver, SLOT(receiveRequestFromMainAlg()), Qt::DirectConnection);
-    connect(&receiver, SIGNAL(sendDataToMainAlg(QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<QVector<bool> > > >, QSharedPointer<pair<QSharedPointer<SSL_WrapperPacket>, bool> >)),
-            &mainalg, SLOT(receiveVisionData(QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<QVector<bool> > > >, QSharedPointer<pair<QSharedPointer<SSL_WrapperPacket>, bool> >)), Qt::DirectConnection);
-
-	//fieldScene Update
-	connect(&receiver, SIGNAL(sendDataToDisplay(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket>)),
-			fieldscene, SLOT(UpdateField(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket>)));
-
+	//ball inside check
 	connect(&robotReceiver, SIGNAL(ballStatus(bool)), &mainalg, SLOT(changeBallStatus(bool)));
 
 	sceneview.start();
 	receiver.start();
 	mainalg.start();
 	connector.start();
+	fieldscene->start();
 	UpdateStatusBar("Waiting SSL connection...");
 	UpdateSSLFPS("FPS = 0");
 }
@@ -131,29 +125,15 @@ void LARCmaCS::UpdateStatusBar(QString message)
 
 void LARCmaCS::scaleView(int _sizescene)
 {
-//    cout << _sizescene << "  " << sizescene;
-//    qreal scaleFactor = (drawScale-1) - (qreal)_scaleFactor/100;
-//    cout << scaleFactor << "  ";
-//    qreal factor = ui->view->matrix().scale ( scaleFactor, scaleFactor ).mapRect ( QRectF ( 0, 0, 1, 1 ) ).width();
-//    cout << factor << "  ";
-//    if ( factor > 0.07 && factor < 100.0 )
-//    drawscale = 1 - (float)(sizescene-_sizescene)/10;
-	drawscale = pow(0.9, _sizescene-sizescene);
+	drawscale = pow(0.9, _sizescene - sizescene);
 	sizescene = _sizescene;
-//    ui->view->wheelEvent();
-//    cout << " DS " << drawscale << endl;
 	scalingRequested = true;
 }
 
 void LARCmaCS::updateView()
 {
-//  static float lastScale = 0;
-//  if ( shutdownSoccerView )
-//  {
-//    return;
-//  }
 	if (scalingRequested) {
-		qreal factor = ui->fieldView->matrix().scale (drawscale, drawscale).mapRect (QRectF ( 0, 0, 1, 1 )).width();
+		qreal factor = ui->fieldView->matrix().scale (drawscale, drawscale).mapRect (QRectF(0, 0, 1, 1)).width();
 		if (factor > 0.07 && factor < 100.0)
 			ui->fieldView->scale (drawscale, drawscale);
 		scalingRequested = false;

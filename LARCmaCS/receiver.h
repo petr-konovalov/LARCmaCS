@@ -17,11 +17,11 @@ struct Receiver : public QObject
 {
 	Q_OBJECT
 private:
-	QTimer mStatisticTimer;
 	QTimer mDisplayTimer;
 	bool mDisplayFlag = false;
 
 public:
+	QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket> > > getVisionData();
 	ReceiverWorker worker;
 	QThread thread;
 
@@ -33,19 +33,17 @@ public:
 	void stop();
 
 public slots:
-	void receiveRequestFromMainAlg();
-	void formStatistics();
+	void swapDataVectors();
+	void sendStatistics(QString statistics);
 	void clearScene();
 	void ChangeSimulatorMode(bool mode);
 	void setDisplayFlag();
-    void VisionDataReady(QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<QVector<bool> > > > detection, QSharedPointer<pair<QSharedPointer<SSL_WrapperPacket>, bool> > geometry);
 
 signals:
 	void wstart();
+	void initWorker();
 	void updateSimulatorMode(bool mode);
 	void clearField();
 	void UpdateSSLFPS(QString status);
-	void sendDataToDisplay(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > detection, QSharedPointer<SSL_WrapperPacket> geometry);
-    void sendDataToMainAlg(QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<QVector<bool> > > > detection, QSharedPointer<pair<QSharedPointer<SSL_WrapperPacket>, bool> > geometry);
 	void wstop();
 };

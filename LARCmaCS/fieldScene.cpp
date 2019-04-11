@@ -9,19 +9,41 @@ FieldScene::FieldScene(QObject *parent) :
 	QGraphicsScene(parent)
 {
 	connect(this, SIGNAL(reDrawScene()), this, SLOT(update()));
-	setBackgroundBrush ( QBrush ( QColor ( 0,0x91,0x19,255 ),Qt::SolidPattern ) );
+	setBackgroundBrush (QBrush(QColor(0, 0x91, 0x19, 255), Qt::SolidPattern));
 	shutdownSoccerView = false;
 	ksize = 10;
 	LoadFieldGeometry();
-
 	ConstructField();
-	fieldBrush = new QBrush ( Qt::NoBrush );
+	fieldBrush = new QBrush(Qt::NoBrush);
 	fieldLinePen = new QPen();
-	fieldLinePen->setColor ( Qt::white );
-	fieldLinePen->setWidth ( 2 );
-	fieldLinePen->setJoinStyle ( Qt::MiterJoin );
-	fieldItem = this->addPath ( *field,*fieldLinePen,*fieldBrush );
+	fieldLinePen->setColor(Qt::white);
+	fieldLinePen->setWidth(2);
+	fieldLinePen->setJoinStyle(Qt::MiterJoin);
+	fieldItem = this->addPath(*field, *fieldLinePen, *fieldBrush);
 	fieldItem->setZValue(0);
+	mDrawTimer.setInterval(33);
+	connect(&mDrawTimer, SIGNAL(timeout()), this, SLOT(updateFrame()));
+}
+
+FieldScene::~FieldScene()
+{
+	mDrawTimer.stop();
+}
+
+void FieldScene::updateFrame()
+{
+	QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket> > > tmp = mReceiver->getVisionData();
+	UpdateField(tmp->first, tmp->second);
+}
+
+void FieldScene::start()
+{
+	mDrawTimer.start();
+}
+
+void FieldScene::setReceiver(Receiver * receiver)
+{
+	mReceiver = receiver;
 }
 
 void FieldScene::AddRobot(Robot *robot)
@@ -47,117 +69,112 @@ void FieldScene::UpdateField(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPa
 	}
 	for (int i = 0; i < detection->size(); i++) {
 		if (!detection->at(i).isNull()) {
+			if (detection->at(i)->has_geometry()) {
+#ifndef OLD_SSL_PROTO
+				UpdateFieldGeometry(detection->at(i));
+#else
+				UpdateGeometry(detection->at(i)->geometry().field());
+#endif
+			}
 			UpdateRobots(detection->at(i));
 		}
 	}
 	emit reDrawScene();
 }
 
+void FieldScene::updateRobot(const SSL_DetectionRobot & robot, int team, unsigned int camID)
+{
+	int id, robotNum;
+	double x, y, orientation, conf;
+
+	conf = robot.confidence();
+	x = robot.x();
+	y = -robot.y();
+
+	orientation = Robot::NAOrientation;
+	if (robot.has_orientation()) {
+		orientation = robot.orientation() * 180.0 / M_PI;
+	}
+
+	QString label;
+	robotNum = Robot::robotNotFound;
+	id = Robot::NA;
+	if (robot.has_robot_id()) {
+		id = robot.robot_id();
+		label.setNum (id + 1, 10);
+		for (int j = 0; j < robots.size(); j++) {
+			if (robots[j]->getTeamID() == team && robots[j]->getRobotID() == id) {
+				robotNum = j;
+				robots[robotNum]->SetPose(x, -y, orientation, conf);
+				break;
+			}
+		}
+	} else {
+		label = "?";
+	}
+
+	if (robotNum == Robot::robotNotFound) {
+		AddRobot(new Robot(x, y, orientation, team, id, camID, conf));
+		robotNum = robots.size() - 1;
+	}
+
+	label = label.toUpper();
+	robots[robotNum]->setRobotLabel(label);
+}
+
 void FieldScene::UpdateRobots(QSharedPointer<SSL_WrapperPacket> packet)
 {
-	if (packet->has_geometry()) {
-#ifndef OLD_SSL_PROTO
-		UpdateFieldGeometry(packet);
-#else
-		UpdateGeometry(packet->geometry().field());
-#endif
-	}
 	SSL_DetectionFrame detection = packet->detection();
 	int robots_blue_n = detection.robots_blue_size();
 	int robots_yellow_n = detection.robots_yellow_size();
-	//cout << robots_blue_n << " " << robots_yellow_n << endl;
-	int i, j, yellowj = 0,bluej = 0;
-	int team = teamBlue;
+	unsigned int camID = detection.camera_id();
 
 	SSL_DetectionRobot robot;
-	for (i = 0; i < robots_blue_n+robots_yellow_n; i++) {
-		//  cout << "i=" << i << endl;
-		if (i < robots_blue_n) {
-			robot = detection.robots_blue ( i );
-			team = teamBlue;
-			j = bluej;
-		} else {
-			robot = detection.robots_yellow ( i-robots_blue_n );
-			team = teamYellow;
-			j=yellowj;
-		}
 
-		double x, y, orientation, conf = robot.confidence();
-		int id = NA;
-		if (robot.has_robot_id())
-			id = robot.robot_id();
-		else
-			id = NA;
-		x = robot.x();
-		y = -robot.y();
-		if (robot.has_orientation())
-			orientation = robot.orientation() * 180.0 / M_PI;
-		else
-			orientation = NAOrientation;
-
-		//seek to the next robot of the same camera and team colour
-		while (j < robots.size() && (robots[j]->key != detection.camera_id() || robots[j]->teamID!=team)) {
-			j++;
-		}
-		//    cout << "robot size " << robots.size() << endl;
-
-		if (j + 1 > robots.size()) {
-			AddRobot (new Robot(x, y, orientation, team, id, detection.camera_id(), conf));
-		}
-		//cout << i << " " << id << " " << x << " " << y << " " << orientation << " " << conf << endl;
-
-		robots[j]->SetPose(x, -y, orientation, conf);
-		QString label;
-
-		if (id != NA) {
-			label.setNum (id + 1, 10);
-		} else {
-			label = "?";
-		}
-		label = label.toUpper();
-		if (label != robots[j]->robotLabel) {
-			robots[j]->robotLabel = label;
-		}
-		j++;
-		if (i < robots_blue_n) {
-			bluej = j;
-		} else {
-			yellowj = j;
-		}
+	while (robots.size() > Constants::maxNumOfRobots) {
+		this->removeItem(robots.last());
+		robots.removeLast();
 	}
-	for (j = bluej; j < robots.size(); j++) {
-		if (robots[j]->key == detection.camera_id() && robots[j]->teamID == teamBlue)
-			robots[j]->conf = 0.0;
-	}
-	for (j=yellowj; j < robots.size(); j++) {
-		if (robots[j]->key == detection.camera_id() && robots[j]->teamID == teamYellow) {
-			robots[j]->conf = 0.0;
+
+	for (int j = 0; j < robots.size(); j++) {
+		if (robots[j]->getCamID() == detection.camera_id()) {
+			robots[j]->setRobotConfidence(0);
 		}
 	}
 
-	QVector<QGraphicsEllipseItem *> tmp;
-	int cameraID = detection.camera_id();
-	while (cameraID + 1 > ballItems.size()) {
+	for (int i = 0; i < robots_blue_n; i++) {
+		robot = detection.robots_blue(i);
+		updateRobot(robot, Robot::teamBlue, camID);
+	}
+
+	for (int i = 0; i < robots_yellow_n; i++) {
+		robot = detection.robots_yellow(i);
+		updateRobot(robot, Robot::teamYellow, camID);
+	}
+
+	//update balls
+
+	QVector<QGraphicsEllipseItem*> tmp;
+	while(camID + 1 > ballItems.size())
 		ballItems.append(tmp);
-	}
-	if (ballItems[cameraID].size() < detection.balls_size()) {
+	if (ballItems[camID].size() < detection.balls_size()) {
 		//need to allocate some space for the new balls
-		QPen pen(QColor(0xcd, 0x59, 0x00, 0xff));
-		pen.setWidth(2);
-		QBrush brush(QColor(0xff, 0x81, 0x00, 0xff), Qt::SolidPattern);
-		while (detection.balls_size() > ballItems[cameraID].size()) {
-			ballItems[cameraID].append(this->addEllipse(0, 0, 12, 12, pen, brush));
-			ballItems[cameraID][ballItems[cameraID].size() - 1]->setZValue(2);
+		QPen pen(QColor(0xcd,0x59,0x00,0xff));
+		pen.setWidth (2);
+		QBrush brush (QColor(0xff, 0x81, 0x00, 0xff), Qt::SolidPattern);
+		while (detection.balls_size() > ballItems[camID].size()) {
+			ballItems[camID].append(this->addEllipse(0, 0, 12, 12, pen, brush));
+			ballItems[camID][ballItems[camID].size() - 1]->setZValue(2);
 		}
-	} else if (ballItems[cameraID].size() > detection.balls_size()) {
+	} else if (ballItems[camID].size() > detection.balls_size()) {
 	//need to delete some balls
-		while (ballItems[cameraID].size() > detection.balls_size()) {
-			this->removeItem(ballItems[cameraID][0]);
-			ballItems[cameraID].remove(0);
+		while(ballItems[camID].size() > detection.balls_size()) {
+			this->removeItem(ballItems[camID][0]);
+			ballItems[camID].remove(0);
 		}
 	}
 	for (int i = 0; i < detection.balls_size(); i++) {
-		ballItems[cameraID][i]->setPos(detection.balls(i).x() / ksize - 6, detection.balls(i).y() / ksize - 6);
+		ballItems[camID][i]->setPos(detection.balls(i).x()/ksize-6, -detection.balls(i).y()/ksize-6);
 	}
 }
 
@@ -167,28 +184,19 @@ void FieldScene::UpdateGeometry(SSL_GeometryFieldSize fieldSize) {
 
 void FieldScene::ClearField()
 {
+	this->clear();
 	LoadFieldGeometry();
-	this->removeItem(fieldItem);
 	field_arcs.clear();
 	field_lines.clear();
 	ConstructField();
 	fieldItem = this->addPath(*field, *fieldLinePen, *fieldBrush);
-	for (int i = 0; i < robots.size(); i++) {
-		this->removeItem(robots[i]);
-	}
 	robots.clear();
-	for (int i = 0; i < ballItems.size(); i++) {
-		for (int j = 0; j < ballItems[i].size(); j++) {
-			this->removeItem(ballItems[i][j]);
-		}
-	}
 	ballItems.clear();
 	emit reDrawScene();
 }
 
 void FieldScene::ConstructField()
 {
-	//scene->removeItem(fieldItem);
 	field = new QPainterPath();
 
 	QFont qfont;

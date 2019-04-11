@@ -33,14 +33,13 @@ TEMPLATE = app
 
 #directories of sources of the vision client
 INCLUDEPATH += \
-    $${SHARED_DIR}/net \
     $${SHARED_DIR}/util \
     $${SHARED_DIR}/rfprotocol \
     $${MATLAB_DIR}/include \
     $$PWD/robots \
+    $$PWD \
 
 SOURCES +=  \
-    $${SHARED_DIR}/net/robocup_vision_client.cpp \
 	$$PWD/main.cpp \
 	$$PWD/larcmacs.cpp \
 	$$PWD/fieldScene.cpp \
@@ -66,7 +65,6 @@ SOURCES +=  \
     $$PWD/robots/defaultRobot.cpp
 
 HEADERS  += \
-    $${SHARED_DIR}/net/robocup_vision_client.h \
     $${SHARED_DIR}/util/timer.h \
     $${SHARED_DIR}/util/field_default_constants.h \
 	$$PWD/larcmacs.h \
