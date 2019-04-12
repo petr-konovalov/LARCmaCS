@@ -34,6 +34,7 @@ private:
 	void UpdateFieldGeometry(QSharedPointer<SSL_WrapperPacket> packet);
 #endif
 	void UpdateGeometry(SSL_GeometryFieldSize fieldSize);
+	void robotsInit();
 	void LoadFieldGeometry();
 	void LoadFieldGeometry(const SSL_GeometryFieldSize &fieldSize);
 	void AddRobot (Robot* robot);

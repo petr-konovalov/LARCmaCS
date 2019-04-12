@@ -23,6 +23,17 @@ FieldScene::FieldScene(QObject *parent) :
 	fieldItem->setZValue(0);
 	mDrawTimer.setInterval(33);
 	connect(&mDrawTimer, SIGNAL(timeout()), this, SLOT(updateFrame()));
+	robotsInit();
+}
+
+void FieldScene::robotsInit()
+{
+	for (int i = 0; i < Constants::maxRobotsInTeam; i++) {
+		AddRobot(new Robot(0, 0, 0, Robot::teamBlue, i, 0, 0));
+	}
+	for (int i = 0; i < Constants::maxRobotsInTeam; i++) {
+		AddRobot(new Robot(0, 0, 0, Robot::teamYellow, i, 0, 0));
+	}
 }
 
 FieldScene::~FieldScene()
@@ -89,7 +100,7 @@ void FieldScene::updateRobot(const SSL_DetectionRobot & robot, int team, unsigne
 
 	conf = robot.confidence();
 	x = robot.x();
-	y = -robot.y();
+	y = robot.y();
 
 	orientation = Robot::NAOrientation;
 	if (robot.has_orientation()) {
@@ -105,7 +116,7 @@ void FieldScene::updateRobot(const SSL_DetectionRobot & robot, int team, unsigne
 		for (int j = 0; j < robots.size(); j++) {
 			if (robots[j]->getTeamID() == team && robots[j]->getRobotID() == id) {
 				robotNum = j;
-				robots[robotNum]->SetPose(x, -y, orientation, conf);
+				robots[robotNum]->SetPose(x, y, orientation, conf);
 				break;
 			}
 		}
@@ -131,6 +142,7 @@ void FieldScene::UpdateRobots(QSharedPointer<SSL_WrapperPacket> packet)
 
 	SSL_DetectionRobot robot;
 
+	//delete robots with undefined patterns
 	while (robots.size() > Constants::maxNumOfRobots) {
 		this->removeItem(robots.last());
 		robots.removeLast();
@@ -192,6 +204,7 @@ void FieldScene::ClearField()
 	fieldItem = this->addPath(*field, *fieldLinePen, *fieldBrush);
 	robots.clear();
 	ballItems.clear();
+	robotsInit();
 	emit reDrawScene();
 }
 
