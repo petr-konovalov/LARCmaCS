@@ -22,6 +22,7 @@ MainAlg::~MainAlg()
 void MainAlg::init(Receiver * receiver)
 {
 	mReceiver = receiver;
+	mPacketSSL = QSharedPointer<PacketSSL>(new PacketSSL());
 	worker.moveToThread(&thread);
 	cout << "Init mainAlg ok" << endl;
 	connect(this, SIGNAL(MLEvalString(QString)), &worker, SLOT(EvalString(QString)));
@@ -78,8 +79,6 @@ void MainAlg::loadVisionData()
 	QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket> > > tmp = mReceiver->getVisionData();
 	QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > detectionPackets = tmp->first;
 	int balls_n, idCam, robots_blue_n, robots_yellow_n;
-	mPacketSSL = QSharedPointer<PacketSSL>(new PacketSSL());
-
 	SSL_DetectionBall ball;
 
 	QSharedPointer<SSL_WrapperPacket> packet;

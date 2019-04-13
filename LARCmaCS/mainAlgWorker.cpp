@@ -252,8 +252,6 @@ void MainAlgWorker::processPacket(QSharedPointer<PacketSSL> packetssl)
 			newmess[j] = ruleArray[j * fmldata.config.RULE_AMOUNT + i];
 		}
 		if (newmess[0] == 1) {
-			char * newmessage = new char[100];
-			memcpy(newmessage, newmess, 100);
 			QByteArray command;
 
 			int voltage = 12; //fixed while we don't have abilities to change it from algos
@@ -290,6 +288,8 @@ void MainAlgWorker::processPacket(QSharedPointer<PacketSSL> packetssl)
 			}
 		}
 	}
+	free(ruleArray);
+	mxDestroyArray(fmldata.Rule);
 
 	if (isPause) { //TODO: add check of remote control
 		QByteArray command;

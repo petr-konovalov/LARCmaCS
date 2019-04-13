@@ -382,7 +382,13 @@ void FieldScene::LoadFieldGeometry(const SSL_GeometryFieldSize & fieldSize)
 	this->goal_width = fieldSize.goal_width();
 	this->goal_depth = fieldSize.goal_depth();
 
-	this->removeItem ( fieldItem );
+	this->removeItem(fieldItem);
+	if (fieldItem != nullptr) {
+		delete fieldItem;
+	}
+	if (field != nullptr) {
+		delete field;
+	}
 	ConstructField();
-	fieldItem = this->addPath (*field, *fieldLinePen, *fieldBrush);
+	fieldItem = this->addPath(*field, *fieldLinePen, *fieldBrush);
 }

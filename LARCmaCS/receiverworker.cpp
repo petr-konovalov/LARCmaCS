@@ -30,8 +30,8 @@ void ReceiverWorker::init()
 	mOutputDetectionPacket = QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >(new QVector<QSharedPointer<SSL_WrapperPacket> >());
 	mDetectionPacket->resize(NUM_OF_CAMERAS);
 	mOutputDetectionPacket->resize(NUM_OF_CAMERAS);
-	mGeometryPacket = QSharedPointer<SSL_WrapperPacket>(new SSL_WrapperPacket());
-	mOutputGeometryPacket = QSharedPointer<SSL_WrapperPacket>(new SSL_WrapperPacket());
+	mGeometryPacket = QSharedPointer<SSL_WrapperPacket>();
+	mOutputGeometryPacket = QSharedPointer<SSL_WrapperPacket>();
 	mInputPacket = QSharedPointer<SSL_WrapperPacket>(new SSL_WrapperPacket());
 	mStatisticsTimer->setInterval(1000);
 	connect(mStatisticsTimer.data(), SIGNAL(timeout()), this, SLOT(formStatistics()));

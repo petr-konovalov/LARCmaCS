@@ -44,8 +44,8 @@ private:
 	//balls
 	QVector < QVector<QGraphicsEllipseItem*> > ballItems;
 	//field
-	QPainterPath *field;
-	QGraphicsPathItem *fieldItem;
+	QPainterPath * field = nullptr;
+	QGraphicsPathItem * fieldItem = nullptr;
 	//brushes and pens
 	QBrush *fieldBrush, *ballBrush;
 	QPen *fieldPen, *fieldLinePen, *ballPen;
