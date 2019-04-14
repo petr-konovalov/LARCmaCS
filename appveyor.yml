@@ -46,3 +46,8 @@ after_test:
 
 artifacts:
   - path: $(ZIP_NAME)
+  
+notifications:
+ - provider: GitHubPullRequest
+   on_build_failure: false
+   template: "{{#passed}}Download:\n{{#jobs}}{{name}}\n{{#artifacts}} [{{fileName}}]({{permalink}}) \n {{/artifacts}}{{/jobs}}{{/passed}}"
