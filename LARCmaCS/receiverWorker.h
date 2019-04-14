@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#define NUM_OF_CAMERAS 4
-
 #pragma once
 
 using namespace std;
@@ -23,42 +21,40 @@ using namespace std;
 #include <QMutex>
 #include <QUdpSocket>
 #include <QTimer>
+#include "constants.h"
 #include "messages_robocup_ssl_wrapper.pb.h"
 #include "packetSSL.h"
-
-#include <time.h>
-
-#define SSL_VISION_PORT 10006
-#define SIM_VISION_PORT 10020
 
 class ReceiverWorker : public QObject
 {
 	Q_OBJECT
 public:
 	explicit ReceiverWorker();
-	QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket> > > getVisionData();
+	const QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket> > > & getVisionData();
 	~ReceiverWorker();
 
 public slots:
 	void processPendingDatagrams();
 	void swapDataVectors();
-	void init();
 	void formStatistics();
 	bool open(unsigned short port);
 	void clearOutput();
 	void close();
 	void start();
+	void stop();
 	void ChangeSimulatorMode(bool flag);
 
 signals:
 	void clientOpen(unsigned short port);
 	void clientClose();
 	void clearField();
-	void UpdateSSLFPS(QString message);
+	void finished();
+	void UpdateSSLFPS(const QString & message);
 
 private:
+	void init();
+	QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket> > > outputVisionData;
 	static const QString visionIP;
-	static const int MaxDataGramSize = 65536;
 	QSharedPointer<QUdpSocket> mSocket;
 	QSharedPointer<QTimer> mStatisticsTimer;
 	bool mClearFlag = false;

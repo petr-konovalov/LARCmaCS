@@ -1,9 +1,22 @@
+// Copyright 2019 Dmitrii Iarosh
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+
+// http://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #pragma once
 
 #include <QGraphicsPathItem>
 #include "field_default_constants.h"
 #include "messages_robocup_ssl_wrapper.pb.h"
-#include "timer.h"
 #include "robot.h"
 #include "constants.h"
 #include "receiver.h"
@@ -20,7 +33,7 @@ public:
 	void start();
 
 public slots:
-	void UpdateField(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > detection, QSharedPointer<SSL_WrapperPacket> geometry);
+	void UpdateField(const QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > & detection, const QSharedPointer<SSL_WrapperPacket> & geometry);
 	void ClearField();
 	void updateFrame();
 
@@ -31,14 +44,14 @@ private:
 	QTimer mDrawTimer;
 	Receiver * mReceiver;
 #ifndef OLD_SSL_PROTO
-	void UpdateFieldGeometry(QSharedPointer<SSL_WrapperPacket> packet);
+	void UpdateFieldGeometry(const QSharedPointer<SSL_WrapperPacket> & packet);
 #endif
-	void UpdateGeometry(SSL_GeometryFieldSize fieldSize);
+	void UpdateGeometry(const SSL_GeometryFieldSize & fieldSize);
 	void robotsInit();
 	void LoadFieldGeometry();
-	void LoadFieldGeometry(const SSL_GeometryFieldSize &fieldSize);
-	void AddRobot (Robot* robot);
-	void UpdateRobots(QSharedPointer<SSL_WrapperPacket> packet);
+	void LoadFieldGeometry(const SSL_GeometryFieldSize & fieldSize);
+	void AddRobot(Robot * robot);
+	void UpdateRobots(const QSharedPointer<SSL_WrapperPacket> & packet);
 	//Robots
 	QVector<Robot*> robots;
 	//balls

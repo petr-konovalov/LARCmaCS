@@ -1,3 +1,17 @@
+// Copyright 2019 Dmitrii Iarosh
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+
+// http://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #include "fieldScene.h"
 #include <QPainter>
 #include <QStyleOptionGraphicsItem>
@@ -64,12 +78,12 @@ void FieldScene::AddRobot(Robot *robot)
 }
 
 #ifndef OLD_SSL_PROTO
-void FieldScene::UpdateFieldGeometry(QSharedPointer<SSL_WrapperPacket> packet) {
+void FieldScene::UpdateFieldGeometry(const QSharedPointer<SSL_WrapperPacket> & packet) {
 	LoadFieldGeometry(packet->geometry().field());
 }
 #endif
 
-void FieldScene::UpdateField(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > detection, QSharedPointer<SSL_WrapperPacket> geometry)
+void FieldScene::UpdateField(const QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > & detection, const QSharedPointer<SSL_WrapperPacket> & geometry)
 {
 	if (!geometry.isNull()) {
 #ifndef OLD_SSL_PROTO
@@ -78,16 +92,18 @@ void FieldScene::UpdateField(QSharedPointer<QVector<QSharedPointer<SSL_WrapperPa
 		UpdateGeometry(geometry->geometry().field());
 #endif
 	}
-	for (int i = 0; i < detection->size(); i++) {
-		if (!detection->at(i).isNull()) {
-			if (detection->at(i)->has_geometry()) {
+	if (!detection.isNull()) {
+		for (int i = 0; i < detection->size(); i++) {
+			if (!detection->at(i).isNull()) {
+				if (detection->at(i)->has_geometry()) {
 #ifndef OLD_SSL_PROTO
-				UpdateFieldGeometry(detection->at(i));
+					UpdateFieldGeometry(detection->at(i));
 #else
-				UpdateGeometry(detection->at(i)->geometry().field());
+					UpdateGeometry(detection->at(i)->geometry().field());
 #endif
+				}
+				UpdateRobots(detection->at(i));
 			}
-			UpdateRobots(detection->at(i));
 		}
 	}
 	emit reDrawScene();
@@ -133,7 +149,7 @@ void FieldScene::updateRobot(const SSL_DetectionRobot & robot, int team, unsigne
 	robots[robotNum]->setRobotLabel(label);
 }
 
-void FieldScene::UpdateRobots(QSharedPointer<SSL_WrapperPacket> packet)
+void FieldScene::UpdateRobots(const QSharedPointer<SSL_WrapperPacket> & packet)
 {
 	SSL_DetectionFrame detection = packet->detection();
 	int robots_blue_n = detection.robots_blue_size();
@@ -171,7 +187,7 @@ void FieldScene::UpdateRobots(QSharedPointer<SSL_WrapperPacket> packet)
 		ballItems.append(tmp);
 	if (ballItems[camID].size() < detection.balls_size()) {
 		//need to allocate some space for the new balls
-		QPen pen(QColor(0xcd,0x59,0x00,0xff));
+		QPen pen(QColor(0xcd, 0x59, 0x00, 0xff));
 		pen.setWidth (2);
 		QBrush brush (QColor(0xff, 0x81, 0x00, 0xff), Qt::SolidPattern);
 		while (detection.balls_size() > ballItems[camID].size()) {
@@ -190,7 +206,7 @@ void FieldScene::UpdateRobots(QSharedPointer<SSL_WrapperPacket> packet)
 	}
 }
 
-void FieldScene::UpdateGeometry(SSL_GeometryFieldSize fieldSize) {
+void FieldScene::UpdateGeometry(const SSL_GeometryFieldSize & fieldSize) {
 	LoadFieldGeometry(fieldSize);
 }
 
@@ -200,6 +216,9 @@ void FieldScene::ClearField()
 	LoadFieldGeometry();
 	field_arcs.clear();
 	field_lines.clear();
+	if (field != nullptr) {
+		delete field;
+	}
 	ConstructField();
 	fieldItem = this->addPath(*field, *fieldLinePen, *fieldBrush);
 	robots.clear();

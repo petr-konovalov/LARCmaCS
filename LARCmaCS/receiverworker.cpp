@@ -18,21 +18,21 @@
 const QString ReceiverWorker::visionIP = QStringLiteral("224.5.23.2");
 
 ReceiverWorker::ReceiverWorker()
-	: mGroupAddress(visionIP){}
+	: mGroupAddress(visionIP)
+{
+	mDetectionPacket = QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >(new QVector<QSharedPointer<SSL_WrapperPacket> >());
+	mOutputDetectionPacket = QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >(new QVector<QSharedPointer<SSL_WrapperPacket> >());
+	mDetectionPacket->resize(Constants::numOfCameras);
+	mOutputDetectionPacket->resize(Constants::numOfCameras);
+	mGeometryPacket = QSharedPointer<SSL_WrapperPacket>();
+	mOutputGeometryPacket = QSharedPointer<SSL_WrapperPacket>();
+	mInputPacket = QSharedPointer<SSL_WrapperPacket>(new SSL_WrapperPacket());
+}
 
 void ReceiverWorker::init()
 {
 	mStatisticsTimer = QSharedPointer<QTimer>(new QTimer());
 	mSocket = QSharedPointer<QUdpSocket>(new QUdpSocket());
-	qRegisterMetaType<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > >("QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >");
-	qRegisterMetaType<QSharedPointer<SSL_WrapperPacket> >("QSharedPointer<SSL_WrapperPacket>");
-	mDetectionPacket = QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >(new QVector<QSharedPointer<SSL_WrapperPacket> >());
-	mOutputDetectionPacket = QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >(new QVector<QSharedPointer<SSL_WrapperPacket> >());
-	mDetectionPacket->resize(NUM_OF_CAMERAS);
-	mOutputDetectionPacket->resize(NUM_OF_CAMERAS);
-	mGeometryPacket = QSharedPointer<SSL_WrapperPacket>();
-	mOutputGeometryPacket = QSharedPointer<SSL_WrapperPacket>();
-	mInputPacket = QSharedPointer<SSL_WrapperPacket>(new SSL_WrapperPacket());
 	mStatisticsTimer->setInterval(1000);
 	connect(mStatisticsTimer.data(), SIGNAL(timeout()), this, SLOT(formStatistics()));
 	connect(mSocket.data(), SIGNAL(readyRead()), this, SLOT(processPendingDatagrams()));
@@ -41,7 +41,6 @@ void ReceiverWorker::init()
 ReceiverWorker::~ReceiverWorker()
 {
 	close();
-
 }
 
 void ReceiverWorker::formStatistics()
@@ -69,12 +68,18 @@ void ReceiverWorker::close()
 void ReceiverWorker::clearOutput()
 {
 	mMutex.lock();
-	for (int i = 0; i < NUM_OF_CAMERAS; i++) {
+	for (int i = 0; i < Constants::numOfCameras; i++) {
 		mDetectionPacket->replace(i, QSharedPointer<SSL_WrapperPacket>());
 	}
 	mGeometryPacket = QSharedPointer<SSL_WrapperPacket>();
 	mClearFlag = true;
 	mMutex.unlock();
+}
+
+void ReceiverWorker::stop()
+{
+	close();
+	emit finished();
 }
 
 bool ReceiverWorker::open(unsigned short port)
@@ -87,14 +92,14 @@ bool ReceiverWorker::open(unsigned short port)
 	return false;
 }
 
-QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket> > > ReceiverWorker::getVisionData()
+const QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket> > > & ReceiverWorker::getVisionData()
 {
-	QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket> > > res = QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket> > >(new pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket> >());
+	outputVisionData = QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket> > >(new pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket> >());
 	mMutex.lock();
-	res->first = mOutputDetectionPacket;
-	res->second = mOutputGeometryPacket;
+	outputVisionData->first = mOutputDetectionPacket;
+	outputVisionData->second = mOutputGeometryPacket;
 	mMutex.unlock();
-	return res;
+	return outputVisionData;
 }
 
 void ReceiverWorker::swapDataVectors()
@@ -142,10 +147,11 @@ void ReceiverWorker::processPendingDatagrams()
 
 void ReceiverWorker::start()
 {
+	init();
 	cout << "Receiver worker start" << endl;
 	connect(this, SIGNAL(clientOpen(unsigned short)), this, SLOT(open(unsigned short)));
 	connect(this, SIGNAL(clientClose()), this, SLOT(close()));
-	emit clientOpen(SSL_VISION_PORT);
+	emit clientOpen(Constants::SSLVisionPort);
 }
 
 void ReceiverWorker::ChangeSimulatorMode(bool flag)
@@ -154,10 +160,10 @@ void ReceiverWorker::ChangeSimulatorMode(bool flag)
 		mIsSimEnabledFlag = flag;
 		if (mIsSimEnabledFlag) {
 			emit clientClose();
-			emit clientOpen(SIM_VISION_PORT);
+			emit clientOpen(Constants::SimVisionPort);
 		} else {
 			emit clientClose();
-			emit clientOpen(SSL_VISION_PORT);
+			emit clientOpen(Constants::SSLVisionPort);
 		}
 	}
 }

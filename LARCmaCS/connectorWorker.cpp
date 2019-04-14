@@ -60,7 +60,7 @@ void ConnectorWorker::init()
 	qDebug()<<"INIT CONNECTOR OK";
 }
 
-QString ConnectorWorker::getGrSimIP()
+const QString & ConnectorWorker::getGrSimIP()
 {
 	return grSimIP;
 }
@@ -70,17 +70,17 @@ unsigned short ConnectorWorker::getGrSimPort()
 	return grSimPort;
 }
 
-void ConnectorWorker::run(int N, const QByteArray &command)
+void ConnectorWorker::run(int N, const QByteArray & command)
 {
 	udpSocket->writeDatagram(command, QHostAddress(numIP[N]), 10000);
 }
 
-void ConnectorWorker::runSim(const QByteArray &command)
+void ConnectorWorker::runSim(const QByteArray & command)
 {
 	udpSocket->writeDatagram(command, QHostAddress(grSimIP), grSimPort);
 }
 
-void ConnectorWorker::changeGrSimIP(const QString &IP)
+void ConnectorWorker::changeGrSimIP(const QString & IP)
 {
 	grSimIP = IP;
 }

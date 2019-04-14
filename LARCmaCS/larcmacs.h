@@ -46,9 +46,9 @@ private:
 	RobotReceiver robotReceiver;
 
 private slots:
-	void UpdateSSLFPS(QString message);
-	void UpdateStatusBar(QString message);
-	void UpdatePauseState(QString message);
+	void UpdateSSLFPS(const QString & message);
+	void UpdateStatusBar(const QString & message);
+	void UpdatePauseState(const QString & message);
 	void updateView();
 	void scaleView(int);
 
@@ -62,12 +62,11 @@ private slots:
 	void on_but_reference_clicked();
 
 signals:
-	void sendToConnectorRM(int N,QByteArray command);
-	void changeGrSimIP(QString IP);
+	void changeGrSimIP(const QString & IP);
 	void changeGrSimPort(unsigned short port);
 	void ChangeSimulatorMode(bool state);
 	//void MatlabPause();
-	void MLEvalString(QString s);
+	void MLEvalString(const QString & s);
 	void updateRobots();
 	void addIp(int, QString);
 };

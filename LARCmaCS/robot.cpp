@@ -32,7 +32,7 @@ void Robot::setRobotConfidence(double confidence)
 	mRobotConfidence = confidence;
 }
 
-void Robot::setRobotLabel(QString label)
+void Robot::setRobotLabel(const QString & label)
 {
 	mRobotLabel = label;
 }

@@ -19,7 +19,7 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 	fieldscene->setReceiver(&receiver);
 	ui->fieldView->setScene(fieldscene);
 	scaleView(8);
-	macsArray = new QString[12];
+	macsArray = new QString[Constants::maxNumOfRobots];
 
 	receiver.init();
 	mainalg.init(&receiver);
@@ -27,7 +27,7 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 	connector.init();
 
 	//algorithm connect
-	connect(this, SIGNAL(MLEvalString(QString)), &mainalg, SLOT(EvalString(QString)));
+	connect(this, SIGNAL(MLEvalString(const QString &)), &mainalg, SLOT(EvalString(const QString &)));
 	//connect(this, SIGNAL(MatlabPause()), &mainalg.worker, SLOT(Pause()));
 
 	//send command to robots
@@ -38,15 +38,13 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 	connect(ui->sceneslider, SIGNAL(valueChanged(int)), this, SLOT(scaleView(int)));
 
 	//info GUI
-	connect(&mainalg, SIGNAL(UpdatePauseState(QString)), this, SLOT(UpdatePauseState(QString)));
-	connect(&mainalg, SIGNAL(StatusMessage(QString)), this, SLOT(UpdateStatusBar(QString)));
-	connect(&receiver, SIGNAL(UpdateSSLFPS(QString)), this, SLOT(UpdateSSLFPS(QString)));
+	connect(&mainalg, SIGNAL(UpdatePauseState(const QString &)), this, SLOT(UpdatePauseState(const QString &)));
+	connect(&mainalg, SIGNAL(StatusMessage(const QString &)), this, SLOT(UpdateStatusBar(const QString &)));
+	connect(&receiver, SIGNAL(UpdateSSLFPS(const QString &)), this, SLOT(UpdateSSLFPS(const QString &)));
 
 	//remotecontrol
-	connect(&remotecontol, SIGNAL(RC_control(int,int,int,int, bool)),
-			this, SLOT(remcontrolsender(int, int,int, int, bool)));
-	connect(this, SIGNAL(sendToConnectorRM(int, const QByteArray &)), &connector.worker, SLOT(run(int, const QByteArray &)));
-
+	connect(&remotecontol, SIGNAL(RC_control(int, int, int, int, bool)),
+			this, SLOT(remcontrolsender(int, int, int, int, bool)));
 	connect(this, SIGNAL(addIp(int, QString)), &connector.worker, SLOT(addIp(int, QString)));
 
 	//simulator Enable
@@ -99,8 +97,6 @@ void LARCmaCS::remcontrolsender(int l, int r,int k, int b, bool kickUp)
 			socket.writeDatagram(byteData, byteData.length(), QHostAddress(IP), port);
 		}
 	}
-
-	return;
 }
 
 LARCmaCS::~LARCmaCS()
@@ -108,17 +104,17 @@ LARCmaCS::~LARCmaCS()
 	delete ui;
 }
 
-void LARCmaCS::UpdatePauseState(QString message)
+void LARCmaCS::UpdatePauseState(const QString & message)
 {
 	ui->label_Pause->setText(message);
 }
 
-void LARCmaCS::UpdateSSLFPS(QString message)
+void LARCmaCS::UpdateSSLFPS(const QString & message)
 {
 	ui->label_SSL_FPS->setText(message);
 }
 
-void LARCmaCS::UpdateStatusBar(QString message)
+void LARCmaCS::UpdateStatusBar(const QString & message)
 {
 	ui->StatusLabel->setText(message);
 }

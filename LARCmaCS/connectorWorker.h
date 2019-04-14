@@ -14,7 +14,7 @@ Q_OBJECT
 public:
 	ConnectorWorker(){}
 
-	QString getGrSimIP();
+	const QString & getGrSimIP();
 	unsigned short getGrSimPort();
 
 	int shutdownconnector;
@@ -44,11 +44,6 @@ private:
 	unsigned short grSimPort = 20011;
 
 signals:
-	void receivedDatagram(QByteArray datagram);
-	void receivedAddresses(QByteArray addressDatagram);
-	void gotStringAddresses(QByteArray stringAddressDatagram);
-	void allNeededRobotsEnabled();
-	void allTasksDone();
 	void robotAdded(QString);
 	void sendMacs(QList<QString>);
 	void sendPortList(QStringList);
@@ -57,10 +52,10 @@ public slots:
 	void init();
 	void start();
 	void stop();
-	void changeGrSimIP(const QString &IP);
+	void changeGrSimIP(const QString & IP);
 	void changeGrSimPort(unsigned short port);
-	void run(int N, const QByteArray &command);
-	void runSim(const QByteArray &command);
+	void run(int N, const QByteArray & command);
+	void runSim(const QByteArray & command);
 	void udpProcessPendingDatagrams();
 	void addIp(int id, QString ip);
 };

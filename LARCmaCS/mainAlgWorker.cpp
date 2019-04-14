@@ -83,28 +83,27 @@ MainAlgWorker::MainAlgWorker()
 	auto allAddrs = in.readAll().split("\n", QString::SkipEmptyParts).filter(QRegExp("^[^#;]"));
 	client.initFromList(allAddrs);
 	mIsBallInside = false;
-	mStatisticsTimer.setInterval(1000);
-	connect(&mStatisticsTimer, SIGNAL(timeout()), this, SLOT(formStatistics()));
-	connect(&mStatisticsTimer, SIGNAL(timeout()), this, SLOT(updatePauseState()));
-	mStatisticsTimer.start();
 }
 
-MainAlgWorker::~MainAlgWorker()
-{
-	mStatisticsTimer.stop();
-}
+MainAlgWorker::~MainAlgWorker(){}
 
 void MainAlgWorker::start()
 {
-	shutdowncomp = false;
+	mStatisticsTimer = QSharedPointer<QTimer>(new QTimer());
+	mShutdownFlag = false;
 	cout << "MainAlg worker start" << endl;
 	init();
+	mStatisticsTimer->setInterval(1000);
+	connect(mStatisticsTimer.data(), SIGNAL(timeout()), this, SLOT(formStatistics()));
+	connect(mStatisticsTimer.data(), SIGNAL(timeout()), this, SLOT(updatePauseState()));
+	mStatisticsTimer->start();
 	run();
 }
 
 void MainAlgWorker::stop()
 {
-	shutdowncomp = true;
+	mStatisticsTimer->stop();
+	mShutdownFlag = true;
 }
 
 void MainAlgWorker::formStatistics()
@@ -153,24 +152,25 @@ void MainAlgWorker::init(){
 
 bool MainAlgWorker::getIsSimEnabledFlag()
 {
-	return isSimEnabledFlag;
+	return mIsSimEnabledFlag;
 }
 
 void MainAlgWorker::setEnableSimFlag(bool flag)
 {
-	isSimEnabledFlag = flag;
+	mIsSimEnabledFlag = flag;
 }
 
 void MainAlgWorker::run()
 {
-	while (!shutdowncomp) {
+	while (!mShutdownFlag) {
 		emit getDataFromReceiver();
 		processPacket(mPacketSSL);
 		QApplication::processEvents();
 	}
+	emit finished();
 }
 
-void MainAlgWorker::setPacketSSL(QSharedPointer<PacketSSL> packetSSL)
+void MainAlgWorker::setPacketSSL(const QSharedPointer<PacketSSL> & packetSSL)
 {
 	mPacketSSL = packetSSL;
 }
@@ -179,7 +179,7 @@ void MainAlgWorker::updatePauseState()
 {
 	engEvalString(fmldata.ep, "ispause=RP.Pause");
 	mxArray *mxitpause = engGetVariable(fmldata.ep, "ispause");
-	isPause = true;
+	mIsPause = true;
 	if (mxitpause != 0) {
 		double* itpause = mxGetPr(mxitpause);
 		if (itpause != 0) {
@@ -191,7 +191,7 @@ void MainAlgWorker::updatePauseState()
 						if ((*zMain_End) == 0) {
 							emit newPauseState("main br");
 						} else {
-							isPause = false;
+							mIsPause = false;
 							emit newPauseState("WORK");
 						}
 					} else {
@@ -211,8 +211,11 @@ void MainAlgWorker::updatePauseState()
 	}
 }
 
-void MainAlgWorker::processPacket(QSharedPointer<PacketSSL> packetssl)
+void MainAlgWorker::processPacket(const QSharedPointer<PacketSSL> & packetssl)
 {
+	if (packetssl.isNull()) {
+		return;
+	}
 // Заполнение массивов Balls Blues и Yellows и запуск main-функции
 	mPacketsPerSecond++;
 	mTotalPacketsNum++;
@@ -256,15 +259,15 @@ void MainAlgWorker::processPacket(QSharedPointer<PacketSSL> packetssl)
 
 			int voltage = 12; //fixed while we don't have abilities to change it from algos
 
-			bool simFlag = isSimEnabledFlag;
+			bool simFlag = mIsSimEnabledFlag;
 			if (!simFlag) {
-				if (!isPause) {
+				if (!mIsPause) {
 					DefaultRobot::formControlPacket(command, newmess[1], newmess[3], newmess[2], newmess[5], newmess[6], newmess[4], voltage, 0);
 				} else {
 					DefaultRobot::formControlPacket(command, newmess[1], 0, 0, 0, 0, 0, voltage, 0);
 				}
 			} else {
-				if (!isPause) {
+				if (!mIsPause) {
 					GrSimRobot::formControlPacket(command, newmess[1], newmess[3], newmess[2], newmess[5], newmess[6], newmess[4], voltage, 0);
 				} else {
 					GrSimRobot::formControlPacket(command, newmess[1], 0, 0, 0, 0, 0, voltage, 0);
@@ -291,9 +294,9 @@ void MainAlgWorker::processPacket(QSharedPointer<PacketSSL> packetssl)
 	free(ruleArray);
 	mxDestroyArray(fmldata.Rule);
 
-	if (isPause) { //TODO: add check of remote control
+	if (mIsPause) { //TODO: add check of remote control
 		QByteArray command;
-		if (!isSimEnabledFlag) {
+		if (!mIsSimEnabledFlag) {
 			for (int i = 1; i <= 12; i++) {
 				DefaultRobot::formControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
 				emit sendToConnector(i, command);
@@ -342,7 +345,7 @@ void MainAlgWorker::stop_matlab()
 	fmtlab = false;
 }
 
-void MainAlgWorker::EvalString(QString s)
+void MainAlgWorker::EvalString(const QString & s)
 {
 	engEvalString(fmldata.ep, s.toUtf8().data());
 }

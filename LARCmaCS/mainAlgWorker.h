@@ -9,31 +9,31 @@
 #include "constants.h"
 
 using namespace std;
-#include <time.h>       /* clock_t, clock(), CLOCKS_PER_SEC */
 
 class MainAlgWorker : public QObject
 {
 	Q_OBJECT
 private:
 	Client client;
-	bool isPause;
+	bool mIsPause;
 	int mTotalPacketsNum = 0;
 	int mPacketsPerSecond = 0;
-	QTimer mStatisticsTimer;
+	QSharedPointer<QTimer> mStatisticsTimer;
 	QSharedPointer<PacketSSL> mPacketSSL;
 	double mIsBallInside;
 
 public:
 	MainAlgWorker();
-	void setPacketSSL(QSharedPointer<PacketSSL> packetSSL);
+	void setPacketSSL(const QSharedPointer<PacketSSL> & packetSSL);
 	bool getIsSimEnabledFlag();
 	~MainAlgWorker();
 
 signals:
+	void finished();
 	void sendToConnector(int N, const QByteArray & command);
 	void sendToSimConnector(const QByteArray & command);
-	void newPauseState(QString state);
-	void sendStatistics(QString statistics);
+	void newPauseState(const QString & state);
+	void sendStatistics(const QString & statistics);
 	void getDataFromReceiver();
 
 public slots:
@@ -42,20 +42,20 @@ public slots:
 	void updatePauseState();
 	void stop();
 	void setEnableSimFlag(bool flag);
-	void processPacket(QSharedPointer<PacketSSL> packetssl);
+	void processPacket(const QSharedPointer<PacketSSL> & packetssl);
 	void Pause();
 	void run_matlab();
 	void stop_matlab();
 	void run();
-	void EvalString(QString s);
+	void EvalString(const QString & s);
 	void changeBallStatus(bool ballStatus);
 
 private:
 	void init();
-	bool isSimEnabledFlag = 0;
+	bool mIsSimEnabledFlag = 0;
 	char m_buffer[256]; // matlab buffer
 	MlData fmldata;
 	bool fmtlab;
-	bool shutdowncomp;
+	bool mShutdownFlag;
 	bool pause;
 };
