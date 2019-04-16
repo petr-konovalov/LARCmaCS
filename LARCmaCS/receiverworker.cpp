@@ -27,6 +27,7 @@ ReceiverWorker::ReceiverWorker()
 	mGeometryPacket = QSharedPointer<SSL_WrapperPacket>();
 	mOutputGeometryPacket = QSharedPointer<SSL_WrapperPacket>();
 	mInputPacket = QSharedPointer<SSL_WrapperPacket>(new SSL_WrapperPacket());
+	outputVisionData = QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket> > >(new pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket> >());
 }
 
 void ReceiverWorker::init()
@@ -94,11 +95,6 @@ bool ReceiverWorker::open(unsigned short port)
 
 const QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket> > > & ReceiverWorker::getVisionData()
 {
-	outputVisionData = QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket> > >(new pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket> >());
-	mMutex.lock();
-	outputVisionData->first = mOutputDetectionPacket;
-	outputVisionData->second = mOutputGeometryPacket;
-	mMutex.unlock();
 	return outputVisionData;
 }
 
@@ -116,6 +112,8 @@ void ReceiverWorker::swapDataVectors()
 		emit clearField();
 		mClearFlag = false;
 	}
+	outputVisionData->first = mOutputDetectionPacket;
+	outputVisionData->second = mOutputGeometryPacket;
 	mMutex.unlock();
 }
 
