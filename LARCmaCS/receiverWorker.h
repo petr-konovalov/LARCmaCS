@@ -57,13 +57,10 @@ private:
 	static const QString visionIP;
 	QSharedPointer<QUdpSocket> mSocket;
 	QSharedPointer<QTimer> mStatisticsTimer;
-	bool mClearFlag = false;
 	QHostAddress mGroupAddress;
 	QMutex mMutex;
 	QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > mDetectionPacket;
 	QSharedPointer<SSL_WrapperPacket> mGeometryPacket;
-	QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > mOutputDetectionPacket;
-	QSharedPointer<SSL_WrapperPacket> mOutputGeometryPacket;
 	QSharedPointer<SSL_WrapperPacket> mInputPacket;
 	int mTotalPacketsNum = 0;
 	int mPacketsPerSecond = 0;

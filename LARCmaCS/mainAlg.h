@@ -36,6 +36,7 @@ struct MainAlg : public QObject
 private:
 	QSharedPointer<PacketSSL> mPacketSSL;
 	Receiver * mReceiver;
+	SSL_DetectionFrame mDetection;
 	MainAlgWorker * mWorker;
 	QThread * mThread;
 public:

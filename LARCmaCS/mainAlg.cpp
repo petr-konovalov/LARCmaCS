@@ -112,38 +112,51 @@ void MainAlg::loadVisionData()
 			continue;
 		}
 		SSL_DetectionRobot robot;
-		SSL_DetectionFrame detection = packet->detection();
+		mDetection.Clear();
+		mDetection = packet->detection();
 
-		idCam = detection.camera_id() + 1;
-		balls_n = detection.balls_size();
+		idCam = mDetection.camera_id() + 1;
+		balls_n = mDetection.balls_size();
 
 		// [Start] Ball info
 		if (balls_n != 0) {
 			mPacketSSL->balls[0] = idCam;
-			ball = detection.balls(0);
+			ball = mDetection.balls(0);
 			mPacketSSL->balls[1] = ball.x();
 			mPacketSSL->balls[2] = ball.y();
 		}
 		// [End] Ball info
 
 		// [Start] Robot info
-		robots_blue_n = detection.robots_blue_size();
-		robots_yellow_n = detection.robots_yellow_size();
+		robots_blue_n = mDetection.robots_blue_size();
+		robots_yellow_n = mDetection.robots_yellow_size();
 
 		for (int i = 0; i < robots_blue_n; i++) {
-			robot = detection.robots_blue(i);
-			mPacketSSL->robots_blue[robot.robot_id()] = idCam;
-			mPacketSSL->robots_blue[robot.robot_id() + 12] = robot.x();
-			mPacketSSL->robots_blue[robot.robot_id() + 24] = robot.y();
-			mPacketSSL->robots_blue[robot.robot_id() + 36] = robot.orientation();
+			robot = mDetection.robots_blue(i);
+			if (robot.has_robot_id() && robot.robot_id() >= 0 && robot.robot_id() <= Constants::maxRobotsInTeam) {
+				mPacketSSL->robots_blue[robot.robot_id()] = idCam;
+				mPacketSSL->robots_blue[robot.robot_id() + 12] = robot.x();
+				mPacketSSL->robots_blue[robot.robot_id() + 24] = robot.y();
+				mPacketSSL->robots_blue[robot.robot_id() + 36] = robot.orientation();
+			} else {
+				if (robot.has_robot_id()) {
+					cout << robot.robot_id() << " blue" << endl;
+				}
+			}
 		}
 
 		for (int i = 0; i < robots_yellow_n; i++) {
-			robot = detection.robots_yellow(i);
-			mPacketSSL->robots_yellow[robot.robot_id()] = idCam;
-			mPacketSSL->robots_yellow[robot.robot_id() + 12] = robot.x();
-			mPacketSSL->robots_yellow[robot.robot_id() + 24] = robot.y();
-			mPacketSSL->robots_yellow[robot.robot_id() + 36] = robot.orientation();
+			robot = mDetection.robots_yellow(i);
+			if (robot.has_robot_id() && robot.robot_id() >= 0 && robot.robot_id() <= Constants::maxRobotsInTeam) {
+				mPacketSSL->robots_yellow[robot.robot_id()] = idCam;
+				mPacketSSL->robots_yellow[robot.robot_id() + 12] = robot.x();
+				mPacketSSL->robots_yellow[robot.robot_id() + 24] = robot.y();
+				mPacketSSL->robots_yellow[robot.robot_id() + 36] = robot.orientation();
+			} else {
+				if (robot.has_robot_id()) {
+					cout << robot.robot_id() << " yellow" << endl;
+				}
+			}
 		}
 		// [End] Robot info
 	}

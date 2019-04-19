@@ -41,6 +41,7 @@ signals:
 	void reDrawScene();
 
 private:
+	SSL_DetectionFrame mDetection;
 	QTimer mDrawTimer;
 	Receiver * mReceiver;
 #ifndef OLD_SSL_PROTO

@@ -21,11 +21,8 @@ ReceiverWorker::ReceiverWorker()
 	: mGroupAddress(visionIP)
 {
 	mDetectionPacket = QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >(new QVector<QSharedPointer<SSL_WrapperPacket> >());
-	mOutputDetectionPacket = QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >(new QVector<QSharedPointer<SSL_WrapperPacket> >());
 	mDetectionPacket->resize(Constants::numOfCameras);
-	mOutputDetectionPacket->resize(Constants::numOfCameras);
 	mGeometryPacket = QSharedPointer<SSL_WrapperPacket>();
-	mOutputGeometryPacket = QSharedPointer<SSL_WrapperPacket>();
 	mInputPacket = QSharedPointer<SSL_WrapperPacket>(new SSL_WrapperPacket());
 	outputVisionData = QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket> > >(new pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket> >());
 }
@@ -73,8 +70,8 @@ void ReceiverWorker::clearOutput()
 		mDetectionPacket->replace(i, QSharedPointer<SSL_WrapperPacket>());
 	}
 	mGeometryPacket = QSharedPointer<SSL_WrapperPacket>();
-	mClearFlag = true;
 	mMutex.unlock();
+	emit clearField();
 }
 
 void ReceiverWorker::stop()
@@ -100,20 +97,9 @@ const QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacke
 
 void ReceiverWorker::swapDataVectors()
 {
-	QSharedPointer<SSL_WrapperPacket> tmpGeometry = mOutputGeometryPacket;
-	QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > tmpDetection = mOutputDetectionPacket;
 	mMutex.lock();
-	mOutputGeometryPacket = mGeometryPacket;
-	mOutputDetectionPacket = mDetectionPacket;
-	if (!mClearFlag) {
-		mDetectionPacket = tmpDetection;
-		mGeometryPacket = tmpGeometry;
-	} else {
-		emit clearField();
-		mClearFlag = false;
-	}
-	outputVisionData->first = mOutputDetectionPacket;
-	outputVisionData->second = mOutputGeometryPacket;
+	outputVisionData->first = mDetectionPacket;
+	outputVisionData->second = mGeometryPacket;
 	mMutex.unlock();
 }
 

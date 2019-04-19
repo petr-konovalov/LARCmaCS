@@ -151,32 +151,38 @@ void FieldScene::updateRobot(const SSL_DetectionRobot & robot, int team, unsigne
 
 void FieldScene::UpdateRobots(const QSharedPointer<SSL_WrapperPacket> & packet)
 {
-	SSL_DetectionFrame detection = packet->detection();
-	int robots_blue_n = detection.robots_blue_size();
-	int robots_yellow_n = detection.robots_yellow_size();
-	unsigned int camID = detection.camera_id();
+	mDetection.Clear();
+	mDetection = packet->detection();
+	int robots_blue_n = mDetection.robots_blue_size();
+	int robots_yellow_n = mDetection.robots_yellow_size();
+	unsigned int camID = mDetection.camera_id();
 
 	SSL_DetectionRobot robot;
 
 	//delete robots with undefined patterns
-	while (robots.size() > Constants::maxNumOfRobots) {
-		this->removeItem(robots.last());
-		robots.removeLast();
+	int i = Constants::maxNumOfRobots;
+	while (i < robots.size()) {
+		if (robots.at(i)->getCamID() == camID) {
+			this->removeItem(robots.at(i));
+			robots.remove(i);
+		} else {
+			i++;
+		}
 	}
 
 	for (int j = 0; j < robots.size(); j++) {
-		if (robots[j]->getCamID() == detection.camera_id()) {
+		if (robots[j]->getCamID() == mDetection.camera_id()) {
 			robots[j]->setRobotConfidence(0);
 		}
 	}
 
 	for (int i = 0; i < robots_blue_n; i++) {
-		robot = detection.robots_blue(i);
+		robot = mDetection.robots_blue(i);
 		updateRobot(robot, Robot::teamBlue, camID);
 	}
 
 	for (int i = 0; i < robots_yellow_n; i++) {
-		robot = detection.robots_yellow(i);
+		robot = mDetection.robots_yellow(i);
 		updateRobot(robot, Robot::teamYellow, camID);
 	}
 
@@ -185,24 +191,24 @@ void FieldScene::UpdateRobots(const QSharedPointer<SSL_WrapperPacket> & packet)
 	QVector<QGraphicsEllipseItem*> tmp;
 	while(camID + 1 > ballItems.size())
 		ballItems.append(tmp);
-	if (ballItems[camID].size() < detection.balls_size()) {
+	if (ballItems[camID].size() < mDetection.balls_size()) {
 		//need to allocate some space for the new balls
 		QPen pen(QColor(0xcd, 0x59, 0x00, 0xff));
 		pen.setWidth (2);
 		QBrush brush (QColor(0xff, 0x81, 0x00, 0xff), Qt::SolidPattern);
-		while (detection.balls_size() > ballItems[camID].size()) {
+		while (mDetection.balls_size() > ballItems[camID].size()) {
 			ballItems[camID].append(this->addEllipse(0, 0, 12, 12, pen, brush));
 			ballItems[camID][ballItems[camID].size() - 1]->setZValue(2);
 		}
-	} else if (ballItems[camID].size() > detection.balls_size()) {
+	} else if (ballItems[camID].size() > mDetection.balls_size()) {
 	//need to delete some balls
-		while(ballItems[camID].size() > detection.balls_size()) {
+		while(ballItems[camID].size() > mDetection.balls_size()) {
 			this->removeItem(ballItems[camID][0]);
 			ballItems[camID].remove(0);
 		}
 	}
-	for (int i = 0; i < detection.balls_size(); i++) {
-		ballItems[camID][i]->setPos(detection.balls(i).x()/ksize-6, -detection.balls(i).y()/ksize-6);
+	for (int i = 0; i < mDetection.balls_size(); i++) {
+		ballItems[camID][i]->setPos(mDetection.balls(i).x()/ksize-6, -mDetection.balls(i).y()/ksize-6);
 	}
 }
 
