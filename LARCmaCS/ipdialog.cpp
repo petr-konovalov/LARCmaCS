@@ -6,7 +6,6 @@ IpDialog::IpDialog(ConnectorWorker &worker,  QWidget *parent) :
 	QDialog(parent),
 	ui(new Ui::IpDialog)
 {
-	receiver.init();
 	QObject::connect(this, SIGNAL(addIp(int, QString)), &worker, SLOT(addIp(int, QString)));
 
 	ui->setupUi(this);

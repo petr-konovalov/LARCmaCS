@@ -20,11 +20,7 @@ const QString ReceiverWorker::visionIP = QStringLiteral("224.5.23.2");
 ReceiverWorker::ReceiverWorker()
 	: mGroupAddress(visionIP)
 {
-	mDetectionPacket = QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >(new QVector<QSharedPointer<SSL_WrapperPacket> >());
-	mDetectionPacket->resize(Constants::numOfCameras);
-	mGeometryPacket = QSharedPointer<SSL_WrapperPacket>();
 	mInputPacket = QSharedPointer<SSL_WrapperPacket>(new SSL_WrapperPacket());
-	outputVisionData = QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket> > >(new pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket> >());
 }
 
 void ReceiverWorker::init()
@@ -65,12 +61,10 @@ void ReceiverWorker::close()
 
 void ReceiverWorker::clearOutput()
 {
-	mMutex.lock();
 	for (int i = 0; i < Constants::numOfCameras; i++) {
-		mDetectionPacket->replace(i, QSharedPointer<SSL_WrapperPacket>());
+		emit updateDetection(QSharedPointer<SSL_WrapperPacket>(), i);
 	}
-	mGeometryPacket = QSharedPointer<SSL_WrapperPacket>();
-	mMutex.unlock();
+	emit updateGeometry(QSharedPointer<SSL_WrapperPacket>());
 	emit clearField();
 }
 
@@ -90,19 +84,6 @@ bool ReceiverWorker::open(unsigned short port)
 	return false;
 }
 
-const QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket> > > & ReceiverWorker::getVisionData()
-{
-	return outputVisionData;
-}
-
-void ReceiverWorker::swapDataVectors()
-{
-	mMutex.lock();
-	outputVisionData->first = mDetectionPacket;
-	outputVisionData->second = mGeometryPacket;
-	mMutex.unlock();
-}
-
 void ReceiverWorker::processPendingDatagrams()
 {
 	unsigned int camID = 0;
@@ -115,13 +96,9 @@ void ReceiverWorker::processPendingDatagrams()
 		mInputPacket->ParseFromArray(datagram.data(), datagramSize);
 		if (mInputPacket->has_detection()) {
 			camID = mInputPacket->detection().camera_id();
-			mMutex.lock();
-			mDetectionPacket->replace(camID, mInputPacket);
-			mMutex.unlock();
+			emit updateDetection(mInputPacket, camID);
 		} else {
-			mMutex.lock();
-			mGeometryPacket = mInputPacket;
-			mMutex.unlock();
+			emit updateGeometry(mInputPacket);
 		}
 		mTotalPacketsNum++;
 		mPacketsPerSecond++;

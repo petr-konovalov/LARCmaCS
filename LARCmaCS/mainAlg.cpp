@@ -32,9 +32,9 @@ MainAlg::~MainAlg()
 	stop();
 }
 
-void MainAlg::init(Receiver * receiver)
+void MainAlg::init(SharedRes * sharedRes)
 {
-	mReceiver = receiver;
+	mSharedRes = sharedRes;
 	mPacketSSL = QSharedPointer<PacketSSL>(new PacketSSL());
 	mWorker->moveToThread(mThread);
 	cout << "Init mainAlg ok" << endl;
@@ -90,9 +90,7 @@ void MainAlg::moveToSimConnector(const QByteArray & command)
 
 void MainAlg::loadVisionData()
 {
-	mReceiver->swapDataVectors();
-	QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket> > > tmp = mReceiver->getVisionData();
-	QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > detectionPackets = tmp->first;
+	QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > detectionPackets = mSharedRes->getDetection();
 	int balls_n, idCam, robots_blue_n, robots_yellow_n;
 	SSL_DetectionBall ball;
 

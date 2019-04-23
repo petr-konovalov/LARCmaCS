@@ -19,7 +19,8 @@
 #include "messages_robocup_ssl_wrapper.pb.h"
 #include "robot.h"
 #include "constants.h"
-#include "receiver.h"
+#include <QTimer>
+#include "sharedRes.h"
 
 using namespace std;
 
@@ -29,7 +30,7 @@ class FieldScene : public QGraphicsScene
 public:
 	explicit FieldScene(QObject *parent = 0);
 	~FieldScene();
-	void setReceiver(Receiver * receiver);
+	void setSharedRes(SharedRes * sharedRes);
 	void start();
 
 public slots:
@@ -43,7 +44,7 @@ signals:
 private:
 	SSL_DetectionFrame mDetection;
 	QTimer mDrawTimer;
-	Receiver * mReceiver;
+	SharedRes * mSharedRes;
 #ifndef OLD_SSL_PROTO
 	void UpdateFieldGeometry(const QSharedPointer<SSL_WrapperPacket> & packet);
 #endif

@@ -17,6 +17,7 @@
 #include <iostream>
 #include <QObject>
 #include <QThread>
+#include "sharedRes.h"
 #include <QSharedPointer>
 
 #include "packetSSL.h"
@@ -34,18 +35,19 @@ private:
 	QTimer mDisplayTimer;
 	ReceiverWorker * mWorker;
 	QThread * mThread;
+	SharedRes * mSharedRes;
 	bool mDisplayFlag = false;
 
 public:
-	const QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket> > > & getVisionData();
 	Receiver();
 	~Receiver();
-	void init();
+	void init(SharedRes * sharedRes);
 	void start();
 	void stop();
 
 public slots:
-	void swapDataVectors();
+	void updateDetection(const QSharedPointer<SSL_WrapperPacket> & detection, int camID);
+	void updateGeometry(const QSharedPointer<SSL_WrapperPacket> & geometry);
 	void sendStatistics(const QString & statistics);
 	void clearScene();
 	void ChangeSimulatorMode(bool mode);

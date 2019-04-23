@@ -28,8 +28,9 @@ Receiver::~Receiver()
 	stop();
 }
 
-void Receiver::init()
+void Receiver::init(SharedRes * sharedRes)
 {
+	mSharedRes = sharedRes;
 	mWorker->moveToThread(mThread);
 	cout << "Init ok" << endl;
 	connect(mThread, SIGNAL(started()), mWorker, SLOT(start()));
@@ -40,6 +41,8 @@ void Receiver::init()
 	connect(mWorker, SIGNAL(clearField()), this, SLOT(clearScene()));
 	connect(mWorker, SIGNAL(UpdateSSLFPS(const QString &)), this, SLOT(sendStatistics(const QString &)));
 	connect(this, SIGNAL(updateSimulatorMode(bool)), mWorker, SLOT(ChangeSimulatorMode(bool)));
+	connect(mWorker, SIGNAL(updateDetection(const QSharedPointer<SSL_WrapperPacket> &, int)), this, SLOT(updateDetection(const QSharedPointer<SSL_WrapperPacket> &, int)));
+	connect(mWorker, SIGNAL(updateGeometry(const QSharedPointer<SSL_WrapperPacket> &)), this, SLOT(updateGeometry(const QSharedPointer<SSL_WrapperPacket> &)));
 }
 
 void Receiver::sendStatistics(const QString & statistics)
@@ -47,14 +50,14 @@ void Receiver::sendStatistics(const QString & statistics)
 	emit UpdateSSLFPS(statistics);
 }
 
-const QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket> > > & Receiver::getVisionData()
+void Receiver::updateDetection(const QSharedPointer<SSL_WrapperPacket> & detection, int camID)
 {
-	return mWorker->getVisionData();
+	mSharedRes->setDetection(detection, camID);
 }
 
-void Receiver::swapDataVectors()
+void Receiver::updateGeometry(const QSharedPointer<SSL_WrapperPacket> & geometry)
 {
-	mWorker->swapDataVectors();
+	mSharedRes->setGeometry(geometry);
 }
 
 void Receiver::setDisplayFlag()

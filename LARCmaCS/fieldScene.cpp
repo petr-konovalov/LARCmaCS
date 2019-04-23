@@ -57,8 +57,7 @@ FieldScene::~FieldScene()
 
 void FieldScene::updateFrame()
 {
-	QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket> > > tmp = mReceiver->getVisionData();
-	UpdateField(tmp->first, tmp->second);
+	UpdateField(mSharedRes->getDetection(), mSharedRes->getGeometry());
 }
 
 void FieldScene::start()
@@ -66,9 +65,9 @@ void FieldScene::start()
 	mDrawTimer.start();
 }
 
-void FieldScene::setReceiver(Receiver * receiver)
+void FieldScene::setSharedRes(SharedRes * sharedRes)
 {
-	mReceiver = receiver;
+	mSharedRes = sharedRes;
 }
 
 void FieldScene::AddRobot(Robot *robot)

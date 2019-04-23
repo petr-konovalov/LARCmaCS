@@ -22,7 +22,6 @@ private slots:
 
 private:
 	Ui::IpDialog *ui;
-	Receiver receiver;
 	Connector connector;
 
 signals:

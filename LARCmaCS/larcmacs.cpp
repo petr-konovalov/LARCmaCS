@@ -16,13 +16,13 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 {
 	ui->setupUi(this);
 	fieldscene = new FieldScene();
-	fieldscene->setReceiver(&receiver);
+	fieldscene->setSharedRes(&sharedRes);
 	ui->fieldView->setScene(fieldscene);
 	scaleView(8);
 	macsArray = new QString[Constants::maxNumOfRobots];
 
-	receiver.init();
-	mainalg.init(&receiver);
+	receiver.init(&sharedRes);
+	mainalg.init(&sharedRes);
 	sceneview.init();
 	connector.init();
 

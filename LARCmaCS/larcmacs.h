@@ -34,6 +34,7 @@ protected:
 	bool scalingRequested;
 	SceneView sceneview;
 	Receiver receiver;
+	SharedRes sharedRes;
 	MainAlg mainalg;
 	Connector connector;
 

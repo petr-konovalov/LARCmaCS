@@ -30,12 +30,10 @@ class ReceiverWorker : public QObject
 	Q_OBJECT
 public:
 	explicit ReceiverWorker();
-	const QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket> > > & getVisionData();
 	~ReceiverWorker();
 
 public slots:
 	void processPendingDatagrams();
-	void swapDataVectors();
 	void formStatistics();
 	bool open(unsigned short port);
 	void clearOutput();
@@ -49,18 +47,16 @@ signals:
 	void clientClose();
 	void clearField();
 	void finished();
+	void updateDetection(const QSharedPointer<SSL_WrapperPacket> & detection, int camID);
+	void updateGeometry(const QSharedPointer<SSL_WrapperPacket> & geometry);
 	void UpdateSSLFPS(const QString & message);
 
 private:
 	void init();
-	QSharedPointer<pair<QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >, QSharedPointer<SSL_WrapperPacket> > > outputVisionData;
 	static const QString visionIP;
 	QSharedPointer<QUdpSocket> mSocket;
 	QSharedPointer<QTimer> mStatisticsTimer;
 	QHostAddress mGroupAddress;
-	QMutex mMutex;
-	QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > mDetectionPacket;
-	QSharedPointer<SSL_WrapperPacket> mGeometryPacket;
 	QSharedPointer<SSL_WrapperPacket> mInputPacket;
 	int mTotalPacketsNum = 0;
 	int mPacketsPerSecond = 0;

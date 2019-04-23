@@ -25,7 +25,7 @@
 #include "mlData.h"
 #include "client.h"
 #include "mainAlgWorker.h"
-#include "receiver.h"
+#include "sharedRes.h"
 #include "messages_robocup_ssl_wrapper.pb.h"
 
 using namespace std;
@@ -35,7 +35,7 @@ struct MainAlg : public QObject
 	Q_OBJECT
 private:
 	QSharedPointer<PacketSSL> mPacketSSL;
-	Receiver * mReceiver;
+	SharedRes * mSharedRes;
 	SSL_DetectionFrame mDetection;
 	MainAlgWorker * mWorker;
 	QThread * mThread;
@@ -43,7 +43,7 @@ public:
 	bool getIsSimEnabledFlag();
 	explicit MainAlg();
 	~MainAlg();
-	void init(Receiver * receiver);
+	void init(SharedRes * sharedRes);
 	void start();
 	void stop();
 

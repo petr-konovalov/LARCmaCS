@@ -62,7 +62,8 @@ SOURCES +=  \
 	$$PWD/settings.cpp \
 	$$PWD/robotReceiver.cpp \
     $$PWD/robots/grSimRobot.cpp \
-    $$PWD/robots/defaultRobot.cpp
+    $$PWD/robots/defaultRobot.cpp \
+    $$PWD/sharedRes.cpp
 
 HEADERS  += \
     $${SHARED_DIR}/util/timer.h \
@@ -89,7 +90,8 @@ HEADERS  += \
         $$PWD/robotReceiver.h \
 	$$PWD/constants.h \
     $$PWD/robots/grSimRobot.h \
-    $$PWD/robots/defaultRobot.h
+    $$PWD/robots/defaultRobot.h \
+    $$PWD/sharedRes.h
 
 FORMS += \
 	$$PWD/larcmacs.ui \
