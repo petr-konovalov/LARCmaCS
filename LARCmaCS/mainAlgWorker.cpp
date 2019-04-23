@@ -220,9 +220,9 @@ void MainAlgWorker::processPacket(const QSharedPointer<PacketSSL> & packetssl)
 	mPacketsPerSecond++;
 	mTotalPacketsNum++;
 
-	memcpy(mxGetPr(fmldata.Ball), packetssl->balls, BALL_COUNT_d);
-	memcpy(mxGetPr(fmldata.Blue), packetssl->robots_blue, TEAM_COUNT_d);
-	memcpy(mxGetPr(fmldata.Yellow), packetssl->robots_yellow, TEAM_COUNT_d);
+	memcpy(mxGetPr(fmldata.Ball), packetssl->balls, Constants::ballAlgoPacketSize * sizeof(double));
+	memcpy(mxGetPr(fmldata.Blue), packetssl->robots_blue, Constants::robotAlgoPacketSize * sizeof(double));
+	memcpy(mxGetPr(fmldata.Yellow), packetssl->robots_yellow, Constants::robotAlgoPacketSize * sizeof(double));
 	memcpy(mxGetPr(fmldata.ballInside), &mIsBallInside, sizeof(double));
 
 
@@ -279,7 +279,7 @@ void MainAlgWorker::processPacket(const QSharedPointer<PacketSSL> & packetssl)
 					if (!simFlag) {
 						emit sendToConnector(i, command);
 					} else {
-						emit sendToSimConnector(command);
+						emit sendToSimConnector(command); //TODO it send only to 0 robot
 					}
 				}
 			if ((newmess[1] > 0) && (newmess[1] <= Constants::maxNumOfRobots)) {

@@ -18,7 +18,9 @@ class Constants
 {
 public:
 	static const int maxNumOfRobots = 16;
-	static const int maxRobotsInTeam = maxNumOfRobots / 2;
+	static const int maxRobotsInTeam = maxNumOfRobots; //maxNumOfRobots / 2;
+	static const int robotAlgoPacketSize = 4 * maxRobotsInTeam;
+	static const int ballAlgoPacketSize = 3;
 	static const unsigned  SSLVisionPort = 10006;
 	static const unsigned  SimVisionPort = 10020;
 	static const int numOfCameras = 4;

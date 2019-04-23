@@ -97,7 +97,7 @@ void MainAlg::loadVisionData()
 	SSL_DetectionBall ball;
 
 	QSharedPointer<SSL_WrapperPacket> packet;
-	for (int i = 0; i < TEAM_COUNT / 4; i++) {
+	for (int i = 0; i < Constants::maxRobotsInTeam; i++) {
 			mPacketSSL->robots_blue[i] = 0;
 			mPacketSSL->robots_yellow[i] = 0;
 	}
@@ -135,9 +135,9 @@ void MainAlg::loadVisionData()
 			robot = mDetection.robots_blue(i);
 			if (robot.has_robot_id() && robot.robot_id() >= 0 && robot.robot_id() <= Constants::maxRobotsInTeam) {
 				mPacketSSL->robots_blue[robot.robot_id()] = idCam;
-				mPacketSSL->robots_blue[robot.robot_id() + 12] = robot.x();
-				mPacketSSL->robots_blue[robot.robot_id() + 24] = robot.y();
-				mPacketSSL->robots_blue[robot.robot_id() + 36] = robot.orientation();
+				mPacketSSL->robots_blue[robot.robot_id() + Constants::maxRobotsInTeam] = robot.x();
+				mPacketSSL->robots_blue[robot.robot_id() + Constants::maxRobotsInTeam * 2] = robot.y();
+				mPacketSSL->robots_blue[robot.robot_id() + Constants::maxRobotsInTeam * 3] = robot.orientation();
 			} else {
 				if (robot.has_robot_id()) {
 					cout << robot.robot_id() << " blue" << endl;
