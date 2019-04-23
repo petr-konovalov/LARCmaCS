@@ -9,7 +9,6 @@ static QString configKeyForRobotNum(int n)
 
 void ConnectorWorker::start()
 {
-	qDebug() << "Connector worker started";
 	shutdownconnector = false;
 	init();
 }
@@ -21,8 +20,6 @@ void ConnectorWorker::stop()
 
 void ConnectorWorker::init()
 {
-	qDebug() << "Initializing connector.worker";
-
 	connectedSockets = 0;
 	connectedRobots = 0;
 	//filename = "numMAC.txt";
@@ -57,7 +54,6 @@ void ConnectorWorker::init()
 
 	timer = new QTimer(this);
 	connect(udpSocket,SIGNAL(readyRead()),this,SLOT(udpProcessPendingDatagrams()));
-	qDebug()<<"INIT CONNECTOR OK";
 }
 
 const QString & ConnectorWorker::getGrSimIP()
@@ -103,7 +99,6 @@ void ConnectorWorker::addIp(int id, QString ip)
 
 void ConnectorWorker::udpProcessPendingDatagrams()
 {
-	qDebug()<<"DATAGRAM!";
 	QByteArray datagram;
 	QHostAddress *robotAddress = new QHostAddress();
 	while (udpSocket->hasPendingDatagrams()) {

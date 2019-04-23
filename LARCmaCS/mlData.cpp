@@ -8,7 +8,7 @@ MlData::MlData(RCConfig conf)
 	Ball         = mxCreateDoubleMatrix(1, 3, mxREAL);
 	Blue         = mxCreateDoubleMatrix(12, 4, mxREAL);
 	Yellow       = mxCreateDoubleMatrix(12, 4, mxREAL);
-	Rule         = mxCreateDoubleMatrix(config.RULE_LENGTH, config.RULE_AMOUNT, mxREAL);
+	Rule         = mxCreateDoubleMatrix(Constants::ruleLength, Constants::ruleAmount, mxREAL);
 	Back_Params  = mxCreateDoubleMatrix(config.BACK_LENGTH, config.BACK_AMOUNT, mxREAL);
 	Back_Amount  = mxCreateDoubleMatrix(1, 1, mxREAL);
 	Back_Length  = mxCreateDoubleMatrix(1, 1, mxREAL);

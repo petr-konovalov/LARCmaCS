@@ -32,7 +32,6 @@ void Receiver::init(SharedRes * sharedRes)
 {
 	mSharedRes = sharedRes;
 	mWorker->moveToThread(mThread);
-	cout << "Init ok" << endl;
 	connect(mThread, SIGNAL(started()), mWorker, SLOT(start()));
 	connect(this, SIGNAL(wstop()), mWorker, SLOT(stop()));
 	connect(mWorker, SIGNAL(finished()), mThread, SLOT(quit()));

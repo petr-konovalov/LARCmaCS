@@ -37,7 +37,6 @@ void MainAlg::init(SharedRes * sharedRes)
 	mSharedRes = sharedRes;
 	mPacketSSL = QSharedPointer<PacketSSL>(new PacketSSL());
 	mWorker->moveToThread(mThread);
-	cout << "Init mainAlg ok" << endl;
 	connect(mThread, SIGNAL(started()), mWorker, SLOT(start()));
 	connect(this, SIGNAL(wstop()), mWorker, SLOT(stop()));
 	connect(mWorker, SIGNAL(finished()), mWorker, SLOT(deleteLater()));

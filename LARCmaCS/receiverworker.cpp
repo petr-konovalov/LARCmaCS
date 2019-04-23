@@ -109,7 +109,6 @@ void ReceiverWorker::processPendingDatagrams()
 void ReceiverWorker::start()
 {
 	init();
-	cout << "Receiver worker start" << endl;
 	connect(this, SIGNAL(clientOpen(unsigned short)), this, SLOT(open(unsigned short)));
 	connect(this, SIGNAL(clientClose()), this, SLOT(close()));
 	emit clientOpen(Constants::SSLVisionPort);

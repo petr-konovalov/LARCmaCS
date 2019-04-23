@@ -17,7 +17,6 @@ Connector::~Connector()
 void Connector::init()
 {
 	worker.moveToThread(&thread);
-	qDebug() << "Init connector ok";
 	connect(this, SIGNAL(wstart()), &worker, SLOT(start()));
 	connect(this, SIGNAL(wstop()), &worker, SLOT(stop()));
 	connect(&thread, SIGNAL(finished()), &worker, SLOT(deleteLater()));
@@ -27,7 +26,6 @@ void Connector::start()
 {
 	thread.start();
 	thread.setPriority(QThread::HighestPriority);
-	qDebug() << "Connector thread start";
 	emit wstart();
 }
 

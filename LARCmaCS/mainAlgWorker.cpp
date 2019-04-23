@@ -91,11 +91,9 @@ void MainAlgWorker::start()
 {
 	mStatisticsTimer = QSharedPointer<QTimer>(new QTimer());
 	mShutdownFlag = false;
-	cout << "MainAlg worker start" << endl;
 	init();
 	mStatisticsTimer->setInterval(1000);
 	connect(mStatisticsTimer.data(), SIGNAL(timeout()), this, SLOT(formStatistics()));
-	connect(mStatisticsTimer.data(), SIGNAL(timeout()), this, SLOT(updatePauseState()));
 	mStatisticsTimer->start();
 	run();
 }
@@ -236,29 +234,27 @@ void MainAlgWorker::processPacket(const QSharedPointer<PacketSSL> & packetssl)
 
 	fmldata.Rule = engGetVariable(fmldata.ep, "Rules");
 	double *ruleArray =
-			(double *)malloc(fmldata.config.RULE_AMOUNT * fmldata.config.RULE_LENGTH * sizeof(double));
-	if (fmldata.Rule != 0)
-		memcpy(ruleArray, mxGetPr(fmldata.Rule)
-			   , fmldata.config.RULE_AMOUNT * fmldata.config.RULE_LENGTH * sizeof(double));
-	else
-		memset(ruleArray, 0, fmldata.config.RULE_AMOUNT * fmldata.config.RULE_LENGTH * sizeof(double));
-
+			(double *)malloc(Constants::ruleAmount * Constants::ruleLength * sizeof(double));
+	if (fmldata.Rule != 0) {
+		memcpy(ruleArray, mxGetPr(fmldata.Rule), Constants::ruleAmount * Constants::ruleLength * sizeof(double));
+	} else {
+		memset(ruleArray, 0, Constants::ruleAmount * Constants::ruleLength * sizeof(double));
+	}
 	char sendString[256];
-	sprintf(sendString, "Rules=zeros(%d, %d);", fmldata.config.RULE_AMOUNT, fmldata.config.RULE_LENGTH);
+	sprintf(sendString, "Rules=zeros(%d, %d);", Constants::ruleAmount, Constants::ruleLength);
 	engEvalString(fmldata.ep, sendString);
 
 // Разбор пришедшего пакета и переправка его строк на connector
 
-	for (int i = 0; i < fmldata.config.RULE_AMOUNT; i++) {
-		char newmess[100];
-		for (int j = 0; j < fmldata.config.RULE_LENGTH; j++) {
-			newmess[j] = ruleArray[j * fmldata.config.RULE_AMOUNT + i];
+	for (int i = 0; i < Constants::ruleAmount; i++) {
+		char newmess[Constants::ruleLength];
+		for (int j = 0; j < Constants::ruleLength; j++) {
+			newmess[j] = ruleArray[j * Constants::ruleAmount + i];
 		}
 		if (newmess[0] == 1) {
 			QByteArray command;
 
 			int voltage = 12; //fixed while we don't have abilities to change it from algos
-
 			bool simFlag = mIsSimEnabledFlag;
 			if (!simFlag) {
 				if (!mIsPause) {
@@ -274,14 +270,17 @@ void MainAlgWorker::processPacket(const QSharedPointer<PacketSSL> & packetssl)
 				}
 			}
 
-			if (newmess[1] == 0)
+			if (newmess[1] == 0) {
 				for (int i = 1; i <= Constants::maxNumOfRobots; i++) {
 					if (!simFlag) {
 						emit sendToConnector(i, command);
 					} else {
-						emit sendToSimConnector(command); //TODO it send only to 0 robot
+						QByteArray multiCommand;
+						GrSimRobot::formControlPacket(multiCommand, i, newmess[3], newmess[2], newmess[5], newmess[6], newmess[4], voltage, 0);
+						emit sendToSimConnector(multiCommand);
 					}
 				}
+			}
 			if ((newmess[1] > 0) && (newmess[1] <= Constants::maxNumOfRobots)) {
 				if (!simFlag) {
 					emit sendToConnector(newmess[1], command);
@@ -308,6 +307,8 @@ void MainAlgWorker::processPacket(const QSharedPointer<PacketSSL> & packetssl)
 			}
 		}
 	}
+
+	updatePauseState();
 }
 
 void MainAlgWorker::Pause()
@@ -317,8 +318,6 @@ void MainAlgWorker::Pause()
 
 void MainAlgWorker::run_matlab()
 {
-	cout << "Work is started..." << endl;
-
 	if (!(fmldata.ep = engOpen(NULL))) {
 		cerr << "Can't open Matlab Engine" << endl;
 		fmtlab = false;
@@ -331,7 +330,7 @@ void MainAlgWorker::run_matlab()
 
 	//-----create Rules-----
 	char sendString[256];
-	sprintf (sendString, "Rules=zeros(%d, %d)", fmldata.config.RULE_AMOUNT, fmldata.config.RULE_LENGTH);
+	sprintf (sendString, "Rules=zeros(%d, %d)", Constants::ruleAmount, Constants::ruleLength);
 	engEvalString(fmldata.ep, sendString);
 
 	QString dirPath = "cd " + QCoreApplication::applicationDirPath() + "/MLscripts";
