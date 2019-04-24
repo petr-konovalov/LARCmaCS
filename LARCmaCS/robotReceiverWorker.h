@@ -35,8 +35,8 @@ private slots:
 	void processPendingDatagrams();
 
 private:
-	QUdpSocket udpSocket4;
-	QHostAddress groupAddress4;
+	QUdpSocket * mUdpSocket;
+	QHostAddress mGroupAddress;
 
 	QHash<char, char> ballStatuses;
 };

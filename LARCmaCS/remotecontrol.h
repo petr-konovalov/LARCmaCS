@@ -31,5 +31,6 @@ public slots:
 private:
 	Ui::RemoteControl *ui;
 signals:
+	void remoteControlOff();
 	void RC_control(int left,int right,int kick,int beep, bool kickUp);
 };

@@ -15,18 +15,16 @@
 #include <QtNetwork>
 
 #include "robotReceiverWorker.h"
+#include "message.h"
 
-RobotReceiverWorker::RobotReceiverWorker(): groupAddress4(QStringLiteral("192.168.1.255"))
-{
-	udpSocket4.bind(QHostAddress::AnyIPv4, 57000, QUdpSocket::ShareAddress);
-	udpSocket4.joinMulticastGroup(groupAddress4);
-
-	connect(&udpSocket4, SIGNAL(readyRead()), this, SLOT(processPendingDatagrams()));
-}
+RobotReceiverWorker::RobotReceiverWorker(): mGroupAddress(QStringLiteral("192.168.1.255")){}
 
 void RobotReceiverWorker::start()
 {
-
+	mUdpSocket = new QUdpSocket();
+	mUdpSocket->bind(QHostAddress::AnyIPv4, 57000, QUdpSocket::ShareAddress);
+	mUdpSocket->joinMulticastGroup(mGroupAddress);
+	connect(mUdpSocket, SIGNAL(readyRead()), this, SLOT(processPendingDatagrams()));
 }
 
 void RobotReceiverWorker::stop()
@@ -37,18 +35,25 @@ void RobotReceiverWorker::stop()
 
 void RobotReceiverWorker::close()
 {
-
+	mUdpSocket->close();
 }
 
 void RobotReceiverWorker::processPendingDatagrams()
 {
 	QByteArray datagram;
 
-	while (udpSocket4.hasPendingDatagrams()) {
-		datagram.resize(int(udpSocket4.pendingDatagramSize()));
-		udpSocket4.readDatagram(datagram.data(), datagram.size());
-		ballStatuses[datagram.at(29)] = datagram.at(4);
-		auto found = std::find(ballStatuses.begin(), ballStatuses.end(), 1);
-		//emit ballStatus(found != ballStatuses.end());
+	while (mUdpSocket->hasPendingDatagrams()) {
+		datagram.resize(static_cast<int>(mUdpSocket->pendingDatagramSize()));
+		mUdpSocket->readDatagram(datagram.data(), datagram.size());
+		if (datagram.size() != 50) {
+			continue;
+		}
+		quint32 crc = Message::calculateCRC(datagram, 46);
+		if (crc != ((quint32)(datagram.at(47) << 24) + (quint32)(datagram.at(48) << 16) + (quint32)(datagram.at(49) << 8) + (quint32)datagram.at(50))) {
+			continue;
+		}
+		QString ip = QString::number((quint32)datagram.at(26)) + "." + QString::number((quint32)datagram.at(27)) + "." + QString::number((quint32)datagram.at(28)) + "." + QString::number((quint32)datagram.at(29));
+		bool isBallInside = datagram.at(4) == 0 ? false : true;
+		emit setBallInsideData(ip, isBallInside);
 	}
 }
