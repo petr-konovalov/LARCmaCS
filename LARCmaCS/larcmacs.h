@@ -39,7 +39,7 @@ protected:
 	Connector connector;
 
 private:
-	Ui::LARCmaCS *ui;
+	Ui::LARCmaCS * ui;
 	float drawscale;
 	qreal sizescene;
 	QString wifiaddrdata[NUM_CONTROL_ROBOTS];
@@ -69,5 +69,4 @@ signals:
 	//void MatlabPause();
 	void MLEvalString(const QString & s);
 	void updateRobots();
-	void addIp(int, QString);
 };

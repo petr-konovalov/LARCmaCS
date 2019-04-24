@@ -1,10 +1,12 @@
 #pragma once
 
 #include <QObject>
-#include <QFile>
 #include <QUdpSocket>
-#include <QtCore>
 #include <QMap>
+#include <QTimer>
+#include "constants.h"
+#include "settings.h"
+#include "defaultRobot.h"
 
 using std::map;
 
@@ -13,40 +15,18 @@ class ConnectorWorker : public QObject
 Q_OBJECT
 public:
 	ConnectorWorker(){}
-
 	const QString & getGrSimIP();
 	unsigned short getGrSimPort();
-
-	int shutdownconnector;
-	char *curRuleArray;
-
-	QString filename;
-	QFile *ipFile;
-	QUdpSocket *udpSocket;
-	map<int const, QString> robotAddrMap;
-	int connectedAllSocketsFlag;
-	QMap<int,QString> numIP;
-	QMap<QString,QString> macIP;
-
-	QList<QString> macList;
-
-	int gotPacketsNum;
-	QTimer* timer;
-
-	int connectedSockets;
-	int connectedRobots;
-	QByteArray command;
-
-	char dat[12];
+	QMap<int, QString> & getIPList();
 
 private:
 	QString grSimIP = "127.0.0.1";
 	unsigned short grSimPort = 20011;
-
+	QUdpSocket * mUdpSocket;
+	QMap<int, QString> mIPRobotList;
+	QTimer * mStatisticsTimer;
 signals:
-	void robotAdded(QString);
-	void sendMacs(QList<QString>);
-	void sendPortList(QStringList);
+	void finished();
 
 public slots:
 	void init();
@@ -57,5 +37,5 @@ public slots:
 	void run(int N, const QByteArray & command);
 	void runSim(const QByteArray & command);
 	void udpProcessPendingDatagrams();
-	void addIp(int id, QString ip);
+	void addIP(int id, const QString & ip);
 };

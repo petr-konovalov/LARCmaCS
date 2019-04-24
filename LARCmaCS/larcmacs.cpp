@@ -24,14 +24,14 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 	receiver.init(&sharedRes);
 	mainalg.init(&sharedRes);
 	sceneview.init();
-	connector.init();
+	connector.init(&sharedRes);
 
 	//algorithm connect
 	connect(this, SIGNAL(MLEvalString(const QString &)), &mainalg, SLOT(EvalString(const QString &)));
 	//connect(this, SIGNAL(MatlabPause()), &mainalg.worker, SLOT(Pause()));
 
 	//send command to robots
-	connect(&mainalg, SIGNAL(sendToConnector(int, const QByteArray &)), &connector.worker, SLOT(run(int, const QByteArray &)));
+	connect(&mainalg, SIGNAL(sendToConnector(int, const QByteArray &)), &connector, SLOT(run(int, const QByteArray &)));
 
 	//gui connector
 	connect(&sceneview.worker, SIGNAL(updateView()), this, SLOT(updateView()));
@@ -45,15 +45,14 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 	//remotecontrol
 	connect(&remotecontol, SIGNAL(RC_control(int, int, int, int, bool)),
 			this, SLOT(remcontrolsender(int, int, int, int, bool)));
-	connect(this, SIGNAL(addIp(int, QString)), &connector.worker, SLOT(addIp(int, QString)));
 
 	//simulator Enable
 	connect(this, SIGNAL(ChangeSimulatorMode(bool)), &receiver, SLOT(ChangeSimulatorMode(bool)));
 	connect(&receiver, SIGNAL(clearField()), fieldscene, SLOT(ClearField()));
 	connect(this, SIGNAL(ChangeSimulatorMode(bool)), &mainalg, SLOT(setEnableSimFlag(bool)));
-	connect(&mainalg, SIGNAL(sendToSimConnector(const QByteArray &)), &connector.worker, SLOT(runSim(const QByteArray &)));
-	connect(this, SIGNAL(changeGrSimIP(const QString &)), &connector.worker, SLOT(changeGrSimIP(const QString &)));
-	connect(this, SIGNAL(changeGrSimPort(unsigned short)), &connector.worker, SLOT(changeGrSimPort(unsigned short)));
+	connect(&mainalg, SIGNAL(sendToSimConnector(const QByteArray &)), &connector, SLOT(runSim(const QByteArray &)));
+	connect(this, SIGNAL(changeGrSimIP(const QString &)), &connector, SLOT(changeGrSimIP(const QString &)));
+	connect(this, SIGNAL(changeGrSimPort(unsigned short)), &connector, SLOT(changeGrSimPort(unsigned short)));
 
 	//ball inside check
 	connect(&robotReceiver, SIGNAL(ballStatus(bool)), &mainalg, SLOT(changeBallStatus(bool)));
@@ -85,8 +84,8 @@ void LARCmaCS::remcontrolsender(int l, int r,int k, int b, bool kickUp)
 		IP = ip;
 		port = Connector::robotPort;
 	} else {
-		IP = connector.worker.getGrSimIP();
-		port = connector.worker.getGrSimPort();
+		IP = connector.getGrSimIP();
+		port = connector.getGrSimPort();
 	}
 
 	if(socket.ConnectedState == QUdpSocket::ConnectedState) {
@@ -169,14 +168,14 @@ void LARCmaCS::on_pushButton_RemoteControl_clicked()
 
 void LARCmaCS::on_pushButton_SetupIP_clicked()
 {
-	IpDialog *ipDialog = new IpDialog(connector.worker, this);
+	IpDialog * ipDialog = new IpDialog(connector.getIPList(), this);
+	connect(ipDialog, SIGNAL(addIp(int, const QString &)), &connector, SLOT(changeIPList(int, const QString &)));
 	ipDialog->setWindowModality(Qt::WindowModality::WindowModal);
 	ipDialog->open();
-	qDebug() << connector.worker.numIP;
 }
 
 void LARCmaCS::on_but_reference_clicked()
 {
-	Reference *refWindow = new Reference();
+	Reference * refWindow = new Reference();
 	refWindow->show();
 }

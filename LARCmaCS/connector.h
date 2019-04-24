@@ -1,40 +1,43 @@
 #pragma once
 
 #include <QObject>
-#include <QFile>
-#include <QUdpSocket>
-#include <QTcpSocket>
-#include <QHostAddress>
 #include <QThread>
 #include <QtCore>
 #include <QtNetwork>
-#include <QTimer>
-#include <QMap>
+#include "sharedRes.h"
 
 #include "connectorWorker.h"
 
-using std::map;
-using std::vector;
-#include <Set>
-
-struct Connector : QObject
+class Connector : public QObject
 {
 	Q_OBJECT
-
+private:
+	ConnectorWorker * mWorker;
+	SharedRes * mSharedRes;
+	QThread * mThread;
 public:
-	ConnectorWorker worker;
-	QThread thread;
-
 	explicit Connector();
 	~Connector();
-
+	const QMap<int, QString> & getIPList();
 	static const unsigned short robotPort = 10000;
-
-	void init();
+	void init(SharedRes * sharedRes);
 	void start();
 	void stop();
+	const QString & getGrSimIP();
+	unsigned short getGrSimPort();
 
 signals:
-	void wstart();
 	void wstop();
+	void addIP(int id, const QString & ip);
+	void sendPacket(int N, const QByteArray & command);
+	void sendSimPacket(const QByteArray & command);
+	void setGrSimIP(const QString & IP);
+	void setGrSimPort(unsigned short port);
+
+public slots:
+	void changeGrSimIP(const QString & IP);
+	void changeGrSimPort(unsigned short port);
+	void run(int N, const QByteArray & command);
+	void runSim(const QByteArray & command);
+	void changeIPList(int id, const QString & ip);
 };

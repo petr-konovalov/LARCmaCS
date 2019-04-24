@@ -1,6 +1,5 @@
 #include "connectorWorker.h"
 #include <QMap>
-#include "settings.h"
 
 static QString configKeyForRobotNum(int n)
 {
@@ -9,51 +8,24 @@ static QString configKeyForRobotNum(int n)
 
 void ConnectorWorker::start()
 {
-	shutdownconnector = false;
 	init();
 }
 
 void ConnectorWorker::stop()
 {
-	shutdownconnector = true;
+	mUdpSocket->close();
+	emit finished();
 }
 
 void ConnectorWorker::init()
 {
-	connectedSockets = 0;
-	connectedRobots = 0;
-	//filename = "numMAC.txt";
-	command.resize(6);
-	command[0]='r';
-	command[1]='u';
-	command[2]='l';
-	command[3]='e';
-	command[4]=' ';
-
-
-	dat[0]='<';
-	dat[1]='b';
-	dat[2]='r';
-	dat[3]='o';
-	dat[4]='a';
-	dat[5]='d';
-	dat[6]=' ';
-
-	dat[10]='c';
-	dat[11]='>';
-	udpSocket = new QUdpSocket(this);
-
-	connectedAllSocketsFlag = false;
-	curRuleArray = new char[4 * 7]; // FIXME!
-
-	gotPacketsNum = 0;
-	Settings s;
-	for(auto i = 1; i <= 12; ++i) {
-		numIP[i] = s.value(configKeyForRobotNum(i),"").toString();
+	Settings settings;
+	mUdpSocket = new QUdpSocket();
+	for (auto i = 1; i <= 12; i++) {
+		mIPRobotList[i] = settings.value(configKeyForRobotNum(i), "").toString();
 	}
-
-	timer = new QTimer(this);
-	connect(udpSocket,SIGNAL(readyRead()),this,SLOT(udpProcessPendingDatagrams()));
+	mStatisticsTimer = new QTimer();
+	connect(mUdpSocket, SIGNAL(readyRead()), this, SLOT(udpProcessPendingDatagrams()));
 }
 
 const QString & ConnectorWorker::getGrSimIP()
@@ -68,12 +40,12 @@ unsigned short ConnectorWorker::getGrSimPort()
 
 void ConnectorWorker::run(int N, const QByteArray & command)
 {
-	udpSocket->writeDatagram(command, QHostAddress(numIP[N]), 10000);
+	mUdpSocket->writeDatagram(command, QHostAddress(mIPRobotList[N]), DefaultRobot::robotPort);
 }
 
 void ConnectorWorker::runSim(const QByteArray & command)
 {
-	udpSocket->writeDatagram(command, QHostAddress(grSimIP), grSimPort);
+	mUdpSocket->writeDatagram(command, QHostAddress(grSimIP), grSimPort);
 }
 
 void ConnectorWorker::changeGrSimIP(const QString & IP)
@@ -86,34 +58,28 @@ void ConnectorWorker::changeGrSimPort(unsigned short port)
 	grSimPort = port;
 }
 
-void ConnectorWorker::addIp(int id, QString ip)
+QMap<int, QString> & ConnectorWorker::getIPList()
+{
+	return mIPRobotList;
+}
+
+void ConnectorWorker::addIP(int id, const QString & ip)
 {
 	if (ip.contains(".")) {
-		numIP[id] = ip;
+		mIPRobotList[id] = ip;
 	} else {
-		 numIP[id] = "";
+		mIPRobotList[id] = "";
 	}
-	Settings s;
-	s.setValue(configKeyForRobotNum(id), ip);
+	Settings settings;
+	settings.setValue(configKeyForRobotNum(id), ip);
 }
 
 void ConnectorWorker::udpProcessPendingDatagrams()
 {
 	QByteArray datagram;
-	QHostAddress *robotAddress = new QHostAddress();
-	while (udpSocket->hasPendingDatagrams()) {
-
-		datagram.resize(udpSocket->pendingDatagramSize());
-		udpSocket->readDatagram(datagram.data(), datagram.size(),robotAddress);
-		QString str(datagram);
-
-		QStringList lst = str.split(' ');
-		if (!lst[0].compare("mac")) {
-			if (!macList.contains(lst[1])) {
-				macList.push_back(lst[1]);
-				macIP[lst[1]] = robotAddress->toString();
-				emit robotAdded(lst[1]);
-			}
-		}
+	QHostAddress * robotAddress = new QHostAddress();
+	while (mUdpSocket->hasPendingDatagrams()) {
+		datagram.resize(mUdpSocket->pendingDatagramSize());
+		mUdpSocket->readDatagram(datagram.data(), datagram.size(), robotAddress);
 	}
 }
