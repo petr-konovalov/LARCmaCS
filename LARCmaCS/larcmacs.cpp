@@ -25,6 +25,7 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 	mainalg.init(&sharedRes);
 	sceneview.init();
 	connector.init(&sharedRes);
+	robotReceiver.init(&sharedRes);
 
 	//algorithm connect
 	connect(this, SIGNAL(MLEvalString(const QString &)), &mainalg, SLOT(EvalString(const QString &)));
@@ -61,6 +62,7 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 	receiver.start();
 	mainalg.start();
 	connector.start();
+	robotReceiver.start();
 	fieldscene->start();
 	UpdateStatusBar("Waiting SSL connection...");
 	UpdateSSLFPS("FPS = 0");
@@ -168,8 +170,7 @@ void LARCmaCS::on_pushButton_RemoteControl_clicked()
 
 void LARCmaCS::on_pushButton_SetupIP_clicked()
 {
-	IpDialog * ipDialog = new IpDialog(connector.getIPList(), this);
-	connect(ipDialog, SIGNAL(addIp(int, const QString &)), &connector, SLOT(changeIPList(int, const QString &)));
+	IpDialog * ipDialog = new IpDialog(&sharedRes, this);
 	ipDialog->setWindowModality(Qt::WindowModality::WindowModal);
 	ipDialog->open();
 }

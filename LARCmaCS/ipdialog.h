@@ -13,7 +13,7 @@ class IpDialog : public QDialog
 	Q_OBJECT
 
 public:
-	explicit IpDialog(const QMap<int, QString> & ipList, QWidget *parent = nullptr);
+	explicit IpDialog(SharedRes * sharedRes, QWidget *parent = nullptr);
 	~IpDialog();
 
 private slots:
@@ -22,7 +22,5 @@ private slots:
 
 private:
 	Ui::IpDialog * ui;
-
-signals:
-	void addIp(int, const QString &);
+	SharedRes * mSharedRes;
 };

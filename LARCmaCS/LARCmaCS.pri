@@ -60,10 +60,11 @@ SOURCES +=  \
 	$$PWD/connectorWorker.cpp \
 	$$PWD/packetSSL.cpp \
 	$$PWD/settings.cpp \
-	$$PWD/robotReceiver.cpp \
     $$PWD/robots/grSimRobot.cpp \
     $$PWD/robots/defaultRobot.cpp \
-    $$PWD/sharedRes.cpp
+    $$PWD/sharedRes.cpp \
+    $$PWD/robotReceiverWorker.cpp \
+    $$PWD/robotReceiver.cpp
 
 HEADERS  += \
     $${SHARED_DIR}/util/timer.h \
@@ -87,11 +88,12 @@ HEADERS  += \
 	$$PWD/mainAlgWorker.h \
         $$PWD/connectorWorker.h \
         $$PWD/settings.h \
-        $$PWD/robotReceiver.h \
 	$$PWD/constants.h \
     $$PWD/robots/grSimRobot.h \
     $$PWD/robots/defaultRobot.h \
-    $$PWD/sharedRes.h
+    $$PWD/sharedRes.h \
+    $$PWD/robotReceiverWorker.h \
+    $$PWD/robotReceiver.h
 
 FORMS += \
 	$$PWD/larcmacs.ui \

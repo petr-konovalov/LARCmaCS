@@ -18,7 +18,6 @@ private:
 public:
 	explicit Connector();
 	~Connector();
-	const QMap<int, QString> & getIPList();
 	static const unsigned short robotPort = 10000;
 	void init(SharedRes * sharedRes);
 	void start();
@@ -28,7 +27,6 @@ public:
 
 signals:
 	void wstop();
-	void addIP(int id, const QString & ip);
 	void sendPacket(int N, const QByteArray & command);
 	void sendSimPacket(const QByteArray & command);
 	void setGrSimIP(const QString & IP);
@@ -39,5 +37,4 @@ public slots:
 	void changeGrSimPort(unsigned short port);
 	void run(int N, const QByteArray & command);
 	void runSim(const QByteArray & command);
-	void changeIPList(int id, const QString & ip);
 };

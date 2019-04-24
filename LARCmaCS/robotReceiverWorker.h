@@ -1,4 +1,4 @@
-// Copyright 2019 Dmitrii Iarosh
+// Copyright 2019 Anastasiia Kornilova
 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,16 +14,29 @@
 
 #pragma once
 
-class Constants
+#include <QHostAddress>
+#include <QUdpSocket>
+
+class RobotReceiverWorker : public QObject
 {
+	Q_OBJECT
+
 public:
-	static const int maxNumOfRobots = 16;
-	static const int maxRobotsInTeam = maxNumOfRobots; //maxNumOfRobots / 2;
-	static const int robotAlgoPacketSize = 5 * maxRobotsInTeam;
-	static const int ballAlgoPacketSize = 3;
-	static const unsigned  SSLVisionPort = 10006;
-	static const unsigned  SimVisionPort = 10020;
-	static const int numOfCameras = 4;
-	static const int ruleLength = 7;
-	static const int ruleAmount = 12;
+	RobotReceiverWorker();
+	void close();
+
+signals:
+	void setBallInsideData(const QString & ip, bool isBallInside);
+	void finished();
+
+private slots:
+	void start();
+	void stop();
+	void processPendingDatagrams();
+
+private:
+	QUdpSocket udpSocket4;
+	QHostAddress groupAddress4;
+
+	QHash<char, char> ballStatuses;
 };

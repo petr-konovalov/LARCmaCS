@@ -5,6 +5,7 @@
 #include <QMap>
 #include <QTimer>
 #include "constants.h"
+#include "sharedRes.h"
 #include "settings.h"
 #include "defaultRobot.h"
 
@@ -17,13 +18,12 @@ public:
 	ConnectorWorker(){}
 	const QString & getGrSimIP();
 	unsigned short getGrSimPort();
-	QMap<int, QString> & getIPList();
 
 private:
 	QString grSimIP = "127.0.0.1";
 	unsigned short grSimPort = 20011;
 	QUdpSocket * mUdpSocket;
-	QMap<int, QString> mIPRobotList;
+	SharedRes * sharedRes;
 	QTimer * mStatisticsTimer;
 signals:
 	void finished();
@@ -36,6 +36,4 @@ public slots:
 	void changeGrSimPort(unsigned short port);
 	void run(int N, const QByteArray & command);
 	void runSim(const QByteArray & command);
-	void udpProcessPendingDatagrams();
-	void addIP(int id, const QString & ip);
 };

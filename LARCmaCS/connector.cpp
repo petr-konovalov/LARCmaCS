@@ -19,7 +19,6 @@ void Connector::init(SharedRes * sharedRes)
 	connect(mWorker, SIGNAL(finished()), mWorker, SLOT(deleteLater()));
 	connect(mThread, SIGNAL(finished()), mThread, SLOT(deleteLater()));
 	connect(mWorker, SIGNAL(finished()), mThread, SLOT(quit()));
-	connect(this, SIGNAL(addIP(int, const QString &)), mWorker, SLOT(addIP(int, const QString &)));
 	connect(this, SIGNAL(sendPacket(int, const QByteArray &)), mWorker, SLOT(run(int, const QByteArray &)));
 	connect(this, SIGNAL(sendSimPacket(const QByteArray &)), mWorker, SLOT(runSim(const QByteArray &)));
 	connect(this, SIGNAL(setGrSimIP(const QString &)), mWorker, SLOT(changeGrSimIP(const QString &)));
@@ -60,16 +59,6 @@ void Connector::start()
 {
 	mThread->start();
 	mThread->setPriority(QThread::HighestPriority);
-}
-
-const QMap<int, QString> & Connector::getIPList()
-{
-	return mWorker->getIPList();
-}
-
-void Connector::changeIPList(int id, const QString & ip)
-{
-	emit addIP(id, ip);
 }
 
 void Connector::stop()

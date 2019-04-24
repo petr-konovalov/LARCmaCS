@@ -1,4 +1,4 @@
-// Copyright 2019 Anastasiia Kornilova
+// Copyright 2019 Dmitrii Iarosh
 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,25 +14,29 @@
 
 #pragma once
 
-#include <QHostAddress>
-#include <QUdpSocket>
+#include <QObject>
+#include <QThread>
+#include "sharedRes.h"
+#include "robotReceiverWorker.h"
 
 class RobotReceiver : public QObject
 {
 	Q_OBJECT
 
+private:
+	QThread mThread;
+	RobotReceiverWorker mWorker;
+	SharedRes * mSharedRes;
 public:
 	RobotReceiver();
-
-signals:
-	void ballStatus(bool status);
+	~RobotReceiver();
+	void start();
+	void stop();
+	void init(SharedRes * sharedRes);
 
 private slots:
-	void processPendingDatagrams();
+	void setBallInsideData(const QString & ip, bool isBallInside);
 
-private:
-	QUdpSocket udpSocket4;
-	QHostAddress groupAddress4;
-
-	QHash<char, char> ballStatuses;
+signals:
+	void wstop();
 };

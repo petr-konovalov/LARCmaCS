@@ -18,6 +18,7 @@
 #include <QVector>
 #include <QSharedPointer>
 #include <QMutex>
+#include <QMap>
 #include "constants.h"
 
 #include <QObject>
@@ -26,13 +27,20 @@ class SharedRes : public QObject
 {
 	Q_OBJECT
 private:
+	QMutex mIPMutex;
+	QMap<int, QString> mIPRobotList;
 	QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > mDetection;
 	QSharedPointer<SSL_WrapperPacket> mGeometry;
+	QSharedPointer<QVector<bool> > mBallInsideData;
 public:
 	SharedRes();
+	QString getRobotIP(int id);
+	void setRobotIP(int id, const QString & ip);
+	void setBallInsideData(const QString & ip, bool isBallInside);
 	void setDetection(const QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > & detection);
 	void setDetection(const QSharedPointer<SSL_WrapperPacket> & detection, int camID);
 	void setGeometry(const QSharedPointer<SSL_WrapperPacket> & geometry);
+	const QSharedPointer<QVector<bool> > & getBallInsideData();
 	const QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > & getDetection();
 	const QSharedPointer<SSL_WrapperPacket> & getGeometry();
 };

@@ -13,15 +13,30 @@
 // limitations under the License.
 
 #include "sharedRes.h"
+#include "settings.h"
 
-SharedRes::SharedRes()
+SharedRes::SharedRes() : mIPMutex()
 {
 	qRegisterMetaType<QSharedPointer<SSL_WrapperPacket> >("QSharedPointer<SSL_WrapperPacket>");
 	mDetection = QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >(new QVector<QSharedPointer<SSL_WrapperPacket> >(Constants::numOfCameras));
-	for (int i = 0; i < Constants::numOfCameras; i++) {
+	for (auto i = 0; i < Constants::numOfCameras; i++) {
 		mDetection->replace(i, QSharedPointer<SSL_WrapperPacket>());
 	}
 	mGeometry = QSharedPointer<SSL_WrapperPacket>();
+	mBallInsideData = QSharedPointer<QVector<bool> >(new QVector<bool>(Constants::maxNumOfRobots));
+	for (auto i = 0; i < Constants::maxNumOfRobots; i++)
+	{
+		mBallInsideData->replace(i, false);
+	}
+	Settings settings;
+	for (auto i = 1; i <= Constants::maxNumOfRobots; i++) {
+		mIPRobotList[i] = settings.value(Settings::configKeyForRobotNum(i), "").toString();
+	}
+}
+
+const QSharedPointer<QVector<bool> > & SharedRes::getBallInsideData()
+{
+	return mBallInsideData;
 }
 
 const QSharedPointer<SSL_WrapperPacket> & SharedRes::getGeometry()
@@ -32,6 +47,42 @@ const QSharedPointer<SSL_WrapperPacket> & SharedRes::getGeometry()
 const QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > & SharedRes::getDetection()
 {
 	return mDetection;
+}
+
+QString SharedRes::getRobotIP(int id)
+{
+	QString tmp;
+	mIPMutex.lock();
+	if (id >= 0 && id < mIPRobotList.size()) {
+		tmp = mIPRobotList[id];
+	}
+	mIPMutex.unlock();
+	return tmp;
+}
+
+void SharedRes::setRobotIP(int id, const QString & ip)
+{
+	mIPMutex.lock();
+	if (ip.contains(".")) {
+		mIPRobotList[id] = ip;
+	} else {
+		mIPRobotList[id] = "";
+	}
+	Settings settings;
+	settings.setValue(Settings::configKeyForRobotNum(id), ip);
+	mIPMutex.unlock();
+}
+
+void SharedRes::setBallInsideData(const QString & ip, bool isBallInside)
+{
+	mIPMutex.lock();
+	for (auto i = 0; i < mIPRobotList.size(); i++) {
+		if (mIPRobotList[i] == ip) {
+			mBallInsideData->replace(i, isBallInside);
+			break;
+		}
+	}
+	mIPMutex.unlock();
 }
 
 void SharedRes::setDetection(const QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > & detection)
