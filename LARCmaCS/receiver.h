@@ -14,29 +14,17 @@
 
 #pragma once
 
-#include <iostream>
 #include <QObject>
-#include <QThread>
-#include "sharedRes.h"
 #include <QSharedPointer>
+#include <QThread>
 
 #include "packetSSL.h"
-
 #include "receiverWorker.h"
-
-using namespace std;
-
-#include <time.h>       /* clock_t, clock(), CLOCKS_PER_SEC */
+#include "sharedRes.h"
 
 struct Receiver : public QObject
 {
 	Q_OBJECT
-private:
-	QTimer mDisplayTimer;
-	ReceiverWorker * mWorker;
-	QThread * mThread;
-	SharedRes * mSharedRes;
-	bool mDisplayFlag = false;
 
 public:
 	Receiver();
@@ -48,14 +36,20 @@ public:
 public slots:
 	void updateDetection(const QSharedPointer<SSL_WrapperPacket> & detection, int camID);
 	void updateGeometry(const QSharedPointer<SSL_WrapperPacket> & geometry);
-	void sendStatistics(const QString & statistics);
 	void clearScene();
-	void ChangeSimulatorMode(bool mode);
 	void setDisplayFlag();
+	void changeSimulatorMode(bool mode);
 
-signals:
+	signals:
 	void updateSimulatorMode(bool mode);
 	void clearField();
 	void UpdateSSLFPS(const QString & status);
 	void wstop();
+
+private:
+	QTimer mDisplayTimer;
+	ReceiverWorker * mWorker;
+	QThread mThread;
+	SharedRes * mSharedRes;
+	bool mDisplayFlag = false;
 };
