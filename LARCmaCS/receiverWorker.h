@@ -51,7 +51,6 @@ private:
 	QUdpSocket mSocket;
 	QTimer mStatisticsTimer;
 	QHostAddress mGroupAddress;
-	QSharedPointer<SSL_WrapperPacket> mInputPacket;
 	int mTotalPacketsNum = 0;
 	int mPacketsPerSecond = 0;
 	bool mIsSimEnabledFlag = false;
