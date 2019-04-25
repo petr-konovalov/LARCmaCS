@@ -52,6 +52,7 @@ void MainAlg::init(SharedRes * sharedRes)
 			this, SLOT(moveToSimConnector(const QByteArray &)));
 	connect(this, SIGNAL(updateEnableSimFlag(bool)), mWorker, SLOT(setEnableSimFlag(bool)));
 	connect(this, SIGNAL(updateBallStatus(bool)), mWorker, SLOT(changeBallStatus(bool)));
+	connect(mWorker, SIGNAL(toMatlabConsole(const QString &)), this, SIGNAL(toMatlabConsole(const QString &)));
 }
 
 void MainAlg::sendStatistics(const QString & statistics)

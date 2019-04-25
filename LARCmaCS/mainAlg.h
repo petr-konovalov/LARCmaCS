@@ -66,4 +66,5 @@ signals:
 	void StatusMessage(const QString & status);
 	void UpdatePauseState(const QString & state);
 	void wstop();
+	void toMatlabConsole(const QString & str);
 };

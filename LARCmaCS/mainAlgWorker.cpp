@@ -351,7 +351,7 @@ void MainAlgWorker::evalString(const QString & s)
 	engEvalString(fmldata.ep, s.toUtf8().data());
 	QString tmp = QString(mMatlabOutputBuffer);
 	if (!tmp.contains("\nispause =") && tmp != "") {
-		cout << tmp.toStdString() << endl;
+		emit toMatlabConsole(tmp);
 	}
 }
 

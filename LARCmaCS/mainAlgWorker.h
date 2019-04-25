@@ -35,6 +35,7 @@ signals:
 	void newPauseState(const QString & state);
 	void sendStatistics(const QString & statistics);
 	void getDataFromReceiver();
+	void toMatlabConsole(const QString & str);
 
 public slots:
 	void start();

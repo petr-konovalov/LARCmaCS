@@ -38,6 +38,8 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 	connect(&sceneview.worker, SIGNAL(updateView()), this, SLOT(updateView()));
 	connect(ui->sceneslider, SIGNAL(valueChanged(int)), this, SLOT(scaleView(int)));
 
+	connect(&mainalg, SIGNAL(toMatlabConsole(const QString &)), this, SLOT(toMatlabConsole(const QString &)));
+
 	//info GUI
 	connect(&mainalg, SIGNAL(UpdatePauseState(const QString &)), this, SLOT(UpdatePauseState(const QString &)));
 	connect(&mainalg, SIGNAL(StatusMessage(const QString &)), this, SLOT(UpdateStatusBar(const QString &)));
@@ -125,6 +127,11 @@ void LARCmaCS::scaleView(int _sizescene)
 	drawscale = pow(0.9, _sizescene - sizescene);
 	sizescene = _sizescene;
 	scalingRequested = true;
+}
+
+void LARCmaCS::toMatlabConsole(const QString & str)
+{
+	ui->matlabConsole->appendPlainText(str);
 }
 
 void LARCmaCS::updateView()

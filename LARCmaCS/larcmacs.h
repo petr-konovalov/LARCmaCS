@@ -56,6 +56,7 @@ private slots:
 private slots:
 	//void on_pushButton_Pause_clicked();
 	void on_pushButton_SetMLdir_clicked();
+	void toMatlabConsole(const QString & str);
 	void remcontrolsender(int l, int r,int k, int b, bool kickUp);
 	void on_checkBox_SimEnable_stateChanged(int state);
 	void on_pushButton_RemoteControl_clicked();
