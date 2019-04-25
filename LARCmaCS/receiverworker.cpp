@@ -13,29 +13,29 @@
 // limitations under the License.
 
 #include "receiverWorker.h"
-#include <QtWidgets/QApplication>
+
+#include <QApplication>
+#include <QMutex>
+
+#include "constants.h"
+#include "packetSSL.h"
 
 const QString ReceiverWorker::visionIP = QStringLiteral("224.5.23.2");
 
 ReceiverWorker::ReceiverWorker()
-	: mGroupAddress(visionIP)
+	: mSocket(this)
+	, mStatisticsTimer(this)
+	, mGroupAddress(visionIP)
 {
 	mInputPacket = QSharedPointer<SSL_WrapperPacket>(new SSL_WrapperPacket());
-}
+	mStatisticsTimer.setInterval(1000);
 
-void ReceiverWorker::init()
-{
-	mStatisticsTimer = QSharedPointer<QTimer>(new QTimer());
-	mSocket = QSharedPointer<QUdpSocket>(new QUdpSocket());
-	mStatisticsTimer->setInterval(1000);
-	connect(mStatisticsTimer.data(), SIGNAL(timeout()), this, SLOT(formStatistics()));
-	connect(mSocket.data(), SIGNAL(readyRead()), this, SLOT(processPendingDatagrams()));
+	connect(&mStatisticsTimer, SIGNAL(timeout()), this, SLOT(formStatistics()));
+	connect(&mSocket, SIGNAL(readyRead()), this, SLOT(processPendingDatagrams()));
 }
 
 ReceiverWorker::~ReceiverWorker()
-{
-	close();
-}
+{}
 
 void ReceiverWorker::formStatistics()
 {
@@ -47,38 +47,23 @@ void ReceiverWorker::formStatistics()
 	ToStatus += "; Total Packets = ";
 	tmp.setNum(mTotalPacketsNum);
 	ToStatus += tmp;
-	emit UpdateSSLFPS(ToStatus);
+	emit updateSSLFPS(ToStatus);
 }
 
 void ReceiverWorker::close()
 {
-	mSocket->close();
-	mStatisticsTimer->stop();
-	clearOutput();
+	mSocket.close();
+	mStatisticsTimer.stop();
 	mTotalPacketsNum = 0;
 	mPacketsPerSecond = 0;
-}
-
-void ReceiverWorker::clearOutput()
-{
-	for (int i = 0; i < Constants::numOfCameras; i++) {
-		emit updateDetection(QSharedPointer<SSL_WrapperPacket>(), i);
-	}
-	emit updateGeometry(QSharedPointer<SSL_WrapperPacket>());
-	emit clearField();
-}
-
-void ReceiverWorker::stop()
-{
-	close();
-	emit finished();
 }
 
 bool ReceiverWorker::open(unsigned short port)
 {
 	close();
-	if (mSocket->bind(QHostAddress::AnyIPv4, port, QUdpSocket::ShareAddress) && mSocket->joinMulticastGroup(mGroupAddress)) {
-		mStatisticsTimer->start();
+	if (mSocket.bind(QHostAddress::AnyIPv4, port, QUdpSocket::ShareAddress)
+			&& mSocket.joinMulticastGroup(mGroupAddress)) {
+		mStatisticsTimer.start();
 		return true;
 	}
 	return false;
@@ -86,16 +71,14 @@ bool ReceiverWorker::open(unsigned short port)
 
 void ReceiverWorker::processPendingDatagrams()
 {
-	unsigned int camID = 0;
-	QByteArray datagram;
-	int datagramSize;
-	while (mSocket->hasPendingDatagrams()) {
-		datagramSize = static_cast<int>(mSocket->pendingDatagramSize());
+	while (mSocket.hasPendingDatagrams()) {
+		int datagramSize = static_cast<int>(mSocket.pendingDatagramSize());
+		QByteArray datagram;
 		datagram.resize(datagramSize);
-		mSocket->readDatagram(datagram.data(), datagram.size());
+		mSocket.readDatagram(datagram.data(), datagram.size());
 		mInputPacket->ParseFromArray(datagram.data(), datagramSize);
 		if (mInputPacket->has_detection()) {
-			camID = mInputPacket->detection().camera_id();
+			unsigned int camID = mInputPacket->detection().camera_id();
 			emit updateDetection(mInputPacket, camID);
 		} else {
 			emit updateGeometry(mInputPacket);
@@ -108,22 +91,19 @@ void ReceiverWorker::processPendingDatagrams()
 
 void ReceiverWorker::start()
 {
-	init();
-	connect(this, SIGNAL(clientOpen(unsigned short)), this, SLOT(open(unsigned short)));
-	connect(this, SIGNAL(clientClose()), this, SLOT(close()));
 	emit clientOpen(Constants::SSLVisionPort);
 }
 
-void ReceiverWorker::ChangeSimulatorMode(bool flag)
+void ReceiverWorker::changeSimulatorMode(bool flag)
 {
 	if (flag != mIsSimEnabledFlag) {
 		mIsSimEnabledFlag = flag;
 		if (mIsSimEnabledFlag) {
-			emit clientClose();
-			emit clientOpen(Constants::SimVisionPort);
+			close();
+			open(Constants::SimVisionPort);
 		} else {
-			emit clientClose();
-			emit clientOpen(Constants::SSLVisionPort);
+			close();
+			open(Constants::SSLVisionPort);
 		}
 	}
 }

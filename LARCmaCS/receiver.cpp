@@ -13,40 +13,32 @@
 // limitations under the License.
 
 #include "receiver.h"
-#include <iostream>
 
-using namespace std;
-
-Receiver::Receiver()
+Receiver::Receiver(SharedRes * sharedRes)
 {
 	mWorker = new ReceiverWorker();
-	mThread = new QThread();
+	mSharedRes = sharedRes;
+
+	mWorker->moveToThread(&mThread);
+
+	connect(mWorker, SIGNAL(finished()), mWorker, SLOT(deleteLater()));
+	connect(mWorker, SIGNAL(finished()), &mThread, SLOT(quit()));
+
+	connect(&mThread, SIGNAL(started()), mWorker, SLOT(start()));
+	connect(&mThread, SIGNAL(finished()), mWorker, SLOT(deleteLater()));
+
+	connect(mWorker, SIGNAL(updateSSLFPS(const QString &)), this, SIGNAL(updateSSLFPS(const QString &)));
+	connect(this, SIGNAL(updateSimulatorMode(bool)), mWorker, SLOT(changeSimulatorMode(bool)));
+	connect(mWorker, SIGNAL(updateDetection(const QSharedPointer<SSL_WrapperPacket> &, int))
+				, this, SLOT(updateDetection(const QSharedPointer<SSL_WrapperPacket> &, int)));
+	connect(mWorker, SIGNAL(updateGeometry(const QSharedPointer<SSL_WrapperPacket> &))
+				, this, SLOT(updateGeometry(const QSharedPointer<SSL_WrapperPacket> &)));
 }
 
 Receiver::~Receiver()
 {
-	stop();
-}
-
-void Receiver::init(SharedRes * sharedRes)
-{
-	mSharedRes = sharedRes;
-	mWorker->moveToThread(mThread);
-	connect(mThread, SIGNAL(started()), mWorker, SLOT(start()));
-	connect(this, SIGNAL(wstop()), mWorker, SLOT(stop()));
-	connect(mWorker, SIGNAL(finished()), mThread, SLOT(quit()));
-	connect(mThread, SIGNAL(finished()), mThread, SLOT(deleteLater()));
-	connect(mWorker, SIGNAL(finished()), mWorker, SLOT(deleteLater()));
-	connect(mWorker, SIGNAL(clearField()), this, SLOT(clearScene()));
-	connect(mWorker, SIGNAL(UpdateSSLFPS(const QString &)), this, SLOT(sendStatistics(const QString &)));
-	connect(this, SIGNAL(updateSimulatorMode(bool)), mWorker, SLOT(ChangeSimulatorMode(bool)));
-	connect(mWorker, SIGNAL(updateDetection(const QSharedPointer<SSL_WrapperPacket> &, int)), this, SLOT(updateDetection(const QSharedPointer<SSL_WrapperPacket> &, int)));
-	connect(mWorker, SIGNAL(updateGeometry(const QSharedPointer<SSL_WrapperPacket> &)), this, SLOT(updateGeometry(const QSharedPointer<SSL_WrapperPacket> &)));
-}
-
-void Receiver::sendStatistics(const QString & statistics)
-{
-	emit UpdateSSLFPS(statistics);
+	mThread.quit();
+	mThread.wait();
 }
 
 void Receiver::updateDetection(const QSharedPointer<SSL_WrapperPacket> & detection, int camID)
@@ -64,19 +56,14 @@ void Receiver::setDisplayFlag()
 	mDisplayFlag = true;
 }
 
-void Receiver::ChangeSimulatorMode(bool mode)
+void Receiver::changeSimulatorMode(bool mode)
 {
 	emit updateSimulatorMode(mode);
 }
 
-void Receiver::clearScene()
-{
-	emit clearField();
-}
-
 void Receiver::start()
 {
-	mThread->start();
+	mThread.start();
 }
 
 void Receiver::stop()
