@@ -24,7 +24,9 @@ class GrSimRobot
 {
 public:
 	GrSimRobot();
-	static void formControlPacket(QByteArray & command, int numOfRobot, int speedX, int speedY, int speedR, bool kickUp, bool kickForward, int kickVoltage, bool enableSpinner, int spinnerSpeed = 0);
+	static void formControlPacket(QByteArray & command, int numOfRobot, int speedX, int speedY, int speedR,
+								  bool kickUp, bool kickForward, int kickVoltage,
+								  bool enableSpinner, int spinnerSpeed = 0);
 private:
 	static float fromPower2Speed(int power);
 	static float fromPower2Kick(bool isKicked, int voltage);

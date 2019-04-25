@@ -45,5 +45,6 @@ void RobotReceiver::init(SharedRes * sharedRes)
 	connect(&mWorker, SIGNAL(finished()), &mThread, SLOT(quit()));
 	connect(&mThread, SIGNAL(finished()), &mThread, SLOT(deleteLater()));
 	connect(&mWorker, SIGNAL(finished()), &mWorker, SLOT(deleteLater()));
-	connect(&mWorker, SIGNAL(setBallInsideData(const QString &, bool)), this, SLOT(setBallInsideData(const QString &, bool)));
+	connect(&mWorker, SIGNAL(setBallInsideData(const QString &, bool)),
+			this, SLOT(setBallInsideData(const QString &, bool)));
 }

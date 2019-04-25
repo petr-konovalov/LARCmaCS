@@ -18,7 +18,8 @@
 SharedRes::SharedRes() : mIPMutex()
 {
 	qRegisterMetaType<QSharedPointer<SSL_WrapperPacket> >("QSharedPointer<SSL_WrapperPacket>");
-	mDetection = QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >(new QVector<QSharedPointer<SSL_WrapperPacket> >(Constants::numOfCameras));
+	mDetection = QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >
+			(new QVector<QSharedPointer<SSL_WrapperPacket> >(Constants::numOfCameras));
 	for (auto i = 0; i < Constants::numOfCameras; i++) {
 		mDetection->replace(i, QSharedPointer<SSL_WrapperPacket>());
 	}

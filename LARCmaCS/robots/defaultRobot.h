@@ -22,5 +22,7 @@ class DefaultRobot
 public:
 	DefaultRobot();
 	static const int robotPort = 10000;
-	static void formControlPacket(QByteArray & command, int numOfRobot, int speedX, int speedY, int speedR, bool kickUp, bool kickForward, int kickVoltage, bool enableSpinner, int spinnerSpeed = 0);
+	static void formControlPacket(QByteArray & command, int numOfRobot, int speedX, int speedY, int speedR,
+								  bool kickUp, bool kickForward, int kickVoltage,
+								  bool enableSpinner, int spinnerSpeed = 0);
 };

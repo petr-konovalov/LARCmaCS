@@ -258,13 +258,15 @@ void MainAlgWorker::processPacket(const QSharedPointer<PacketSSL> & packetssl)
 			bool simFlag = mIsSimEnabledFlag;
 			if (!simFlag) {
 				if (!mIsPause) {
-					DefaultRobot::formControlPacket(command, newmess[1], newmess[3], newmess[2], newmess[5], newmess[6], newmess[4], voltage, 0);
+					DefaultRobot::formControlPacket(command, newmess[1], newmess[3], newmess[2], newmess[5],
+							newmess[6], newmess[4], voltage, 0);
 				} else {
 					DefaultRobot::formControlPacket(command, newmess[1], 0, 0, 0, 0, 0, voltage, 0);
 				}
 			} else {
 				if (!mIsPause) {
-					GrSimRobot::formControlPacket(command, newmess[1], newmess[3], newmess[2], newmess[5], newmess[6], newmess[4], voltage, 0);
+					GrSimRobot::formControlPacket(command, newmess[1], newmess[3], newmess[2], newmess[5],
+							newmess[6], newmess[4], voltage, 0);
 				} else {
 					GrSimRobot::formControlPacket(command, newmess[1], 0, 0, 0, 0, 0, voltage, 0);
 				}
@@ -276,7 +278,8 @@ void MainAlgWorker::processPacket(const QSharedPointer<PacketSSL> & packetssl)
 						emit sendToConnector(i, command);
 					} else {
 						QByteArray multiCommand;
-						GrSimRobot::formControlPacket(multiCommand, i, newmess[3], newmess[2], newmess[5], newmess[6], newmess[4], voltage, 0);
+						GrSimRobot::formControlPacket(multiCommand, i, newmess[3], newmess[2], newmess[5],
+								newmess[6], newmess[4], voltage, 0);
 						emit sendToSimConnector(multiCommand);
 					}
 				}

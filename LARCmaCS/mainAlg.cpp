@@ -46,8 +46,10 @@ void MainAlg::init(SharedRes * sharedRes)
 	connect(mWorker, SIGNAL(getDataFromReceiver()), this, SLOT(loadVisionData()), Qt::DirectConnection);
 	connect(mWorker, SIGNAL(newPauseState(const QString &)), this, SLOT(receivePauseState(const QString &)));
 	connect(mWorker, SIGNAL(sendStatistics(const QString &)), this, SLOT(sendStatistics(const QString &)));
-	connect(mWorker, SIGNAL(sendToConnector(int, const QByteArray &)), this, SLOT(moveToConnector(int, const QByteArray &)));
-	connect(mWorker, SIGNAL(sendToSimConnector(const QByteArray &)), this, SLOT(moveToSimConnector(const QByteArray &)));
+	connect(mWorker, SIGNAL(sendToConnector(int, const QByteArray &)),
+			this, SLOT(moveToConnector(int, const QByteArray &)));
+	connect(mWorker, SIGNAL(sendToSimConnector(const QByteArray &)),
+			this, SLOT(moveToSimConnector(const QByteArray &)));
 	connect(this, SIGNAL(updateEnableSimFlag(bool)), mWorker, SLOT(setEnableSimFlag(bool)));
 	connect(this, SIGNAL(updateBallStatus(bool)), mWorker, SLOT(changeBallStatus(bool)));
 }

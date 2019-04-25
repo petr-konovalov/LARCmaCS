@@ -34,7 +34,8 @@ public:
 	void start();
 
 public slots:
-	void UpdateField(const QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > & detection, const QSharedPointer<SSL_WrapperPacket> & geometry);
+	void UpdateField(const QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > & detection,
+					 const QSharedPointer<SSL_WrapperPacket> & geometry);
 	void ClearField();
 	void updateFrame();
 

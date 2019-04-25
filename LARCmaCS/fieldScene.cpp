@@ -82,7 +82,8 @@ void FieldScene::UpdateFieldGeometry(const QSharedPointer<SSL_WrapperPacket> & p
 }
 #endif
 
-void FieldScene::UpdateField(const QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > & detection, const QSharedPointer<SSL_WrapperPacket> & geometry)
+void FieldScene::UpdateField(const QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > & detection,
+							 const QSharedPointer<SSL_WrapperPacket> & geometry)
 {
 	if (!geometry.isNull()) {
 #ifndef OLD_SSL_PROTO
@@ -273,20 +274,29 @@ void FieldScene::ConstructField()
 	field->moveTo((field_length / (2 * ksize) - defense_radius / ksize), defense_stretch / (2 * ksize));
 	field->lineTo((field_length / (2 * ksize) - defense_radius / ksize), -defense_stretch / (2 * ksize));
 	field->moveTo((field_length / (2 * ksize) - defense_radius / ksize), defense_stretch / (2 * ksize));
-	field->arcTo((field_length / (2 * ksize) - defense_radius / ksize), -(defense_radius / ksize - defense_stretch / (2 * ksize)), 2 * defense_radius / ksize, 2 * defense_radius / ksize, 180, 90);
-	field->moveTo((field_length / (2 * ksize) - defense_radius / ksize), -defense_stretch / (2 * ksize));
-	field->arcTo((field_length / (2 * ksize) - defense_radius / ksize), -(defense_radius / ksize + defense_stretch / (2 * ksize)), 2 * defense_radius / ksize, 2 * defense_radius / ksize, 180, -90);
+	field->arcTo((field_length / (2 * ksize) - defense_radius / ksize),
+				 -(defense_radius / ksize - defense_stretch / (2 * ksize)),
+				 2 * defense_radius / ksize, 2 * defense_radius / ksize, 180, 90);
+	field->moveTo((field_length / (2 * ksize) - defense_radius / ksize),
+				  -defense_stretch / (2 * ksize));
+	field->arcTo((field_length / (2 * ksize) - defense_radius / ksize),
+				 -(defense_radius / ksize + defense_stretch / (2 * ksize)),
+				 2 * defense_radius / ksize, 2 * defense_radius / ksize, 180, -90);
 
-	field->moveTo( -field_length/(2*ksize),goal_width/(2*ksize) );
-	field->lineTo( - ( field_length/(2*ksize)+goal_depth/ksize ),goal_width/(2*ksize) );
-	field->lineTo( - ( field_length/(2*ksize)+goal_depth/ksize ),-goal_width/(2*ksize) );
-	field->lineTo( -field_length/(2*ksize),-goal_width/(2*ksize) );
-	field->moveTo( - ( field_length/(2*ksize)-defense_radius/ksize ),defense_stretch/(2*ksize) );
-	field->lineTo( - ( field_length/(2*ksize)-defense_radius/ksize ),-defense_stretch/(2*ksize) );
-	field->moveTo( - ( field_length/(2*ksize)-defense_radius/ksize ),defense_stretch/(2*ksize) );
-	field->arcTo( - ( field_length/(2*ksize)+defense_radius/ksize ),- (defense_radius/ksize-defense_stretch/(2*ksize) ),2*defense_radius/ksize,2*defense_radius/ksize,0,-90 );
-	field->moveTo( - ( field_length/(2*ksize)-defense_radius/ksize ),-defense_stretch/(2*ksize) );
-	field->arcTo( - ( field_length/(2*ksize)+defense_radius/ksize ),- ( defense_radius/ksize+defense_stretch/(2*ksize) ),2*defense_radius/ksize,2*defense_radius/ksize,0,90 );
+	field->moveTo(-field_length / (2 * ksize), goal_width / (2 * ksize));
+	field->lineTo(-(field_length / (2 * ksize) + goal_depth / ksize), goal_width /(2 * ksize));
+	field->lineTo(-(field_length / (2 * ksize) + goal_depth / ksize), -goal_width / (2 * ksize));
+	field->lineTo(-field_length / (2 * ksize), -goal_width / (2 * ksize));
+	field->moveTo(-(field_length / (2 * ksize) - defense_radius / ksize), defense_stretch / (2 * ksize));
+	field->lineTo(-(field_length / (2 * ksize) - defense_radius / ksize), -defense_stretch / (2 * ksize));
+	field->moveTo(-(field_length / (2 * ksize) - defense_radius / ksize), defense_stretch / (2 * ksize));
+	field->arcTo(-(field_length / (2 * ksize) + defense_radius / ksize ),
+				 -(defense_radius / ksize-defense_stretch / (2 * ksize)),
+				 2 * defense_radius / ksize, 2 * defense_radius / ksize, 0, -90);
+	field->moveTo(-(field_length / (2 * ksize) - defense_radius / ksize), -defense_stretch / (2 * ksize));
+	field->arcTo(-(field_length / (2 * ksize) + defense_radius / ksize),
+				 -(defense_radius / ksize + defense_stretch / (2 * ksize)),
+				 2 * defense_radius / ksize, 2 * defense_radius / ksize, 0, 90);
 #else
 	if (field_lines.empty() || field_arcs.empty()) {
 		field->moveTo ( 0,-field_width/(2*ksize) );

@@ -49,10 +49,13 @@ void RobotReceiverWorker::processPendingDatagrams()
 			continue;
 		}
 		quint32 crc = Message::calculateCRC(datagram, 46);
-		if (crc != ((quint32)(datagram.at(47) << 24) + (quint32)(datagram.at(48) << 16) + (quint32)(datagram.at(49) << 8) + (quint32)datagram.at(50))) {
+		if (crc != ((quint32)(datagram.at(47) << 24) + (quint32)(datagram.at(48) << 16)
+					+ (quint32)(datagram.at(49) << 8) + (quint32)datagram.at(50))) {
 			continue;
 		}
-		QString ip = QString::number((quint32)datagram.at(26)) + "." + QString::number((quint32)datagram.at(27)) + "." + QString::number((quint32)datagram.at(28)) + "." + QString::number((quint32)datagram.at(29));
+		QString ip = QString::number((quint32)datagram.at(26)) + "."
+				+ QString::number((quint32)datagram.at(27)) + "." + QString::number((quint32)datagram.at(28))
+				+ "." + QString::number((quint32)datagram.at(29));
 		bool isBallInside = datagram.at(4) == 0 ? false : true;
 		emit setBallInsideData(ip, isBallInside);
 	}

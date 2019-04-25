@@ -26,7 +26,9 @@ float GrSimRobot::fromPower2Speed(int power)
 	return power / 100.0 * 6; //should be implemented after experiments
 }
 
-void GrSimRobot::formControlPacket(QByteArray & command, int numOfRobot, int speedX, int speedY, int speedR, bool kickUp, bool kickForward, int kickVoltage, bool enableSpinner, int spinnerSpeed)
+void GrSimRobot::formControlPacket(QByteArray & command, int numOfRobot, int speedX, int speedY, int speedR,
+								   bool kickUp, bool kickForward, int kickVoltage,
+								   bool enableSpinner, int spinnerSpeed)
 {
 	grSim_Packet packet;
 	bool yellow = false;
