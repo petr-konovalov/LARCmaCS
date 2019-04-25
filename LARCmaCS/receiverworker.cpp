@@ -91,7 +91,7 @@ void ReceiverWorker::processPendingDatagrams()
 
 void ReceiverWorker::start()
 {
-	emit clientOpen(Constants::SSLVisionPort);
+	open(Constants::SSLVisionPort);
 }
 
 void ReceiverWorker::changeSimulatorMode(bool flag)

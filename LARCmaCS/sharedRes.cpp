@@ -52,17 +52,17 @@ const QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > & SharedRes::
 QString SharedRes::getRobotIP(int id)
 {
 	QString tmp;
-	mIPMutex.lock();
-	if (id >= 0 && id < mIPRobotList.size()) {
-		tmp = mIPRobotList[id];
-	}
-	mIPMutex.unlock();
+	//mIPMutex.lock();
+//	if (id >= 0 && id < mIPRobotList.size()) {
+//		tmp = mIPRobotList[id];
+//	}
+	//mIPMutex.unlock();
 	return tmp;
 }
 
 void SharedRes::setRobotIP(int id, const QString & ip)
 {
-	mIPMutex.lock();
+	//mIPMutex.lock();
 	if (ip.contains(".")) {
 		mIPRobotList[id] = ip;
 	} else {
@@ -70,19 +70,19 @@ void SharedRes::setRobotIP(int id, const QString & ip)
 	}
 	Settings settings;
 	settings.setValue(Settings::configKeyForRobotNum(id), ip);
-	mIPMutex.unlock();
+	//mIPMutex.unlock();
 }
 
 void SharedRes::setBallInsideData(const QString & ip, bool isBallInside)
 {
-	mIPMutex.lock();
-	for (auto i = 0; i < mIPRobotList.size(); i++) {
-		if (mIPRobotList[i] == ip) {
-			mBallInsideData->replace(i, isBallInside);
-			break;
-		}
-	}
-	mIPMutex.unlock();
+	//mIPMutex.lock();
+//	for (auto i = 0; i < mIPRobotList.size(); i++) {
+//		if (mIPRobotList[i] == ip) {
+//			mBallInsideData->replace(i, isBallInside);
+//			break;
+//		}
+//	}
+	//mIPMutex.unlock();
 }
 
 void SharedRes::setDetection(const QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > & detection)
