@@ -56,6 +56,10 @@ void ReceiverWorker::close()
 	mStatisticsTimer.stop();
 	mTotalPacketsNum = 0;
 	mPacketsPerSecond = 0;
+	for (int i = 0; i < Constants::numOfCameras; i++) {
+		emit updateDetection(QSharedPointer<SSL_WrapperPacket>(), i);
+	}
+	emit updateGeometry(QSharedPointer<SSL_WrapperPacket>());
 }
 
 bool ReceiverWorker::open(unsigned short port)
