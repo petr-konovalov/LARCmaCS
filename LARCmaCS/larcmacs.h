@@ -32,9 +32,9 @@ public:
 
 protected:
 	bool scalingRequested;
+	SharedRes sharedRes;
 	SceneView sceneview;
 	Receiver receiver;
-	SharedRes sharedRes;
 	MainAlg mainalg;
 	Connector connector;
 

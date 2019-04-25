@@ -14,16 +14,10 @@
 
 #pragma once
 
-using namespace std;
-
-#include <iostream>
-#include <QObject>
-#include <QMutex>
-#include <QUdpSocket>
 #include <QTimer>
-#include "constants.h"
+#include <QUdpSocket>
+
 #include "messages_robocup_ssl_wrapper.pb.h"
-#include "packetSSL.h"
 
 class ReceiverWorker : public QObject
 {
@@ -33,14 +27,12 @@ public:
 	~ReceiverWorker();
 
 public slots:
-	void processPendingDatagrams();
-	void formStatistics();
-	bool open(unsigned short port);
-	void clearOutput();
-	void close();
 	void start();
-	void stop();
-	void ChangeSimulatorMode(bool flag);
+	void changeSimulatorMode(bool flag);
+
+private slots:
+	void formStatistics();
+	void processPendingDatagrams();
 
 signals:
 	void clientOpen(unsigned short port);
@@ -49,13 +41,15 @@ signals:
 	void finished();
 	void updateDetection(const QSharedPointer<SSL_WrapperPacket> & detection, int camID);
 	void updateGeometry(const QSharedPointer<SSL_WrapperPacket> & geometry);
-	void UpdateSSLFPS(const QString & message);
+	void updateSSLFPS(const QString & message);
 
 private:
-	void init();
+	bool open(unsigned short port);
+	void close();
+
 	static const QString visionIP;
-	QSharedPointer<QUdpSocket> mSocket;
-	QSharedPointer<QTimer> mStatisticsTimer;
+	QUdpSocket mSocket;
+	QTimer mStatisticsTimer;
 	QHostAddress mGroupAddress;
 	QSharedPointer<SSL_WrapperPacket> mInputPacket;
 	int mTotalPacketsNum = 0;

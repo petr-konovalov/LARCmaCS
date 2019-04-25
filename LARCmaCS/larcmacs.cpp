@@ -12,7 +12,8 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 	ui(new Ui::LARCmaCS),
 	scalingRequested(true),
 	sizescene(10),
-	drawscale(1)
+	drawscale(1),
+	receiver(&sharedRes)
 {
 	ui->setupUi(this);
 	fieldscene = new FieldScene();
@@ -21,7 +22,6 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 	scaleView(8);
 	macsArray = new QString[Constants::maxNumOfRobots];
 
-	receiver.init(&sharedRes);
 	mainalg.init(&sharedRes);
 	sceneview.init();
 	connector.init(&sharedRes);
@@ -40,14 +40,14 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 	//info GUI
 	connect(&mainalg, SIGNAL(UpdatePauseState(const QString &)), this, SLOT(UpdatePauseState(const QString &)));
 	connect(&mainalg, SIGNAL(StatusMessage(const QString &)), this, SLOT(UpdateStatusBar(const QString &)));
-	connect(&receiver, SIGNAL(UpdateSSLFPS(const QString &)), this, SLOT(UpdateSSLFPS(const QString &)));
+	connect(&receiver, SIGNAL(updateSSLFPS(const QString &)), this, SLOT(UpdateSSLFPS(const QString &)));
 
 	//remotecontrol
 	connect(&remotecontol, SIGNAL(RC_control(int, int, int, int, bool)),
 			this, SLOT(remcontrolsender(int, int, int, int, bool)));
 
 	//simulator Enable
-	connect(this, SIGNAL(ChangeSimulatorMode(bool)), &receiver, SLOT(ChangeSimulatorMode(bool)));
+	connect(this, SIGNAL(ChangeSimulatorMode(bool)), &receiver, SLOT(changeSimulatorMode(bool)));
 	connect(&receiver, SIGNAL(clearField()), fieldscene, SLOT(ClearField()));
 	connect(this, SIGNAL(ChangeSimulatorMode(bool)), &mainalg, SLOT(setEnableSimFlag(bool)));
 	connect(&mainalg, SIGNAL(sendToSimConnector(const QByteArray &)), &connector, SLOT(runSim(const QByteArray &)));
