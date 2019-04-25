@@ -238,10 +238,14 @@ void FieldScene::ConstructField()
 
 	QFont qfont;
 	qfont.setPixelSize(20);
-	field->addText(QPoint(field_length/(2*ksize) + 100 / ksize, field_width/(2*ksize)+200/ksize), qfont , "(" + QString::number(field_length / 2) + ", " + QString::number(-field_width / 2) + ")");
-	field->addText(QPoint(-field_length/(2*ksize)-1400/ksize, field_width/(2*ksize)+200/ksize), qfont , "(" + QString::number(-field_length / 2) + ", " + QString::number(-field_width / 2) + ")");
-	field->addText(QPoint(-field_length/(2*ksize)-1300/ksize, -field_width/(2*ksize)-100/ksize), qfont , "(" + QString::number(-field_length / 2) + ", " + QString::number(field_width / 2) + ")");
-	field->addText(QPoint(field_length/(2*ksize)+100/ksize, -field_width/(2*ksize)-100/ksize), qfont , "(" + QString::number(field_length / 2) + ", " + QString::number(field_width / 2) + ")");
+	field->addText(QPoint(field_length/(2*ksize) + 100 / ksize, field_width/(2*ksize)+200/ksize), qfont
+				, "(" + QString::number(field_length / 2) + ", " + QString::number(-field_width / 2) + ")");
+	field->addText(QPoint(-field_length/(2*ksize)-1400/ksize, field_width/(2*ksize)+200/ksize), qfont
+				, "(" + QString::number(-field_length / 2) + ", " + QString::number(-field_width / 2) + ")");
+	field->addText(QPoint(-field_length/(2*ksize)-1300/ksize, -field_width/(2*ksize)-100/ksize), qfont
+				, "(" + QString::number(-field_length / 2) + ", " + QString::number(field_width / 2) + ")");
+	field->addText(QPoint(field_length/(2*ksize)+100/ksize, -field_width/(2*ksize)-100/ksize)
+				, qfont , "(" + QString::number(field_length / 2) + ", " + QString::number(field_width / 2) + ")");
 
 #ifdef OLD_SSL_PROTO
 	field->moveTo(0, -field_width / (2 * ksize));
@@ -288,7 +292,8 @@ void FieldScene::ConstructField()
 		field->moveTo ( 0,-field_width/(2*ksize) );
 		field->lineTo ( 0,field_width/(2*ksize) );
 
-		field->addEllipse ( -2*center_circle_radius/(2*ksize),-center_circle_radius/ksize, 4*center_circle_radius/(2*ksize),2*center_circle_radius/ksize );
+		field->addEllipse ( -2*center_circle_radius/(2*ksize),-center_circle_radius/ksize
+				, 4*center_circle_radius/(2*ksize),2*center_circle_radius/ksize );
 
 		field->moveTo ( field_length/(2*ksize),-field_width/(2*ksize) );
 		field->lineTo ( field_length/(2*ksize),field_width/(2*ksize) );
@@ -335,8 +340,12 @@ void FieldScene::ConstructField()
 			} else {
 				tmp = field_arcs[i].a2() - field_arcs[i].a1();
 			}
-			field->moveTo(field_arcs[i].center().x() / ksize + field_arcs[i].radius() / ksize, field_arcs[i].center().y() / ksize);
-			field->arcTo(field_arcs[i].center().x() / ksize - field_arcs[i].radius() / ksize, field_arcs[i].center().y() / ksize - field_arcs[i].radius() / ksize, 2 * field_arcs[i].radius() / ksize, 2 * field_arcs[i].radius() / ksize, field_arcs[i].a1(), tmp/0.0175);
+			field->moveTo(field_arcs[i].center().x() / ksize + field_arcs[i].radius() / ksize
+					, field_arcs[i].center().y() / ksize);
+			field->arcTo(field_arcs[i].center().x() / ksize - field_arcs[i].radius() / ksize
+					, field_arcs[i].center().y() / ksize - field_arcs[i].radius() / ksize
+					, 2 * field_arcs[i].radius() / ksize, 2 * field_arcs[i].radius() / ksize
+					, field_arcs[i].a1(), tmp/0.0175);
 		}
 	}
 #endif
