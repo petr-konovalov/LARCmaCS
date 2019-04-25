@@ -16,9 +16,9 @@ public:
 	void setKickUp(int kickUp);
 	void setKickForward(int kickForward);
 	QByteArray generateByteArray();
+	static quint32 calculateCRC(const QByteArray &buf, int len);
 
 private:
-	quint32 calculateCRC(const QByteArray &buf, int len);
 	int mSpeedX;
 	int mSpeedY;
 	int mSpeedR;

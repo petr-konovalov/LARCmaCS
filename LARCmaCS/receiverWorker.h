@@ -1,49 +1,58 @@
+// Copyright 2019 Dmitrii Iarosh
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+
+// http://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #pragma once
 
-#include <iostream>
-#include <QObject>
+#include <QTimer>
+#include <QUdpSocket>
 
-#include "packetSSL.h"
-#include "robocup_ssl_client.h"
+#include "messages_robocup_ssl_wrapper.pb.h"
 
-#include <time.h>
-
-struct ReceiverWorker : public QObject
+class ReceiverWorker : public QObject
 {
 	Q_OBJECT
 public:
 	explicit ReceiverWorker();
+	~ReceiverWorker();
 
 public slots:
-	void MainAlgFree();
 	void start();
-	void stop();
+	void changeSimulatorMode(bool flag);
 
-public slots:
-	void ChangeMaxPacketFrequencyMod(bool state);
-
-public:
-	SSL_DetectionFrame detection;
-
-	SSL_GeometryFieldSize fieldsize;
+private slots:
+	void formStatistics();
+	void processPendingDatagrams();
 
 signals:
-	void activateGUI();
-	void activateMA(PacketSSL packetssl);
-	void updatefieldGeometry();
-	void UpdateSSLFPS(QString message);
+	void clientOpen(unsigned short port);
+	void clientClose();
+	void clearField();
+	void finished();
+	void updateDetection(const QSharedPointer<SSL_WrapperPacket> & detection, int camID);
+	void updateGeometry(const QSharedPointer<SSL_WrapperPacket> & geometry);
+	void updateSSLFPS(const QString & message);
 
 private:
-	PacketSSL packetssl;
-	clock_t timer_m;
-	int Time_count;
+	bool open(unsigned short port);
+	void close();
 
-private:
-	void run();
-	RoboCupSSLClient client;
-	SSL_WrapperPacket packet;
-	bool NewPacket;
-	bool shutdownread;
-	bool mainalgisfree;
-	bool MaxPacketFrequencyMod;
+	static const QString visionIP;
+	QUdpSocket mSocket;
+	QTimer mStatisticsTimer;
+	QHostAddress mGroupAddress;
+	QSharedPointer<SSL_WrapperPacket> mInputPacket;
+	int mTotalPacketsNum = 0;
+	int mPacketsPerSecond = 0;
+	bool mIsSimEnabledFlag = false;
 };

@@ -158,5 +158,6 @@ void RemoteControl::RC_send(void)
 
 void RemoteControl::closeEvent(QCloseEvent *)
 {
+	emit remoteControlOff();
 	TimerStop();
 }

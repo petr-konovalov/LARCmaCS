@@ -14,29 +14,15 @@
 
 #pragma once
 
-#include <QObject>
-#include <QThread>
-#include "sharedRes.h"
-#include "robotReceiverWorker.h"
+#include <QByteArray>
+#include "message.h"
 
-class RobotReceiver : public QObject
+class DefaultRobot
 {
-	Q_OBJECT
-
-private:
-	QThread mThread;
-	RobotReceiverWorker mWorker;
-	SharedRes * mSharedRes;
 public:
-	RobotReceiver();
-	~RobotReceiver();
-	void start();
-	void stop();
-	void init(SharedRes * sharedRes);
-
-private slots:
-	void setBallInsideData(const QString & ip, bool isBallInside);
-
-signals:
-	void wstop();
+	DefaultRobot();
+	static const int robotPort = 10000;
+	static void formControlPacket(QByteArray & command, int numOfRobot, int speedX, int speedY, int speedR,
+								  bool kickUp, bool kickForward, int kickVoltage,
+								  bool enableSpinner, int spinnerSpeed = 0);
 };

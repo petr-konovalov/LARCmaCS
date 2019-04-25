@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include "engine.h"
+#include "constants.h"
 #include "matrix.h"
 
 typedef struct

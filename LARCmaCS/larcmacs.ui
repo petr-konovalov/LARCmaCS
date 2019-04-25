@@ -71,7 +71,7 @@
       </layout>
      </item>
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,1">
+      <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0,0,0,0,1">
        <property name="leftMargin">
         <number>0</number>
        </property>
@@ -116,6 +116,41 @@
         </layout>
        </item>
        <item>
+        <widget class="QCheckBox" name="checkBox_SimEnable">
+         <property name="text">
+          <string>Enable Simulator</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Simulator IP</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEditSimIP">
+         <property name="text">
+          <string>127.0.0.1</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Simulator port</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEditSimPort">
+         <property name="text">
+          <string>20011</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -139,7 +174,7 @@
        <property name="spacing">
         <number>2</number>
        </property>
-	   <item row="3" column="0">
+       <item row="3" column="0">
         <widget class="QPushButton" name="pushButton_Pause">
          <property name="text">
           <string>Matlab_Pause</string>
@@ -250,7 +285,7 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_15" stretch="10,10,4,1">
+    <layout class="QHBoxLayout" name="horizontalLayout_15" stretch="10,10,1">
      <item>
       <widget class="QLabel" name="StatusLabel">
        <property name="frameShape">
@@ -274,13 +309,6 @@
        </property>
        <property name="text">
         <string/>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="checkBox_MlMaxFreq">
-       <property name="text">
-        <string>MaxMLPacketFrequencyMod</string>
        </property>
       </widget>
      </item>

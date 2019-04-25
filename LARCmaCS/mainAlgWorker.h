@@ -4,50 +4,58 @@
 #include "packetSSL.h"
 #include "mlData.h"
 #include "client.h"
-
-#define MAX_NUM_ROBOTS 12
+#include "grSimRobot.h"
+#include "defaultRobot.h"
+#include "constants.h"
 
 using namespace std;
-#include <time.h>       /* clock_t, clock(), CLOCKS_PER_SEC */
 
-struct MainAlgWorker : public QObject
+class MainAlgWorker : public QObject
 {
 	Q_OBJECT
-	clock_t timer,timer_s,timer_m,timer_max;
-	int Time_count;
-	bool Send2BT[MAX_NUM_ROBOTS];
+private:
 	Client client;
-	bool isPause;
+	bool mIsPause;
+	int mTotalPacketsNum = 0;
+	int mPacketsPerSecond = 0;
+	QSharedPointer<QTimer> mStatisticsTimer;
+	QSharedPointer<PacketSSL> mPacketSSL;
 	double mIsBallInside;
 
 public:
 	MainAlgWorker();
+	void setPacketSSL(const QSharedPointer<PacketSSL> & packetSSL);
+	bool getIsSimEnabledFlag();
 	~MainAlgWorker();
 
 signals:
-	void sendToConnector(int N,QByteArray command);
-	void sendToBTtransmitter(char * message);
-	void mainAlgFree();
-	void StatusMessage(QString message);
-	void UpdatePauseState(QString message);
+	void finished();
+	void sendToConnector(int N, const QByteArray & command);
+	void sendToSimConnector(const QByteArray & command);
+	void newPauseState(const QString & state);
+	void sendStatistics(const QString & statistics);
+	void getDataFromReceiver();
 
 public slots:
-
 	void start();
-	void Send2BTChangeit(bool *send2BT_);
+	void formStatistics();
+	void updatePauseState();
 	void stop();
-	void run(PacketSSL packetssl);
+	void setEnableSimFlag(bool flag);
+	void processPacket(const QSharedPointer<PacketSSL> & packetssl);
 	void Pause();
 	void run_matlab();
 	void stop_matlab();
-	void EvalString(QString s);
+	void run();
+	void EvalString(const QString & s);
 	void changeBallStatus(bool ballStatus);
 
 private:
 	void init();
+	bool mIsSimEnabledFlag = 0;
 	char m_buffer[256]; // matlab buffer
 	MlData fmldata;
 	bool fmtlab;
-	bool shutdowncomp;
+	bool mShutdownFlag;
 	bool pause;
 };

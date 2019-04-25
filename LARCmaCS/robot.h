@@ -3,24 +3,24 @@
 #include <QGraphicsScene>
 #include <QGraphicsPathItem>
 
-const int teamUnknown = 0;
-const int teamBlue = 1;
-const int teamYellow = 2;
-const int NA = 0xffff;
-const double NAOrientation = 1000.0;
-
 class Robot : public QGraphicsPathItem
 {
 public:
-	double orientation;     //In degrees
-	int teamID;             //Team ID. 0 = blue, 1 = yellow
-	int id;                 //ID of the robot in its team
-	double x,y;
-	double conf;
-	int key;
-	QString robotLabel;
+	static const int teamUnknown = -1;
+	static const int teamBlue = 0;
+	static const int teamYellow = 1;
+	static const int NA = -1;
+	static const int robotNotFound = -1;
+	constexpr static const double NAOrientation = 1000.0;
 
 private:
+	double mOrientation;     //In degrees
+	int mTeamID;             //Team ID. 0 = blue, 1 = yellow
+	int mRobotID;                 //ID of the robot in its team
+	double mRobotX, mRobotY;
+	double mRobotConfidence;
+	int mCamID;
+	QString mRobotLabel;
 	QBrush *brush;
 	QPen *pen, *idPen, *confPen;
 	QPainterPath robotOutline, robotOutlineCircle, robotID;
@@ -30,12 +30,14 @@ public:
 	QRectF boundingRect() const;
 	QPainterPath shape() const;
 	unsigned long int tStamp;
-	void paint ( QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget );
-	//    void update ( qreal x, qreal y, qreal width, qreal height ) { return;}
-	//    void update ( const QRectF & rect = QRectF() ) {return;}
-
+	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	Robot();
-	Robot ( double _x, double _y, double _orientation, int _teamID, int _id, int _key, double _conf );
-	void SetPose ( double _x, double _y, double _orientation, double _conf );
+	Robot(double _x, double _y, double _orientation, int _teamID, int _id, int _key, double _conf);
+	void SetPose(double _x, double _y, double _orientation, double _conf);
+	int getTeamID();
+	int getCamID();
+	int getRobotID();
+	void setRobotConfidence(double robotConfidence);
+	void setRobotLabel(const QString & label);
 	~Robot();
 };

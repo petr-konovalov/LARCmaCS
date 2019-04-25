@@ -14,29 +14,16 @@
 
 #pragma once
 
-#include <QObject>
-#include <QThread>
-#include "sharedRes.h"
-#include "robotReceiverWorker.h"
-
-class RobotReceiver : public QObject
+class Constants
 {
-	Q_OBJECT
-
-private:
-	QThread mThread;
-	RobotReceiverWorker mWorker;
-	SharedRes * mSharedRes;
 public:
-	RobotReceiver();
-	~RobotReceiver();
-	void start();
-	void stop();
-	void init(SharedRes * sharedRes);
-
-private slots:
-	void setBallInsideData(const QString & ip, bool isBallInside);
-
-signals:
-	void wstop();
+	static const int maxNumOfRobots = 16;
+	static const int maxRobotsInTeam = maxNumOfRobots; //maxNumOfRobots / 2;
+	static const int robotAlgoPacketSize = 5 * maxRobotsInTeam;
+	static const int ballAlgoPacketSize = 3;
+	static const unsigned  SSLVisionPort = 10006;
+	static const unsigned  SimVisionPort = 10020;
+	static const int numOfCameras = 4;
+	static const int ruleLength = 7;
+	static const int ruleAmount = 12;
 };

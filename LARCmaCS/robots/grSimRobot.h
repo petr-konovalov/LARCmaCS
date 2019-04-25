@@ -14,29 +14,20 @@
 
 #pragma once
 
-#include <QObject>
-#include <QThread>
-#include "sharedRes.h"
-#include "robotReceiverWorker.h"
+#include <QByteArray>
+#include "grSim_Packet.pb.h"
+#include "grSim_Commands.pb.h"
+#include "grSim_Replacement.pb.h"
+#include "constants.h"
 
-class RobotReceiver : public QObject
+class GrSimRobot
 {
-	Q_OBJECT
-
-private:
-	QThread mThread;
-	RobotReceiverWorker mWorker;
-	SharedRes * mSharedRes;
 public:
-	RobotReceiver();
-	~RobotReceiver();
-	void start();
-	void stop();
-	void init(SharedRes * sharedRes);
-
-private slots:
-	void setBallInsideData(const QString & ip, bool isBallInside);
-
-signals:
-	void wstop();
+	GrSimRobot();
+	static void formControlPacket(QByteArray & command, int numOfRobot, int speedX, int speedY, int speedR,
+								  bool kickUp, bool kickForward, int kickVoltage,
+								  bool enableSpinner, int spinnerSpeed = 0);
+private:
+	static float fromPower2Speed(int power);
+	static float fromPower2Kick(bool isKicked, int voltage);
 };

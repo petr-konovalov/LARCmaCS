@@ -13,7 +13,7 @@ class IpDialog : public QDialog
 	Q_OBJECT
 
 public:
-	explicit IpDialog(ConnectorWorker &worker, QWidget *parent = nullptr);
+	explicit IpDialog(SharedRes * sharedRes, QWidget *parent = nullptr);
 	~IpDialog();
 
 private slots:
@@ -21,10 +21,6 @@ private slots:
 	void on_buttonBox_rejected();
 
 private:
-	Ui::IpDialog *ui;
-	Receiver receiver;
-	Connector connector;
-
-signals:
-	void addIp(int, QString);
+	Ui::IpDialog * ui;
+	SharedRes * mSharedRes;
 };

@@ -1,43 +1,73 @@
+// Copyright 2019 Dmitrii Iarosh
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+
+// http://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #pragma once
 
 #include <QGraphicsPathItem>
 #include "field_default_constants.h"
-#include "robocup_ssl_client.h"
-#include "timer.h"
+#include "messages_robocup_ssl_wrapper.pb.h"
 #include "robot.h"
+#include "constants.h"
+#include <QTimer>
+#include "sharedRes.h"
+
+using namespace std;
 
 class FieldScene : public QGraphicsScene
 {
 	Q_OBJECT
 public:
 	explicit FieldScene(QObject *parent = 0);
+	~FieldScene();
+	void setSharedRes(SharedRes * sharedRes);
+	void start();
 
-	void AddRobot ( Robot* robot );
-	void UpdateRobots ( SSL_DetectionFrame &detection );
-	int UpdateBalls ( QVector<QPointF> &_balls, int cameraID );
+public slots:
+	void UpdateField(const QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > & detection,
+					 const QSharedPointer<SSL_WrapperPacket> & geometry);
+	void ClearField();
+	void updateFrame();
 
-#ifndef OLD_SSL_PROTO
-	void UpdateField(SSL_GeometryFieldSize field);
-#endif
-
-	void UpdateGeometry(SSL_GeometryFieldSize fieldSize);
-	void LoadFieldGeometry();
-	void LoadFieldGeometry ( SSL_GeometryFieldSize &fieldSize );
+signals:
+	void reDrawScene();
 
 private:
-
+	SSL_DetectionFrame mDetection;
+	QTimer mDrawTimer;
+	SharedRes * mSharedRes;
+#ifndef OLD_SSL_PROTO
+	void UpdateFieldGeometry(const QSharedPointer<SSL_WrapperPacket> & packet);
+#endif
+	void UpdateGeometry(const SSL_GeometryFieldSize & fieldSize);
+	void robotsInit();
+	void LoadFieldGeometry();
+	void LoadFieldGeometry(const SSL_GeometryFieldSize & fieldSize);
+	void AddRobot(Robot * robot);
+	void UpdateRobots(const QSharedPointer<SSL_WrapperPacket> & packet);
 	//Robots
-	QVector<Robot*> blueRobots,yellowRobots, robots;
+	QVector<Robot*> robots;
 	//balls
 	QVector < QVector<QGraphicsEllipseItem*> > ballItems;
 	//field
-	QPainterPath *field;
-	QGraphicsPathItem *fieldItem;
+	QPainterPath * field = nullptr;
+	QGraphicsPathItem * fieldItem = nullptr;
 	//brushes and pens
 	QBrush *fieldBrush, *ballBrush;
 	QPen *fieldPen, *fieldLinePen, *ballPen;
 	bool shutdownSoccerView;
 
+	void updateRobot(const SSL_DetectionRobot & robot, int team, unsigned int camID);
 	void ConstructField();
 
 	//gain size
@@ -54,8 +84,8 @@ private:
 	double penalty_spot_from_field_line_dist;
 	double penalty_line_from_spot_dist;
 #else
-	vector<SSL_FieldLineSegment> field_lines;
-	vector<SSL_FieldCicularArc> field_arcs;
+	QVector<SSL_FieldLineSegment> field_lines;
+	QVector<SSL_FieldCicularArc> field_arcs;
 	double penalty_area_width;
 	double penalty_area_depth;
 #endif

@@ -1,4 +1,4 @@
-// Copyright 2019 Anastasiia Kornilova
+// Copyright 2019 Dmitrii Iarosh
 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,27 +12,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <QtNetwork>
+#include "robotReceiver.h"
 
-#include "robotreceiver.h"
+RobotReceiver::RobotReceiver(){}
 
-RobotReceiver::RobotReceiver(): groupAddress4(QStringLiteral("192.168.1.255"))
+RobotReceiver::~RobotReceiver()
 {
-	udpSocket4.bind(QHostAddress::AnyIPv4, 57000, QUdpSocket::ShareAddress);
-	udpSocket4.joinMulticastGroup(groupAddress4);
-
-	connect(&udpSocket4, SIGNAL(readyRead()), this, SLOT(processPendingDatagrams()));
+	stop();
 }
 
-void RobotReceiver::processPendingDatagrams()
+void RobotReceiver::stop()
 {
-	QByteArray datagram;
+	emit wstop();
+}
 
-	while (udpSocket4.hasPendingDatagrams()) {
-		datagram.resize(int(udpSocket4.pendingDatagramSize()));
-		udpSocket4.readDatagram(datagram.data(), datagram.size());
-		ballStatuses[datagram.at(29)] = datagram.at(4);
-		auto found = std::find(ballStatuses.begin(), ballStatuses.end(), 1);
-		emit ballStatus(found != ballStatuses.end());
-	}
+void RobotReceiver::start()
+{
+	mThread.start();
+}
+
+void RobotReceiver::setBallInsideData(const QString & ip, bool isBallInside)
+{
+	mSharedRes->setBallInsideData(ip, isBallInside);
+}
+
+void RobotReceiver::init(SharedRes * sharedRes)
+{
+	mSharedRes = sharedRes;
+	mWorker.moveToThread(&mThread);
+	connect(&mThread, SIGNAL(started()), &mWorker, SLOT(start()));
+	connect(this, SIGNAL(wstop()), &mWorker, SLOT(stop()));
+	connect(&mWorker, SIGNAL(finished()), &mThread, SLOT(quit()));
+	connect(&mThread, SIGNAL(finished()), &mThread, SLOT(deleteLater()));
+	connect(&mWorker, SIGNAL(finished()), &mWorker, SLOT(deleteLater()));
+	connect(&mWorker, SIGNAL(setBallInsideData(const QString &, bool)),
+			this, SLOT(setBallInsideData(const QString &, bool)));
 }

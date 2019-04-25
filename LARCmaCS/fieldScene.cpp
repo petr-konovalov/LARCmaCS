@@ -1,3 +1,17 @@
+// Copyright 2019 Dmitrii Iarosh
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+
+// http://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #include "fieldScene.h"
 #include <QPainter>
 #include <QStyleOptionGraphicsItem>
@@ -8,26 +22,52 @@
 FieldScene::FieldScene(QObject *parent) :
 	QGraphicsScene(parent)
 {
-	setBackgroundBrush ( QBrush ( QColor ( 0,0x91,0x19,255 ),Qt::SolidPattern ) );
-	//drawMutex = _drawMutex;
+	connect(this, SIGNAL(reDrawScene()), this, SLOT(update()));
+	setBackgroundBrush (QBrush(QColor(0, 0x91, 0x19, 255), Qt::SolidPattern));
 	shutdownSoccerView = false;
-	//    glWidget = new QGLWidget ( QGLFormat ( QGL::DoubleBuffer ) );
-	//    setViewport ( glWidget );
 	ksize = 10;
 	LoadFieldGeometry();
-
 	ConstructField();
-	fieldBrush = new QBrush ( Qt::NoBrush );
+	fieldBrush = new QBrush(Qt::NoBrush);
 	fieldLinePen = new QPen();
-	fieldLinePen->setColor ( Qt::white );
-	fieldLinePen->setWidth ( 2 );
-	fieldLinePen->setJoinStyle ( Qt::MiterJoin );
-	fieldItem = this->addPath ( *field,*fieldLinePen,*fieldBrush );
+	fieldLinePen->setColor(Qt::white);
+	fieldLinePen->setWidth(2);
+	fieldLinePen->setJoinStyle(Qt::MiterJoin);
+	fieldItem = this->addPath(*field, *fieldLinePen, *fieldBrush);
 	fieldItem->setZValue(0);
-	//    drawScale = 0.15;
+	mDrawTimer.setInterval(33);
+	connect(&mDrawTimer, SIGNAL(timeout()), this, SLOT(updateFrame()));
+	robotsInit();
+}
 
-	//    connect(this, SIGNAL(scaleView(qreal)),rc,SLOT(scaleView(qreal)));
-	//    scalingRequested = true;
+void FieldScene::robotsInit()
+{
+	for (int i = 0; i < Constants::maxRobotsInTeam; i++) {
+		AddRobot(new Robot(0, 0, 0, Robot::teamBlue, i, 0, 0));
+	}
+	for (int i = 0; i < Constants::maxRobotsInTeam; i++) {
+		AddRobot(new Robot(0, 0, 0, Robot::teamYellow, i, 0, 0));
+	}
+}
+
+FieldScene::~FieldScene()
+{
+	mDrawTimer.stop();
+}
+
+void FieldScene::updateFrame()
+{
+	UpdateField(mSharedRes->getDetection(), mSharedRes->getGeometry());
+}
+
+void FieldScene::start()
+{
+	mDrawTimer.start();
+}
+
+void FieldScene::setSharedRes(SharedRes * sharedRes)
+{
+	mSharedRes = sharedRes;
 }
 
 void FieldScene::AddRobot(Robot *robot)
@@ -37,149 +77,164 @@ void FieldScene::AddRobot(Robot *robot)
 }
 
 #ifndef OLD_SSL_PROTO
-void FieldScene::UpdateField(SSL_GeometryFieldSize field) {
-	LoadFieldGeometry(field);
+void FieldScene::UpdateFieldGeometry(const QSharedPointer<SSL_WrapperPacket> & packet) {
+	LoadFieldGeometry(packet->geometry().field());
 }
 #endif
 
-void FieldScene::UpdateRobots(SSL_DetectionFrame &detection)
+void FieldScene::UpdateField(const QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > & detection,
+							 const QSharedPointer<SSL_WrapperPacket> & geometry)
 {
-	int robots_blue_n =  detection.robots_blue_size();
-	int robots_yellow_n =  detection.robots_yellow_size();
-	//cout << robots_blue_n << " " << robots_yellow_n << endl;
-	int i,j,yellowj=0,bluej=0;
-	int team=teamBlue;
-
-	SSL_DetectionRobot robot;
-	for (i = 0; i < robots_blue_n+robots_yellow_n; i++) {
-		//  cout << "i=" << i << endl;
-		if (i < robots_blue_n) {
-			robot = detection.robots_blue ( i );
-			team = teamBlue;
-			j=bluej;
-		} else {
-			robot = detection.robots_yellow ( i-robots_blue_n );
-			team = teamYellow;
-			j=yellowj;
-		}
-
-		double x,y,orientation,conf =robot.confidence();
-		int id=NA;
-		if (robot.has_robot_id())
-			id = robot.robot_id();
-		else
-			id = NA;
-		x = robot.x();
-		y = -robot.y();
-		if (robot.has_orientation())
-			orientation = robot.orientation() *180.0/M_PI;
-		else
-			orientation = NAOrientation;
-
-		//seek to the next robot of the same camera and team colour
-		while ( j<robots.size() && ( robots[j]->key!=detection.camera_id() || robots[j]->teamID!=team ) )
-			j++;
-		//    cout << "robot size " << robots.size() << endl;
-
-		if ( j+1>robots.size() )
-			AddRobot ( new Robot ( x,y,orientation,team,id,detection.camera_id(),conf ) );
-
-		//cout << i << " " << id << " " << x << " " << y << " " << orientation << " " << conf << endl;
-
-		robots[j]->SetPose ( x, -y,orientation,conf );
-		QString label;
-
-		if ( id!=NA )
-			label.setNum ( id+1,10 );
-		else
-			label = "?";
-		label = label.toUpper();
-		if ( label!=robots[j]->robotLabel )
-			robots[j]->robotLabel = label;
-
-		j++;
-
-		if ( i<robots_blue_n )
-			bluej=j;
-		else
-			yellowj=j;
+	if (!geometry.isNull()) {
+#ifndef OLD_SSL_PROTO
+		UpdateFieldGeometry(geometry);
+#else
+		UpdateGeometry(geometry->geometry().field());
+#endif
 	}
-	for ( j=bluej;j<robots.size();j++ ) {
-		if ( robots[j]->key==detection.camera_id() && robots[j]->teamID==teamBlue )
-			robots[j]->conf=0.0;
-	}
-	for ( j=yellowj;j<robots.size();j++ ) {
-		if ( robots[j]->key==detection.camera_id() && robots[j]->teamID==teamYellow )
-			robots[j]->conf=0.0;
-	}
-
-	QVector<QGraphicsEllipseItem*> tmp;
-	int cameraID=detection.camera_id();
-	while(cameraID+1>ballItems.size())
-		ballItems.append(tmp);
-	if ( ballItems[cameraID].size() < detection.balls_size() ) {
-		//need to allocate some space for the new balls
-		QPen pen ( QColor ( 0xcd,0x59,0x00,0xff ) );
-		pen.setWidth ( 2 );
-		QBrush brush ( QColor ( 0xff,0x81,0x00,0xff ),Qt::SolidPattern );
-		while (detection.balls_size()>ballItems[cameraID].size()) {
-			ballItems[cameraID].append ( this->addEllipse ( 0,0,12,12,pen,brush ) );
-			ballItems[cameraID][ballItems[cameraID].size()-1]->setZValue(2);
-		}
-	} else if ( ballItems[cameraID].size() >detection.balls_size() ){
-	//need to delete some balls
-		while(ballItems[cameraID].size()>detection.balls_size()) {
-			this->removeItem ( ballItems[cameraID][0] );
-			ballItems[cameraID].remove(0);
+	if (!detection.isNull()) {
+		for (int i = 0; i < detection->size(); i++) {
+			if (!detection->at(i).isNull()) {
+				if (detection->at(i)->has_geometry()) {
+#ifndef OLD_SSL_PROTO
+					UpdateFieldGeometry(detection->at(i));
+#else
+					UpdateGeometry(detection->at(i)->geometry().field());
+#endif
+				}
+				UpdateRobots(detection->at(i));
+			}
 		}
 	}
-	for ( int i=0;i<detection.balls_size();i++ ) {
-		ballItems[cameraID][i]->setPos ( detection.balls(i).x()/ksize-6,detection.balls(i).y()/ksize-6 );
-
-	}
-	return;
+	emit reDrawScene();
 }
 
-void FieldScene::UpdateGeometry(SSL_GeometryFieldSize fieldSize) {
+void FieldScene::updateRobot(const SSL_DetectionRobot & robot, int team, unsigned int camID)
+{
+	int id, robotNum;
+	double x, y, orientation, conf;
+
+	conf = robot.confidence();
+	x = robot.x();
+	y = robot.y();
+
+	orientation = Robot::NAOrientation;
+	if (robot.has_orientation()) {
+		orientation = robot.orientation() * 180.0 / M_PI;
+	}
+
+	QString label;
+	robotNum = Robot::robotNotFound;
+	id = Robot::NA;
+	if (robot.has_robot_id()) {
+		id = robot.robot_id();
+		label.setNum (id, 10); //TODO change ipTable so it starts from 0 and add labels without +1
+		for (int j = 0; j < robots.size(); j++) {
+			if (robots[j]->getTeamID() == team && robots[j]->getRobotID() == id) {
+				robotNum = j;
+				robots[robotNum]->SetPose(x, y, orientation, conf);
+				break;
+			}
+		}
+	} else {
+		label = "?";
+	}
+
+	if (robotNum == Robot::robotNotFound) {
+		AddRobot(new Robot(x, y, orientation, team, id, camID, conf));
+		robotNum = robots.size() - 1;
+	}
+
+	label = label.toUpper();
+	robots[robotNum]->setRobotLabel(label);
+}
+
+void FieldScene::UpdateRobots(const QSharedPointer<SSL_WrapperPacket> & packet)
+{
+	mDetection.Clear();
+	mDetection = packet->detection();
+	int robots_blue_n = mDetection.robots_blue_size();
+	int robots_yellow_n = mDetection.robots_yellow_size();
+	unsigned int camID = mDetection.camera_id();
+
+	SSL_DetectionRobot robot;
+
+	//delete robots with undefined patterns
+	int i = Constants::maxNumOfRobots;
+	while (i < robots.size()) {
+		if (robots.at(i)->getCamID() == camID) {
+			this->removeItem(robots.at(i));
+			robots.remove(i);
+		} else {
+			i++;
+		}
+	}
+
+	for (int j = 0; j < robots.size(); j++) {
+		if (robots[j]->getCamID() == mDetection.camera_id()) {
+			robots[j]->setRobotConfidence(0);
+		}
+	}
+
+	for (int i = 0; i < robots_blue_n; i++) {
+		robot = mDetection.robots_blue(i);
+		updateRobot(robot, Robot::teamBlue, camID);
+	}
+
+	for (int i = 0; i < robots_yellow_n; i++) {
+		robot = mDetection.robots_yellow(i);
+		updateRobot(robot, Robot::teamYellow, camID);
+	}
+
+	//update balls
+
+	QVector<QGraphicsEllipseItem*> tmp;
+	while(camID + 1 > ballItems.size())
+		ballItems.append(tmp);
+	if (ballItems[camID].size() < mDetection.balls_size()) {
+		//need to allocate some space for the new balls
+		QPen pen(QColor(0xcd, 0x59, 0x00, 0xff));
+		pen.setWidth (2);
+		QBrush brush (QColor(0xff, 0x81, 0x00, 0xff), Qt::SolidPattern);
+		while (mDetection.balls_size() > ballItems[camID].size()) {
+			ballItems[camID].append(this->addEllipse(0, 0, 12, 12, pen, brush));
+			ballItems[camID][ballItems[camID].size() - 1]->setZValue(2);
+		}
+	} else if (ballItems[camID].size() > mDetection.balls_size()) {
+	//need to delete some balls
+		while(ballItems[camID].size() > mDetection.balls_size()) {
+			this->removeItem(ballItems[camID][0]);
+			ballItems[camID].remove(0);
+		}
+	}
+	for (int i = 0; i < mDetection.balls_size(); i++) {
+		ballItems[camID][i]->setPos(mDetection.balls(i).x()/ksize-6, -mDetection.balls(i).y()/ksize-6);
+	}
+}
+
+void FieldScene::UpdateGeometry(const SSL_GeometryFieldSize & fieldSize) {
 	LoadFieldGeometry(fieldSize);
 }
 
-int FieldScene::UpdateBalls(QVector<QPointF> &_balls, int cameraID)
+void FieldScene::ClearField()
 {
-	QVector<QGraphicsEllipseItem*> tmp;
-	while(cameraID+1>ballItems.size())
-		ballItems.append(tmp);
-
-	if ( ballItems[cameraID].size() < _balls.size() ) {
-		//need to allocate some space for the new balls
-		QPen pen ( QColor ( 0xcd,0x59,0x00,0xff ) );
-		pen.setWidth ( 2 );
-		QBrush brush ( QColor ( 0xff,0x81,0x00,0xff ),Qt::SolidPattern );
-		while(_balls.size()>ballItems[cameraID].size()) {
-			ballItems[cameraID].append ( this->addEllipse ( 0,0,12,12,pen,brush ) );
-			ballItems[cameraID][ballItems[cameraID].size()-1]->setZValue(2);
-		}
-	} else if ( ballItems[cameraID].size() >_balls.size() ) {
-	//need to delete some balls
-		while(ballItems[cameraID].size()>_balls.size()){
-		this->removeItem ( ballItems[cameraID][0] );
-		ballItems[cameraID].remove(0);
-		}
+	this->clear();
+	LoadFieldGeometry();
+	field_arcs.clear();
+	field_lines.clear();
+	if (field != nullptr) {
+		delete field;
 	}
-
-	for ( int i=0;i<_balls.size();i++ ) {
-	//Let's update the ball positions now
-//      cout << _balls[i].x()/ksize << " " << _balls[i].y()/ksize << endl;
-		ballItems[cameraID][i]->setPos ( _balls[i].x()/ksize-6,_balls[i].y()/ksize-6 );
-	}
-
-	int balls = ballItems[cameraID].size();
-	return balls;
+	ConstructField();
+	fieldItem = this->addPath(*field, *fieldLinePen, *fieldBrush);
+	robots.clear();
+	ballItems.clear();
+	robotsInit();
+	emit reDrawScene();
 }
 
 void FieldScene::ConstructField()
 {
-	//scene->removeItem(fieldItem);
 	field = new QPainterPath();
 
 	QFont qfont;
@@ -194,53 +249,54 @@ void FieldScene::ConstructField()
 				, qfont , "(" + QString::number(field_length / 2) + ", " + QString::number(field_width / 2) + ")");
 
 #ifdef OLD_SSL_PROTO
-	field->moveTo ( 0,-field_width/(2*ksize) );
-	field->lineTo ( 0,field_width/(2*ksize) );
+	field->moveTo(0, -field_width / (2 * ksize));
+	field->lineTo(0, field_width / (2 * ksize));
 
-	field->addEllipse ( -2*center_circle_radius/(2*ksize),-center_circle_radius/ksize,
-						4*center_circle_radius/(2*ksize),2*center_circle_radius/ksize );
+	field->addEllipse(-2 * center_circle_radius / (2 * ksize), -center_circle_radius / ksize,
+						4 * center_circle_radius / (2 * ksize), 2 * center_circle_radius / ksize);
 
-	field->moveTo ( field_length/(2*ksize),-field_width/(2*ksize) );
-	field->lineTo ( field_length/(2*ksize),field_width/(2*ksize) );
+	field->moveTo(field_length / (2 * ksize), -field_width / (2 * ksize));
+	field->lineTo(field_length / (2 * ksize), field_width / (2 * ksize));
 
-	field->moveTo ( -field_length/(2*ksize),-field_width/(2*ksize) );
-	field->lineTo ( -field_length/(2*ksize),field_width/(2*ksize) );
+	field->moveTo(-field_length / (2 * ksize), -field_width / (2 * ksize));
+	field->lineTo(-field_length / (2 * ksize), field_width / (2 * ksize));
 
-	field->moveTo ( -field_length/(2*ksize),-field_width/(2*ksize) );
-	field->lineTo ( field_length/(2*ksize),-field_width/(2*ksize) );
+	field->moveTo(-field_length / (2 * ksize), -field_width / (2 * ksize));
+	field->lineTo(field_length / (2 * ksize), -field_width / (2 * ksize));
 
-	field->moveTo ( -field_length/(2*ksize),field_width/(2*ksize) );
-	field->lineTo ( field_length/(2*ksize),field_width/(2*ksize) );
+	field->moveTo(-field_length / (2 * ksize), field_width / (2 * ksize));
+	field->lineTo(field_length / (2 * ksize), field_width / (2 * ksize));
 
-	field->moveTo ( field_length/(2*ksize),goal_width/(2*ksize) );
-	field->lineTo ( ( field_length/(2*ksize)+goal_depth/ksize ),goal_width/(2*ksize) );
-	field->lineTo ( ( field_length/(2*ksize)+goal_depth/ksize ),-goal_width/(2*ksize) );
-	field->lineTo ( field_length/(2*ksize),-goal_width/(2*ksize) );
-	field->moveTo ( ( field_length/(2*ksize)-defense_radius/ksize ),defense_stretch/(2*ksize) );
-	field->lineTo ( ( field_length/(2*ksize)-defense_radius/ksize ),-defense_stretch/(2*ksize) );
-	field->moveTo ( ( field_length/(2*ksize)-defense_radius/ksize ),defense_stretch/(2*ksize) );
-	field->arcTo ( ( field_length/(2*ksize)-defense_radius/ksize )
-			, -( defense_radius/ksize-defense_stretch/(2*ksize) )
-			, 2*defense_radius/ksize,2*defense_radius/ksize,180,90 );
-	field->moveTo ( ( field_length/(2*ksize)-defense_radius/ksize ), -defense_stretch/(2*ksize) );
-	field->arcTo ( ( field_length/(2*ksize)-defense_radius/ksize )
-			, -( defense_radius/ksize+defense_stretch/(2*ksize) )
-			, 2*defense_radius/ksize,2*defense_radius/ksize,180,-90 );
+	field->moveTo(field_length / (2 * ksize), goal_width / (2 * ksize));
+	field->lineTo((field_length / (2 * ksize) + goal_depth/ksize), goal_width / (2 * ksize));
+	field->lineTo((field_length / (2 * ksize) + goal_depth / ksize), -goal_width / (2 * ksize));
+	field->lineTo(field_length / (2 * ksize), -goal_width / (2 * ksize));
+	field->moveTo((field_length / (2 * ksize) - defense_radius / ksize), defense_stretch / (2 * ksize));
+	field->lineTo((field_length / (2 * ksize) - defense_radius / ksize), -defense_stretch / (2 * ksize));
+	field->moveTo((field_length / (2 * ksize) - defense_radius / ksize), defense_stretch / (2 * ksize));
+	field->arcTo((field_length / (2 * ksize) - defense_radius / ksize),
+				 -(defense_radius / ksize - defense_stretch / (2 * ksize)),
+				 2 * defense_radius / ksize, 2 * defense_radius / ksize, 180, 90);
+	field->moveTo((field_length / (2 * ksize) - defense_radius / ksize),
+				  -defense_stretch / (2 * ksize));
+	field->arcTo((field_length / (2 * ksize) - defense_radius / ksize),
+				 -(defense_radius / ksize + defense_stretch / (2 * ksize)),
+				 2 * defense_radius / ksize, 2 * defense_radius / ksize, 180, -90);
 
-	field->moveTo ( -field_length/(2*ksize),goal_width/(2*ksize) );
-	field->lineTo ( - ( field_length/(2*ksize)+goal_depth/ksize ),goal_width/(2*ksize) );
-	field->lineTo ( - ( field_length/(2*ksize)+goal_depth/ksize ),-goal_width/(2*ksize) );
-	field->lineTo ( -field_length/(2*ksize),-goal_width/(2*ksize) );
-	field->moveTo ( - ( field_length/(2*ksize)-defense_radius/ksize ),defense_stretch/(2*ksize) );
-	field->lineTo ( - ( field_length/(2*ksize)-defense_radius/ksize ),-defense_stretch/(2*ksize) );
-	field->moveTo ( - ( field_length/(2*ksize)-defense_radius/ksize ),defense_stretch/(2*ksize) );
-	field->arcTo ( - ( field_length/(2*ksize)+defense_radius/ksize )
-			,- (defense_radius/ksize-defense_stretch/(2*ksize) )
-			,2*defense_radius/ksize,2*defense_radius/ksize,0,-90 );
-	field->moveTo ( - ( field_length/(2*ksize)-defense_radius/ksize ),-defense_stretch/(2*ksize) );
-	field->arcTo ( - ( field_length/(2*ksize)+defense_radius/ksize )
-			,- ( defense_radius/ksize+defense_stretch/(2*ksize) )
-			,2*defense_radius/ksize,2*defense_radius/ksize,0,90 );
+	field->moveTo(-field_length / (2 * ksize), goal_width / (2 * ksize));
+	field->lineTo(-(field_length / (2 * ksize) + goal_depth / ksize), goal_width /(2 * ksize));
+	field->lineTo(-(field_length / (2 * ksize) + goal_depth / ksize), -goal_width / (2 * ksize));
+	field->lineTo(-field_length / (2 * ksize), -goal_width / (2 * ksize));
+	field->moveTo(-(field_length / (2 * ksize) - defense_radius / ksize), defense_stretch / (2 * ksize));
+	field->lineTo(-(field_length / (2 * ksize) - defense_radius / ksize), -defense_stretch / (2 * ksize));
+	field->moveTo(-(field_length / (2 * ksize) - defense_radius / ksize), defense_stretch / (2 * ksize));
+	field->arcTo(-(field_length / (2 * ksize) + defense_radius / ksize ),
+				 -(defense_radius / ksize-defense_stretch / (2 * ksize)),
+				 2 * defense_radius / ksize, 2 * defense_radius / ksize, 0, -90);
+	field->moveTo(-(field_length / (2 * ksize) - defense_radius / ksize), -defense_stretch / (2 * ksize));
+	field->arcTo(-(field_length / (2 * ksize) + defense_radius / ksize),
+				 -(defense_radius / ksize + defense_stretch / (2 * ksize)),
+				 2 * defense_radius / ksize, 2 * defense_radius / ksize, 0, 90);
 #else
 	if (field_lines.empty() || field_arcs.empty()) {
 		field->moveTo ( 0,-field_width/(2*ksize) );
@@ -335,7 +391,7 @@ void FieldScene::LoadFieldGeometry()
 #endif
 }
 
-void FieldScene::LoadFieldGeometry ( SSL_GeometryFieldSize &fieldSize )
+void FieldScene::LoadFieldGeometry(const SSL_GeometryFieldSize & fieldSize)
 {
 #ifdef OLD_SSL_PROTO
 	this->line_width = fieldSize.line_width();
@@ -352,10 +408,10 @@ void FieldScene::LoadFieldGeometry ( SSL_GeometryFieldSize &fieldSize )
 	field_lines.clear();
 	field_arcs.clear();
 	for (int i = 0; i < fieldSize.field_lines_size(); i++) {
-		field_lines.push_back(fieldSize.field_lines(i));
+		field_lines.append(fieldSize.field_lines(i));
 	}
 	for (int i = 0; i < fieldSize.field_arcs_size(); i++) {
-		field_arcs.push_back(fieldSize.field_arcs(i));
+		field_arcs.append(fieldSize.field_arcs(i));
 	}
 
 	this->penalty_area_depth = FieldConstantsRoboCup2018A::kPenaltyAreaDepth;
@@ -369,7 +425,13 @@ void FieldScene::LoadFieldGeometry ( SSL_GeometryFieldSize &fieldSize )
 	this->goal_width = fieldSize.goal_width();
 	this->goal_depth = fieldSize.goal_depth();
 
-	this->removeItem ( fieldItem );
+	this->removeItem(fieldItem);
+	if (fieldItem != nullptr) {
+		delete fieldItem;
+	}
+	if (field != nullptr) {
+		delete field;
+	}
 	ConstructField();
-	fieldItem = this->addPath ( *field,*fieldLinePen,*fieldBrush );
+	fieldItem = this->addPath(*field, *fieldLinePen, *fieldBrush);
 }

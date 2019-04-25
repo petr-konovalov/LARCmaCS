@@ -73,9 +73,7 @@ int initConfig(RCConfig *config){
 
 MainAlgWorker::MainAlgWorker()
 {
-	timer_s=0;
-	timer_m=clock();
-	Time_count=0;
+	mPacketSSL = QSharedPointer<PacketSSL>();
 	QFile addrFile("gamepads.txt");
 	if (!addrFile.open(QIODevice::ReadOnly)) {
 		qDebug() << "File with addresses is not opened!!!";
@@ -84,11 +82,6 @@ MainAlgWorker::MainAlgWorker()
 	QTextStream in(&addrFile);
 	auto allAddrs = in.readAll().split("\n", QString::SkipEmptyParts).filter(QRegExp("^[^#;]"));
 	client.initFromList(allAddrs);
-
-	for (int i=0; i<MAX_NUM_ROBOTS; i++)
-	{
-		Send2BT[i]=true;
-	}
 	mIsBallInside = false;
 }
 
@@ -96,249 +89,34 @@ MainAlgWorker::~MainAlgWorker(){}
 
 void MainAlgWorker::start()
 {
-	shutdowncomp = false;
-	cout << "MainAlg worker start" << endl;
+	mStatisticsTimer = QSharedPointer<QTimer>(new QTimer());
+	mShutdownFlag = false;
 	init();
+	mStatisticsTimer->setInterval(1000);
+	connect(mStatisticsTimer.data(), SIGNAL(timeout()), this, SLOT(formStatistics()));
+	mStatisticsTimer->start();
+	run();
 }
 
 void MainAlgWorker::stop()
 {
-	shutdowncomp = true;
+	mStatisticsTimer->stop();
+	mShutdownFlag = true;
 }
 
-void MainAlgWorker::Send2BTChangeit(bool * send2BT_)
+void MainAlgWorker::formStatistics()
 {
-	for (int i=0; i<MAX_NUM_ROBOTS; i++) {
-		Send2BT[i]=send2BT_[i];
-	}
+	QString tmp;
+	QString ToStatus = "Using Matlab: PacketsPerSec = ";
+	tmp.setNum(mPacketsPerSecond);
+	mPacketsPerSecond = 0;
+	ToStatus += tmp;
+	ToStatus += " Total packets = ";
+	tmp.setNum(mTotalPacketsNum);
+	ToStatus += tmp;
+	emit sendStatistics(ToStatus);
 }
 
-void MainAlgWorker::run(PacketSSL packetssl)
-{
-	if (shutdowncomp)
-		return;
-	timer = clock();
-	Time_count++;
-
-// Заполнение массивов Balls Blues и Yellows и запуск main-функции
-
-	memcpy(mxGetPr(fmldata.Ball), packetssl.balls, BALL_COUNT_d);
-	memcpy(mxGetPr(fmldata.Blue), packetssl.robots_blue, TEAM_COUNT_d);
-	memcpy(mxGetPr(fmldata.Yellow), packetssl.robots_yellow, TEAM_COUNT_d);
-	memcpy(mxGetPr(fmldata.ballInside), &mIsBallInside, sizeof(double));
-
-	engPutVariable(fmldata.ep, "Balls", fmldata.Ball);
-	engPutVariable(fmldata.ep, "Blues", fmldata.Blue);
-	engPutVariable(fmldata.ep, "Yellows", fmldata.Yellow);
-	engPutVariable(fmldata.ep, "ballInside", fmldata.ballInside);
-
-	engEvalString(fmldata.ep, fmldata.config.file_of_matlab);
-
-// Забираем Rules и очищаем его в воркспейсе
-
-	fmldata.Rule = engGetVariable(fmldata.ep, "Rules");
-	double *ruleArray =
-			(double *)malloc(fmldata.config.RULE_AMOUNT * fmldata.config.RULE_LENGTH * sizeof(double));
-	if (fmldata.Rule!=0)
-		memcpy(ruleArray, mxGetPr(fmldata.Rule)
-			   , fmldata.config.RULE_AMOUNT * fmldata.config.RULE_LENGTH * sizeof(double));
-	else
-		memset(ruleArray,0,fmldata.config.RULE_AMOUNT * fmldata.config.RULE_LENGTH * sizeof(double));
-
-	char sendString[256];
-	sprintf(sendString, "Rules=zeros(%d, %d);", fmldata.config.RULE_AMOUNT, fmldata.config.RULE_LENGTH);
-	engEvalString(fmldata.ep, sendString);
-
-// Разбор пришедшего пакета и переправка его строк на connector и BT
-
-	for (int i = 0; i < fmldata.config.RULE_AMOUNT; i++) {
-		char newmess[100];
-		for (int j = 0; j < fmldata.config.RULE_LENGTH; j++) {
-			newmess[j]=ruleArray[j * fmldata.config.RULE_AMOUNT + i];
-		}
-		if (newmess[0]==1) {
-			char * newmessage=new char[100];
-			memcpy(newmessage,newmess,100);
-			if ((newmess[1]>=0) && (newmess[1]<=MAX_NUM_ROBOTS) && ((newmess[1]==0) || (Send2BT[newmess[1]-1]==true)))
-				emit sendToBTtransmitter(newmessage);
-
-			Message msg;
-			msg.setKickVoltageLevel(12);
-			msg.setKickerChargeEnable(1);
-
-			if (!isPause) {
-				msg.setSpeedX(newmess[2]);
-				msg.setSpeedY(newmess[3]);
-				msg.setSpeedR(newmess[5]);
-
-				msg.setKickForward(newmess[4]);
-				msg.setKickUp(newmess[6]);
-			} else {
-				msg.setSpeedX(0);
-				msg.setSpeedY(0);
-				msg.setSpeedR(0);
-
-				msg.setKickForward(0);
-			}
-
-			QByteArray command = msg.generateByteArray();
-
-			if (newmess[1]==0)
-				for (int i=1; i<=MAX_NUM_ROBOTS; i++)
-					emit sendToConnector(i,command);
-			if ((newmess[1]>0) && (newmess[1]<=MAX_NUM_ROBOTS))
-				emit sendToConnector(newmess[1],command);
-		}
-	}
-
-// Раз в секунду создание пакета статистики и переправка в GUI
-
-	clock_t timer_c=clock()-timer;
-	if (timer_c>timer_max)
-		timer_max=timer_c;
-	timer_s=timer_s+timer_c;
-	if (clock()-timer_m>CLOCKS_PER_SEC) {
-		timer_m=clock();
-		QString temp;
-		QString ToStatus="Using Matlab: Count=";
-		temp.setNum(Time_count);
-		ToStatus=ToStatus+temp;
-
-		ToStatus=ToStatus+" ~time=";
-		temp.setNum(timer_s/Time_count);
-		ToStatus=ToStatus+temp;
-
-		ToStatus=ToStatus+" maxtime=";
-		temp.setNum(timer_max);
-		ToStatus=ToStatus+temp;
-
-		ToStatus=ToStatus+" fulltime=";
-		temp.setNum(timer_s);
-		ToStatus=ToStatus+temp;
-
-		timer_s=0;
-		timer_max=0;
-		Time_count=0;
-		emit StatusMessage(ToStatus);
-
-		engEvalString(fmldata.ep,"ispause=RP.Pause");
-		mxArray *mxitpause=engGetVariable(fmldata.ep,"ispause");
-		isPause = true;
-		if (mxitpause!=0) {
-		double *itpause=mxGetPr(mxitpause);
-		if (itpause!=0) {
-			if ((*itpause)==0) {
-				mxArray *mxzMain_End=engGetVariable(fmldata.ep,"zMain_End");
-				if (mxzMain_End!=0) {
-					double *zMain_End=mxGetPr(mxzMain_End);
-					if (zMain_End!=0) {
-						if ((*zMain_End)==0)
-							emit UpdatePauseState("main br");
-						else {
-							emit UpdatePauseState("WORK");
-							isPause = false;
-						}
-					} else
-						emit UpdatePauseState("-err-z");
-				} else
-					emit UpdatePauseState("-err-mz");
-			} else
-				emit UpdatePauseState("PAUSE");
-		} else
-			emit UpdatePauseState("-err-p"); //Ответ от матлаба повреждён
-		} else
-			emit UpdatePauseState("-err-mp"); //Нет ответа от матлаб
-	}
-
-	if (isPause) {
-		Message msg;
-		msg.setKickVoltageLevel(12);
-		msg.setKickerChargeEnable(1);
-
-		msg.setSpeedX(0);
-		msg.setSpeedY(0);
-		msg.setSpeedR(0);
-
-		msg.setKickForward(0);
-
-		QByteArray command = msg.generateByteArray();
-		for (int i = 1; i <= 12; i++) {
-			emit sendToConnector(i, command);
-		}
-	}
-
-// Сообщение ресиверу о готовности обработки нового пакета.
-
-	QApplication::processEvents();
-	emit mainAlgFree();
-//    qDebug()<<"MainAlg!";
-
-}
-
-void MainAlgWorker::Pause()
-{
-	engEvalString(fmldata.ep, "PAUSE();");
-}
-
-void MainAlgWorker::run_matlab()
-{
-	cout << "Work is started..." << endl;
-
-	if (!(fmldata.ep = engOpen(NULL))) {
-		cerr << "Can't open Matlab Engine" << endl;
-		fmtlab = false;
-		return;
-	}
-
-	m_buffer[255] = '\0';
-	engOutputBuffer(fmldata.ep, m_buffer, 255);
-	printf("Matlab Engine is opened\n");
-
-	// Path_Of_Files
-	// TCHAR CurrentPath[MAX_PATH];
-	// char StringWithPath[MAX_PATH],StringPath[MAX_PATH];
-
-	/*
-	// Detecting Directory
-	printf("Start to detect directory\n");
-	GetCurrentDirectory(sizeof(CurrentPath), CurrentPath);
-
-#ifdef UNICODE
-	wcstombs(StringPath, CurrentPath, MAX_PATH - 1);
-#else
-	CharToOem(StringPath, CurrentPath);
-#endif
-
-	sprintf(StringWithPath, "cd %s;", StringPath);
-	engEvalString(fmldata.ep, StringWithPath);
-	printf("We are on %s\n",StringWithPath);
-*/
-	//-----create Rules-----
-	char sendString[256];
-	sprintf (sendString, "Rules=zeros(%d, %d)", fmldata.config.RULE_AMOUNT, fmldata.config.RULE_LENGTH);
-	engEvalString(fmldata.ep, sendString);
-//    engEvalString(fmldata.ep, "disp(1)");
-
-	QString dirPath = "cd " + QCoreApplication::applicationDirPath() + "/MLscripts";
-	engEvalString(fmldata.ep, dirPath.toUtf8().data());
-	fmtlab = true;
-	pause = false;
-}
-
-void MainAlgWorker::stop_matlab()
-{
-	fmtlab = false;
-}
-
-void MainAlgWorker::EvalString(QString s)
-{
-	engEvalString(fmldata.ep,s.toUtf8().data());
-}
-
-void MainAlgWorker::changeBallStatus(bool ballStatus)
-{
-	mIsBallInside = ballStatus;
-}
 
 void MainAlgWorker::init(){
 	RCConfig rcconfig;
@@ -358,14 +136,223 @@ void MainAlgWorker::init(){
 		cerr << "...bad" << endl;
 		rcconfig.name = "Robofootball";
 		rcconfig.file_of_matlab = "main";
-		rcconfig.RULE_AMOUNT=5;
-		rcconfig.RULE_LENGTH=7;
-		rcconfig.BACK_AMOUNT=10;
-		rcconfig.BACK_LENGTH=8;
+		rcconfig.RULE_AMOUNT = 5;
+		rcconfig.RULE_LENGTH = 7;
+		rcconfig.BACK_AMOUNT = 10;
+		rcconfig.BACK_LENGTH = 8;
 	}
 
 	MlData mtl(rcconfig);
 	fmldata = mtl;
 
 	run_matlab();
+}
+
+bool MainAlgWorker::getIsSimEnabledFlag()
+{
+	return mIsSimEnabledFlag;
+}
+
+void MainAlgWorker::setEnableSimFlag(bool flag)
+{
+	mIsSimEnabledFlag = flag;
+}
+
+void MainAlgWorker::run()
+{
+	while (!mShutdownFlag) {
+		emit getDataFromReceiver();
+		processPacket(mPacketSSL);
+		QApplication::processEvents();
+	}
+	emit finished();
+}
+
+void MainAlgWorker::setPacketSSL(const QSharedPointer<PacketSSL> & packetSSL)
+{
+	mPacketSSL = packetSSL;
+}
+
+void MainAlgWorker::updatePauseState()
+{
+	engEvalString(fmldata.ep, "ispause=RP.Pause");
+	mxArray *mxitpause = engGetVariable(fmldata.ep, "ispause");
+	mIsPause = true;
+	if (mxitpause != 0) {
+		double* itpause = mxGetPr(mxitpause);
+		if (itpause != 0) {
+			if ((*itpause) == 0) {
+				mxArray* mxzMain_End = engGetVariable(fmldata.ep, "zMain_End");
+				if (mxzMain_End != 0) {
+					double* zMain_End = mxGetPr(mxzMain_End);
+					if (zMain_End != 0) {
+						if ((*zMain_End) == 0) {
+							emit newPauseState("main br");
+						} else {
+							mIsPause = false;
+							emit newPauseState("WORK");
+						}
+					} else {
+						emit newPauseState("-err-z");
+					}
+				} else {
+					emit newPauseState("-err-mz");
+				}
+			} else {
+				emit newPauseState("PAUSE");
+			}
+		} else {
+			emit newPauseState("-err-p"); //Matlab answer corrupted
+		}
+	} else {
+		emit newPauseState("-err-mp"); //Matlab does not respond
+	}
+}
+
+void MainAlgWorker::processPacket(const QSharedPointer<PacketSSL> & packetssl)
+{
+	if (packetssl.isNull()) {
+		return;
+	}
+// Заполнение массивов Balls Blues и Yellows и запуск main-функции
+	mPacketsPerSecond++;
+	mTotalPacketsNum++;
+
+	memcpy(mxGetPr(fmldata.Ball), packetssl->balls, Constants::ballAlgoPacketSize * sizeof(double));
+	memcpy(mxGetPr(fmldata.Blue), packetssl->robots_blue, Constants::robotAlgoPacketSize * sizeof(double));
+	memcpy(mxGetPr(fmldata.Yellow), packetssl->robots_yellow, Constants::robotAlgoPacketSize * sizeof(double));
+	memcpy(mxGetPr(fmldata.ballInside), &mIsBallInside, sizeof(double));
+
+
+	engPutVariable(fmldata.ep, "Balls", fmldata.Ball);
+	engPutVariable(fmldata.ep, "Blues", fmldata.Blue);
+	engPutVariable(fmldata.ep, "Yellows", fmldata.Yellow);
+	engPutVariable(fmldata.ep, "ballInside", fmldata.ballInside);
+
+	engEvalString(fmldata.ep, fmldata.config.file_of_matlab);
+// Забираем Rules и очищаем его в воркспейсе
+
+	fmldata.Rule = engGetVariable(fmldata.ep, "Rules");
+	double *ruleArray =
+			(double *)malloc(Constants::ruleAmount * Constants::ruleLength * sizeof(double));
+	if (fmldata.Rule != 0) {
+		memcpy(ruleArray, mxGetPr(fmldata.Rule), Constants::ruleAmount * Constants::ruleLength * sizeof(double));
+	} else {
+		memset(ruleArray, 0, Constants::ruleAmount * Constants::ruleLength * sizeof(double));
+	}
+	char sendString[256];
+	sprintf(sendString, "Rules=zeros(%d, %d);", Constants::ruleAmount, Constants::ruleLength);
+	engEvalString(fmldata.ep, sendString);
+
+// Разбор пришедшего пакета и переправка его строк на connector
+
+	for (int i = 0; i < Constants::ruleAmount; i++) {
+		char newmess[Constants::ruleLength];
+		for (int j = 0; j < Constants::ruleLength; j++) {
+			newmess[j] = ruleArray[j * Constants::ruleAmount + i];
+		}
+		if (newmess[0] == 1) {
+			QByteArray command;
+
+			int voltage = 12; //fixed while we don't have abilities to change it from algos
+			bool simFlag = mIsSimEnabledFlag;
+			if (!simFlag) {
+				if (!mIsPause) {
+					DefaultRobot::formControlPacket(command, newmess[1], newmess[3], newmess[2], newmess[5],
+							newmess[6], newmess[4], voltage, 0);
+				} else {
+					DefaultRobot::formControlPacket(command, newmess[1], 0, 0, 0, 0, 0, voltage, 0);
+				}
+			} else {
+				if (!mIsPause) {
+					GrSimRobot::formControlPacket(command, newmess[1], newmess[3], newmess[2], newmess[5],
+							newmess[6], newmess[4], voltage, 0);
+				} else {
+					GrSimRobot::formControlPacket(command, newmess[1], 0, 0, 0, 0, 0, voltage, 0);
+				}
+			}
+
+			if (newmess[1] == 0) {
+				for (int i = 1; i <= Constants::maxNumOfRobots; i++) {
+					if (!simFlag) {
+						emit sendToConnector(i, command);
+					} else {
+						QByteArray multiCommand;
+						GrSimRobot::formControlPacket(multiCommand, i, newmess[3], newmess[2], newmess[5],
+								newmess[6], newmess[4], voltage, 0);
+						emit sendToSimConnector(multiCommand);
+					}
+				}
+			}
+			if ((newmess[1] > 0) && (newmess[1] <= Constants::maxNumOfRobots)) {
+				if (!simFlag) {
+					emit sendToConnector(newmess[1], command);
+				} else {
+					emit sendToSimConnector(command);
+				}
+			}
+		}
+	}
+	free(ruleArray);
+	mxDestroyArray(fmldata.Rule);
+
+	if (mIsPause) { //TODO: add check of remote control
+		QByteArray command;
+		if (!mIsSimEnabledFlag) {
+			for (int i = 1; i <= 12; i++) {
+				DefaultRobot::formControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
+				emit sendToConnector(i, command);
+			}
+		} else {
+			for (int i = 0; i <= 12; i++) {
+				GrSimRobot::formControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
+				emit sendToSimConnector(command); //for more power of remote control
+			}
+		}
+	}
+
+	updatePauseState();
+}
+
+void MainAlgWorker::Pause()
+{
+	engEvalString(fmldata.ep, "PAUSE();");
+}
+
+void MainAlgWorker::run_matlab()
+{
+	if (!(fmldata.ep = engOpen(NULL))) {
+		cerr << "Can't open Matlab Engine" << endl;
+		fmtlab = false;
+		return;
+	}
+
+	m_buffer[255] = '\0';
+	engOutputBuffer(fmldata.ep, m_buffer, 255);
+	printf("Matlab Engine is opened\n");
+
+	//-----create Rules-----
+	char sendString[256];
+	sprintf (sendString, "Rules=zeros(%d, %d)", Constants::ruleAmount, Constants::ruleLength);
+	engEvalString(fmldata.ep, sendString);
+
+	QString dirPath = "cd " + QCoreApplication::applicationDirPath() + "/MLscripts";
+	engEvalString(fmldata.ep, dirPath.toUtf8().data());
+	fmtlab = true;
+	pause = false;
+}
+
+void MainAlgWorker::stop_matlab()
+{
+	fmtlab = false;
+}
+
+void MainAlgWorker::EvalString(const QString & s)
+{
+	engEvalString(fmldata.ep, s.toUtf8().data());
+}
+
+void MainAlgWorker::changeBallStatus(bool ballStatus)
+{
+	mIsBallInside = ballStatus;
 }

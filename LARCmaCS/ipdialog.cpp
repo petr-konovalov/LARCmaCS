@@ -2,28 +2,24 @@
 #include "ui_ipdialog.h"
 #include "settings.h"
 
-IpDialog::IpDialog(ConnectorWorker &worker,  QWidget *parent) :
+IpDialog::IpDialog(SharedRes * sharedRes,  QWidget * parent) :
 	QDialog(parent),
 	ui(new Ui::IpDialog)
 {
-	receiver.init();
-	QObject::connect(this, SIGNAL(addIp(int, QString)), &worker, SLOT(addIp(int, QString)));
-
+	mSharedRes = sharedRes;
 	ui->setupUi(this);
-	ui->lineEditIp1->setText(worker.numIP[1]);
-	ui->lineEditIp2->setText(worker.numIP[2]);
-	ui->lineEditIp3->setText(worker.numIP[3]);
-	ui->lineEditIp4->setText(worker.numIP[4]);
-	ui->lineEditIp5->setText(worker.numIP[5]);
-	ui->lineEditIp6->setText(worker.numIP[6]);
-	ui->lineEditIp7->setText(worker.numIP[7]);
-	ui->lineEditIp8->setText(worker.numIP[8]);
-	ui->lineEditIp9->setText(worker.numIP[9]);
-	ui->lineEditIp10->setText(worker.numIP[10]);
-	ui->lineEditIp11->setText(worker.numIP[11]);
-	ui->lineEditIp12->setText(worker.numIP[12]);
-
-	qDebug() << connector.worker.numIP;
+	ui->lineEditIp1->setText(sharedRes->getRobotIP(0));
+	ui->lineEditIp2->setText(sharedRes->getRobotIP(1));
+	ui->lineEditIp3->setText(sharedRes->getRobotIP(2));
+	ui->lineEditIp4->setText(sharedRes->getRobotIP(3));
+	ui->lineEditIp5->setText(sharedRes->getRobotIP(4));
+	ui->lineEditIp6->setText(sharedRes->getRobotIP(5));
+	ui->lineEditIp7->setText(sharedRes->getRobotIP(6));
+	ui->lineEditIp8->setText(sharedRes->getRobotIP(7));
+	ui->lineEditIp9->setText(sharedRes->getRobotIP(8));
+	ui->lineEditIp10->setText(sharedRes->getRobotIP(9));
+	ui->lineEditIp11->setText(sharedRes->getRobotIP(10));
+	ui->lineEditIp12->setText(sharedRes->getRobotIP(11));
 }
 
 IpDialog::~IpDialog()
@@ -33,22 +29,19 @@ IpDialog::~IpDialog()
 
 void IpDialog::on_buttonBox_accepted()
 {
-	emit(addIp(1, ui->lineEditIp1->text()));
-	emit(addIp(2, ui->lineEditIp2->text()));
-	emit(addIp(3, ui->lineEditIp3->text()));
-	emit(addIp(4, ui->lineEditIp4->text()));
-	emit(addIp(5, ui->lineEditIp5->text()));
-	emit(addIp(6, ui->lineEditIp6->text()));
-	emit(addIp(7, ui->lineEditIp7->text()));
-	emit(addIp(8, ui->lineEditIp8->text()));
-	emit(addIp(9, ui->lineEditIp9->text()));
-	emit(addIp(10, ui->lineEditIp10->text()));
-	emit(addIp(11, ui->lineEditIp11->text()));
-	emit(addIp(12, ui->lineEditIp12->text()));
-
+	mSharedRes->setRobotIP(1, ui->lineEditIp1->text());
+	mSharedRes->setRobotIP(2, ui->lineEditIp2->text());
+	mSharedRes->setRobotIP(3, ui->lineEditIp3->text());
+	mSharedRes->setRobotIP(4, ui->lineEditIp4->text());
+	mSharedRes->setRobotIP(5, ui->lineEditIp5->text());
+	mSharedRes->setRobotIP(6, ui->lineEditIp6->text());
+	mSharedRes->setRobotIP(7, ui->lineEditIp7->text());
+	mSharedRes->setRobotIP(8, ui->lineEditIp8->text());
+	mSharedRes->setRobotIP(9, ui->lineEditIp9->text());
+	mSharedRes->setRobotIP(10, ui->lineEditIp10->text());
+	mSharedRes->setRobotIP(11, ui->lineEditIp11->text());
+	mSharedRes->setRobotIP(12, ui->lineEditIp12->text());
 	this->close();
-
-	qDebug("OK");
 }
 
 void IpDialog::on_buttonBox_rejected()
