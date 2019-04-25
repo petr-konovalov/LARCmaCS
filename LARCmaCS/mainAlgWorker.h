@@ -47,13 +47,13 @@ public slots:
 	void run_matlab();
 	void stop_matlab();
 	void run();
-	void EvalString(const QString & s);
+	void evalString(const QString & s);
 	void changeBallStatus(bool ballStatus);
 
 private:
 	void init();
 	bool mIsSimEnabledFlag = 0;
-	char m_buffer[256]; // matlab buffer
+	char mMatlabOutputBuffer[Constants::matlabOutputBufferSize];
 	MlData fmldata;
 	bool fmtlab;
 	bool mShutdownFlag;

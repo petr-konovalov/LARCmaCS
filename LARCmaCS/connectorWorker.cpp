@@ -17,7 +17,6 @@ void ConnectorWorker::init()
 	Settings settings;
 	mUdpSocket = new QUdpSocket();
 	mStatisticsTimer = new QTimer();
-	connect(mUdpSocket, SIGNAL(readyRead()), this, SLOT(udpProcessPendingDatagrams()));
 }
 
 const QString & ConnectorWorker::getGrSimIP()
