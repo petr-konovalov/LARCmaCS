@@ -21,11 +21,9 @@ Receiver::Receiver(SharedRes * sharedRes)
 
 	mWorker->moveToThread(&mThread);
 
-	// Correct finish
 	connect(mWorker, SIGNAL(finished()), mWorker, SLOT(deleteLater()));
 	connect(mWorker, SIGNAL(finished()), &mThread, SLOT(quit()));
 
-	// Correct start
 	connect(&mThread, SIGNAL(started()), mWorker, SLOT(start()));
 	connect(&mThread, SIGNAL(finished()), mWorker, SLOT(deleteLater()));
 
