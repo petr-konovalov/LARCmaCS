@@ -27,7 +27,6 @@ public:
 	explicit LARCmaCS(QWidget *parent = 0);
 	~LARCmaCS();
 
-	FieldScene *fieldscene;
 	QString * macsArray;
 
 protected:
@@ -35,6 +34,7 @@ protected:
 	SharedRes sharedRes;
 	SceneView sceneview;
 	Receiver receiver;
+	FieldScene * fieldscene;
 	MainAlg mainalg;
 	Connector connector;
 

@@ -19,15 +19,15 @@
 #include <math.h>
 #include <QTextStream>
 
-FieldScene::FieldScene(QObject *parent) :
-	QGraphicsScene(parent)
+FieldScene::FieldScene(SharedRes * sharedRes, QObject *parent)
+	: QGraphicsScene(parent)
+	, mSharedRes(sharedRes)
 {
-	connect(this, SIGNAL(reDrawScene()), this, SLOT(update()));
 	setBackgroundBrush (QBrush(QColor(0, 0x91, 0x19, 255), Qt::SolidPattern));
 	shutdownSoccerView = false;
 	ksize = 10;
-	LoadFieldGeometry();
-	ConstructField();
+	loadFieldGeometry();
+	constructField();
 	fieldBrush = new QBrush(Qt::NoBrush);
 	fieldLinePen = new QPen();
 	fieldLinePen->setColor(Qt::white);
@@ -35,18 +35,21 @@ FieldScene::FieldScene(QObject *parent) :
 	fieldLinePen->setJoinStyle(Qt::MiterJoin);
 	fieldItem = this->addPath(*field, *fieldLinePen, *fieldBrush);
 	fieldItem->setZValue(0);
+
 	mDrawTimer.setInterval(33);
 	connect(&mDrawTimer, SIGNAL(timeout()), this, SLOT(updateFrame()));
+	connect(this, SIGNAL(redrawScene()), this, SLOT(update()));
 	robotsInit();
+	mDrawTimer.start();
 }
 
 void FieldScene::robotsInit()
 {
 	for (int i = 0; i < Constants::maxRobotsInTeam; i++) {
-		AddRobot(new Robot(0, 0, 0, Robot::teamBlue, i, 0, 0));
+		addRobot(new Robot(0, 0, 0, Robot::teamBlue, i, 0, 0));
 	}
 	for (int i = 0; i < Constants::maxRobotsInTeam; i++) {
-		AddRobot(new Robot(0, 0, 0, Robot::teamYellow, i, 0, 0));
+		addRobot(new Robot(0, 0, 0, Robot::teamYellow, i, 0, 0));
 	}
 }
 
@@ -57,39 +60,29 @@ FieldScene::~FieldScene()
 
 void FieldScene::updateFrame()
 {
-	UpdateField(mSharedRes->getDetection(), mSharedRes->getGeometry());
+	updateField(mSharedRes->getDetection(), mSharedRes->getGeometry());
 }
 
-void FieldScene::start()
-{
-	mDrawTimer.start();
-}
-
-void FieldScene::setSharedRes(SharedRes * sharedRes)
-{
-	mSharedRes = sharedRes;
-}
-
-void FieldScene::AddRobot(Robot *robot)
+void FieldScene::addRobot(Robot *robot)
 {
 	robots.append(robot);
 	this->addItem(robot);
 }
 
 #ifndef OLD_SSL_PROTO
-void FieldScene::UpdateFieldGeometry(const QSharedPointer<SSL_WrapperPacket> & packet) {
-	LoadFieldGeometry(packet->geometry().field());
+void FieldScene::updateFieldGeometry(const QSharedPointer<SSL_WrapperPacket> & packet) {
+	loadFieldGeometry(packet->geometry().field());
 }
 #endif
 
-void FieldScene::UpdateField(const QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > & detection,
+void FieldScene::updateField(const QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > & detection,
 							 const QSharedPointer<SSL_WrapperPacket> & geometry)
 {
 	if (!geometry.isNull()) {
 #ifndef OLD_SSL_PROTO
-		UpdateFieldGeometry(geometry);
+		updateFieldGeometry(geometry);
 #else
-		UpdateGeometry(geometry->geometry().field());
+		updateGeometry(geometry->geometry().field());
 #endif
 	}
 	if (!detection.isNull()) {
@@ -97,16 +90,16 @@ void FieldScene::UpdateField(const QSharedPointer<QVector<QSharedPointer<SSL_Wra
 			if (!detection->at(i).isNull()) {
 				if (detection->at(i)->has_geometry()) {
 #ifndef OLD_SSL_PROTO
-					UpdateFieldGeometry(detection->at(i));
+					updateFieldGeometry(detection->at(i));
 #else
-					UpdateGeometry(detection->at(i)->geometry().field());
+					updateGeometry(detection->at(i)->geometry().field());
 #endif
 				}
-				UpdateRobots(detection->at(i));
+				updateRobots(detection->at(i));
 			}
 		}
 	}
-	emit reDrawScene();
+	emit redrawScene();
 }
 
 void FieldScene::updateRobot(const SSL_DetectionRobot & robot, int team, unsigned int camID)
@@ -141,7 +134,7 @@ void FieldScene::updateRobot(const SSL_DetectionRobot & robot, int team, unsigne
 	}
 
 	if (robotNum == Robot::robotNotFound) {
-		AddRobot(new Robot(x, y, orientation, team, id, camID, conf));
+		addRobot(new Robot(x, y, orientation, team, id, camID, conf));
 		robotNum = robots.size() - 1;
 	}
 
@@ -149,7 +142,7 @@ void FieldScene::updateRobot(const SSL_DetectionRobot & robot, int team, unsigne
 	robots[robotNum]->setRobotLabel(label);
 }
 
-void FieldScene::UpdateRobots(const QSharedPointer<SSL_WrapperPacket> & packet)
+void FieldScene::updateRobots(const QSharedPointer<SSL_WrapperPacket> & packet)
 {
 	mDetection.Clear();
 	mDetection = packet->detection();
@@ -212,28 +205,28 @@ void FieldScene::UpdateRobots(const QSharedPointer<SSL_WrapperPacket> & packet)
 	}
 }
 
-void FieldScene::UpdateGeometry(const SSL_GeometryFieldSize & fieldSize) {
-	LoadFieldGeometry(fieldSize);
+void FieldScene::updateGeometry(const SSL_GeometryFieldSize & fieldSize) {
+	loadFieldGeometry(fieldSize);
 }
 
 void FieldScene::ClearField()
 {
 	this->clear();
-	LoadFieldGeometry();
+	loadFieldGeometry();
 	field_arcs.clear();
 	field_lines.clear();
 	if (field != nullptr) {
 		delete field;
 	}
-	ConstructField();
+	constructField();
 	fieldItem = this->addPath(*field, *fieldLinePen, *fieldBrush);
 	robots.clear();
 	ballItems.clear();
 	robotsInit();
-	emit reDrawScene();
+	emit redrawScene();
 }
 
-void FieldScene::ConstructField()
+void FieldScene::constructField()
 {
 	field = new QPainterPath();
 
@@ -361,7 +354,7 @@ void FieldScene::ConstructField()
 #endif
 }
 
-void FieldScene::LoadFieldGeometry()
+void FieldScene::loadFieldGeometry()
 {
 #ifdef OLD_SSL_PROTO
 	this->line_width = FieldConstantsRoboCup2009::line_width;
@@ -391,7 +384,7 @@ void FieldScene::LoadFieldGeometry()
 #endif
 }
 
-void FieldScene::LoadFieldGeometry(const SSL_GeometryFieldSize & fieldSize)
+void FieldScene::loadFieldGeometry(const SSL_GeometryFieldSize & fieldSize)
 {
 #ifdef OLD_SSL_PROTO
 	this->line_width = fieldSize.line_width();
@@ -432,6 +425,6 @@ void FieldScene::LoadFieldGeometry(const SSL_GeometryFieldSize & fieldSize)
 	if (field != nullptr) {
 		delete field;
 	}
-	ConstructField();
+	constructField();
 	fieldItem = this->addPath(*field, *fieldLinePen, *fieldBrush);
 }

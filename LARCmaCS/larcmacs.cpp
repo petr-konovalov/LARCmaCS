@@ -7,25 +7,24 @@
 #include "settings.h"
 #include "grSimRobot.h"
 
-LARCmaCS::LARCmaCS(QWidget *parent) :
-	QWidget(parent),
-	ui(new Ui::LARCmaCS),
-	scalingRequested(true),
-	sizescene(10),
-	drawscale(1),
-	receiver(&sharedRes)
+LARCmaCS::LARCmaCS(QWidget *parent)
+	: QWidget(parent)
+	, ui(new Ui::LARCmaCS)
+	, scalingRequested(true)
+	, sizescene(10)
+	, drawscale(1)
+	, receiver(&sharedRes)
+	, robotReceiver(&sharedRes)
+	, fieldscene(new FieldScene(&sharedRes))
+	, mainalg(&sharedRes)
+	, connector(&sharedRes)
 {
 	ui->setupUi(this);
-	fieldscene = new FieldScene();
-	fieldscene->setSharedRes(&sharedRes);
 	ui->fieldView->setScene(fieldscene);
 	scaleView(8);
 	macsArray = new QString[Constants::maxNumOfRobots];
 
-	mainalg.init(&sharedRes);
 	sceneview.init();
-	connector.init(&sharedRes);
-	robotReceiver.init(&sharedRes);
 
 	//algorithm connect
 	connect(this, SIGNAL(MLEvalString(const QString &)), &mainalg, SLOT(EvalString(const QString &)));
@@ -43,7 +42,7 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 
 	//info GUI
 	connect(&mainalg, SIGNAL(UpdatePauseState(const QString &)), this, SLOT(UpdatePauseState(const QString &)));
-	connect(&mainalg, SIGNAL(StatusMessage(const QString &)), this, SLOT(UpdateStatusBar(const QString &)));
+	connect(&mainalg, SIGNAL(engineStatistics(const QString &)), this, SLOT(UpdateStatusBar(const QString &)));
 	connect(&receiver, SIGNAL(updateSSLFPS(const QString &)), this, SLOT(UpdateSSLFPS(const QString &)));
 
 	//remotecontrol
@@ -58,15 +57,7 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 	connect(this, SIGNAL(changeGrSimIP(const QString &)), &connector, SLOT(changeGrSimIP(const QString &)));
 	connect(this, SIGNAL(changeGrSimPort(unsigned short)), &connector, SLOT(changeGrSimPort(unsigned short)));
 
-	//ball inside check
-	connect(&robotReceiver, SIGNAL(ballStatus(bool)), &mainalg, SLOT(changeBallStatus(bool)));
-
 	sceneview.start();
-	receiver.start();
-	mainalg.start();
-	connector.start();
-	robotReceiver.start();
-	fieldscene->start();
 	UpdateStatusBar("Waiting SSL connection...");
 	UpdateSSLFPS("FPS = 0");
 }

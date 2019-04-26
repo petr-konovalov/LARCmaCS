@@ -1,22 +1,17 @@
 #include "connectorWorker.h"
 #include <QMap>
 
-void ConnectorWorker::start()
+ConnectorWorker::ConnectorWorker(SharedRes * sharedRes)
+	: mSharedRes(sharedRes)
+	, mUdpSocket(this)
+	, mStatisticsTimer(this)
 {
-	init();
+//	connect(&mUdpSocket, SIGNAL(readyRead()), this, SLOT(udpProcessPendingDatagrams()));
 }
 
 void ConnectorWorker::stop()
 {
-	mUdpSocket->close();
-	emit finished();
-}
-
-void ConnectorWorker::init()
-{
-	Settings settings;
-	mUdpSocket = new QUdpSocket();
-	mStatisticsTimer = new QTimer();
+	mUdpSocket.close();
 }
 
 const QString & ConnectorWorker::getGrSimIP()
@@ -29,14 +24,18 @@ unsigned short ConnectorWorker::getGrSimPort()
 	return grSimPort;
 }
 
+void ConnectorWorker::start()
+{
+}
+
 void ConnectorWorker::run(int N, const QByteArray & command)
 {
-	mUdpSocket->writeDatagram(command, QHostAddress(sharedRes->getRobotIP(N)), DefaultRobot::robotPort);
+	mUdpSocket.writeDatagram(command, QHostAddress(mSharedRes->getRobotIP(N)), DefaultRobot::robotPort);
 }
 
 void ConnectorWorker::runSim(const QByteArray & command)
 {
-	mUdpSocket->writeDatagram(command, QHostAddress(grSimIP), grSimPort);
+	mUdpSocket.writeDatagram(command, QHostAddress(grSimIP), grSimPort);
 }
 
 void ConnectorWorker::changeGrSimIP(const QString & IP)

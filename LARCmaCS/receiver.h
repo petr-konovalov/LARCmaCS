@@ -29,8 +29,6 @@ struct Receiver : public QObject
 public:
 	Receiver(SharedRes * sharedRes);
 	~Receiver();
-	void start();
-	void stop();
 
 public slots:
 	void updateDetection(const QSharedPointer<SSL_WrapperPacket> & detection, int camID);
@@ -38,11 +36,10 @@ public slots:
 	void setDisplayFlag();
 	void changeSimulatorMode(bool mode);
 
-	signals:
+signals:
 	void updateSimulatorMode(bool mode);
 	void clearField();
 	void updateSSLFPS(const QString & status);
-	void wstop();
 
 private:
 	QTimer mDisplayTimer;

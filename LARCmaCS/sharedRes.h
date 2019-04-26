@@ -15,23 +15,17 @@
 #pragma once
 
 #include "messages_robocup_ssl_wrapper.pb.h"
+
 #include <QVector>
 #include <QSharedPointer>
 #include <QMutex>
 #include <QMap>
 #include "constants.h"
 
-#include <QObject>
-
 class SharedRes : public QObject
 {
 	Q_OBJECT
-private:
-	QMutex mIPMutex;
-	QMap<int, QString> mIPRobotList;
-	QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > mDetection;
-	QSharedPointer<SSL_WrapperPacket> mGeometry;
-	QSharedPointer<QVector<bool> > mBallInsideData;
+
 public:
 	SharedRes();
 	QString getRobotIP(int id);
@@ -43,4 +37,11 @@ public:
 	const QSharedPointer<QVector<bool> > & getBallInsideData();
 	const QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > & getDetection();
 	const QSharedPointer<SSL_WrapperPacket> & getGeometry();
+
+private:
+	QMutex mIPMutex;
+	QMap<int, QString> mIPRobotList;
+	QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > mDetection;
+	QSharedPointer<SSL_WrapperPacket> mGeometry;
+	QSharedPointer<QVector<bool> > mBallInsideData;
 };

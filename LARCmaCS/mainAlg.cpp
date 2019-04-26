@@ -13,52 +13,35 @@
 // limitations under the License.
 
 #include "mainAlg.h"
-#include <iostream>
-#include <windows.h>
-#include <QtWidgets/QApplication>
 
-using namespace std;
-
-#include "message.h"
-
-MainAlg::MainAlg()
+MainAlg::MainAlg(SharedRes * sharedRes)
+	: mSharedRes(sharedRes)
+	, mWorker(new MainAlgWorker())
 {
-	mWorker = new MainAlgWorker();
-	mThread = new QThread();
-}
+	mWorker->moveToThread(&mThread);
+	connect(&mThread, SIGNAL(started()), mWorker, SLOT(start()));
+	connect(&mThread, SIGNAL(finished()), mWorker, SLOT(deleteLater()));
 
-MainAlg::~MainAlg()
-{
-	stop();
-}
-
-void MainAlg::init(SharedRes * sharedRes)
-{
-	mSharedRes = sharedRes;
-	mPacketSSL = QSharedPointer<PacketSSL>(new PacketSSL());
-	mWorker->moveToThread(mThread);
-	connect(mThread, SIGNAL(started()), mWorker, SLOT(start()));
-	connect(this, SIGNAL(wstop()), mWorker, SLOT(stop()));
-	connect(mWorker, SIGNAL(finished()), mWorker, SLOT(deleteLater()));
-	connect(mThread, SIGNAL(finished()), mThread, SLOT(deleteLater()));
-	connect(mWorker, SIGNAL(finished()), mThread, SLOT(quit()));
-	connect(this, SIGNAL(MLEvalString(const QString &)), mWorker, SLOT(evalString(const QString &)));
+	connect(this, SIGNAL(MLEvalString(const QString &)), mWorker, SLOT(EvalString(const QString &)));
 	connect(mWorker, SIGNAL(getDataFromReceiver()), this, SLOT(loadVisionData()), Qt::DirectConnection);
 	connect(mWorker, SIGNAL(newPauseState(const QString &)), this, SLOT(receivePauseState(const QString &)));
-	connect(mWorker, SIGNAL(sendStatistics(const QString &)), this, SLOT(sendStatistics(const QString &)));
+	connect(mWorker, SIGNAL(sendStatistics(const QString &)), this, SIGNAL(engineStatistics(const QString &)));
 	connect(mWorker, SIGNAL(sendToConnector(int, const QByteArray &)),
-			this, SLOT(moveToConnector(int, const QByteArray &)));
+			this, SIGNAL(sendToConnector(int, const QByteArray &)));
 	connect(mWorker, SIGNAL(sendToSimConnector(const QByteArray &)),
-			this, SLOT(moveToSimConnector(const QByteArray &)));
+			this, SIGNAL(sendToSimConnector(const QByteArray &)));
 	connect(this, SIGNAL(updateEnableSimFlag(bool)), mWorker, SLOT(setEnableSimFlag(bool)));
 	connect(this, SIGNAL(updateBallStatus(bool)), mWorker, SLOT(changeBallStatus(bool)));
 	connect(mWorker, SIGNAL(toMatlabConsole(const QString &)), this, SIGNAL(toMatlabConsole(const QString &)));
 	connect(this, SIGNAL(updateMatlabDebugFrequency(int)), mWorker, SLOT(setMatlabDebugFrequency(int)));
+
+	mThread.start();
 }
 
-void MainAlg::sendStatistics(const QString & statistics)
+MainAlg::~MainAlg()
 {
-	emit StatusMessage(statistics);
+	mThread.quit();
+	mThread.wait();
 }
 
 void MainAlg::changeBallStatus(bool status)
@@ -81,16 +64,6 @@ void MainAlg::EvalString(const QString & s)
 	emit MLEvalString(s);
 }
 
-void MainAlg::moveToConnector(int N, const QByteArray & command)
-{
-	emit sendToConnector(N, command);
-}
-
-void MainAlg::moveToSimConnector(const QByteArray & command)
-{
-	emit sendToSimConnector(command);
-}
-
 void MainAlg::loadVisionData()
 {
 	QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > detectionPackets = mSharedRes->getDetection();
@@ -98,6 +71,8 @@ void MainAlg::loadVisionData()
 	SSL_DetectionBall ball;
 
 	QSharedPointer<SSL_WrapperPacket> packet;
+
+	QSharedPointer<PacketSSL> mPacketSSL = QSharedPointer<PacketSSL>(new PacketSSL());
 	for (int i = 0; i < Constants::maxRobotsInTeam; i++) {
 			mPacketSSL->robots_blue[i] = 0;
 			mPacketSSL->robots_yellow[i] = 0;
@@ -168,14 +143,4 @@ void MainAlg::loadVisionData()
 void MainAlg::receivePauseState(const QString & state)
 {
 	emit UpdatePauseState(state);
-}
-
-void MainAlg::start()
-{
-	mThread->start();
-}
-
-void MainAlg::stop()
-{
-	emit wstop();
 }
