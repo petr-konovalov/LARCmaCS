@@ -17,34 +17,30 @@
 #include "robotReceiverWorker.h"
 #include "message.h"
 
-RobotReceiverWorker::RobotReceiverWorker(): mGroupAddress(QStringLiteral("192.168.1.255")){}
+RobotReceiverWorker::RobotReceiverWorker()
+	: mUdpSocket(this)
+	, mGroupAddress(QStringLiteral("192.168.1.255"))
+{}
+
+RobotReceiverWorker::~RobotReceiverWorker()
+{
+	mUdpSocket.close();
+}
 
 void RobotReceiverWorker::start()
 {
-	mUdpSocket = new QUdpSocket();
-	mUdpSocket->bind(QHostAddress::AnyIPv4, 57000, QUdpSocket::ShareAddress);
-	mUdpSocket->joinMulticastGroup(mGroupAddress);
-	connect(mUdpSocket, SIGNAL(readyRead()), this, SLOT(processPendingDatagrams()));
-}
-
-void RobotReceiverWorker::stop()
-{
-	close();
-	emit finished();
-}
-
-void RobotReceiverWorker::close()
-{
-	mUdpSocket->close();
+	mUdpSocket.bind(QHostAddress::AnyIPv4, 57000, QUdpSocket::ShareAddress);
+	mUdpSocket.joinMulticastGroup(mGroupAddress);
+	connect(&mUdpSocket, SIGNAL(readyRead()), this, SLOT(processPendingDatagrams()));
 }
 
 void RobotReceiverWorker::processPendingDatagrams()
 {
 	QByteArray datagram;
 
-	while (mUdpSocket->hasPendingDatagrams()) {
-		datagram.resize(static_cast<int>(mUdpSocket->pendingDatagramSize()));
-		mUdpSocket->readDatagram(datagram.data(), datagram.size());
+	while (mUdpSocket.hasPendingDatagrams()) {
+		datagram.resize(static_cast<int>(mUdpSocket.pendingDatagramSize()));
+		mUdpSocket.readDatagram(datagram.data(), datagram.size());
 		if (datagram.size() != 50) {
 			continue;
 		}

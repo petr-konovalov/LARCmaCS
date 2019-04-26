@@ -23,20 +23,17 @@ class RobotReceiverWorker : public QObject
 
 public:
 	RobotReceiverWorker();
-	void close();
+	~RobotReceiverWorker();
 
 signals:
 	void setBallInsideData(const QString & ip, bool isBallInside);
-	void finished();
 
 private slots:
 	void start();
-	void stop();
 	void processPendingDatagrams();
 
 private:
-	QUdpSocket * mUdpSocket;
+	QUdpSocket mUdpSocket;
 	QHostAddress mGroupAddress;
-
 	QHash<char, char> ballStatuses;
 };
