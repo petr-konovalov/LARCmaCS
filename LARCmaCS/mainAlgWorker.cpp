@@ -145,7 +145,7 @@ void MainAlgWorker::init(){
 	MlData mtl(rcconfig);
 	fmldata = mtl;
 
-	run_matlab();
+	runMatlab();
 }
 
 bool MainAlgWorker::getIsSimEnabledFlag()
@@ -319,7 +319,7 @@ void MainAlgWorker::Pause()
 	engEvalString(fmldata.ep, "PAUSE();");
 }
 
-void MainAlgWorker::run_matlab()
+void MainAlgWorker::runMatlab()
 {
 	if (!(fmldata.ep = engOpen(NULL))) {
 		cerr << "Can't open Matlab Engine" << endl;

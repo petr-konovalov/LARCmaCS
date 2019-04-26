@@ -16,13 +16,13 @@ LARCmaCS::LARCmaCS(QWidget *parent)
 	, receiver(&sharedRes)
 	, robotReceiver(&sharedRes)
 	, fieldscene(new FieldScene(&sharedRes))
+	, mainalg(&sharedRes)
 {
 	ui->setupUi(this);
 	ui->fieldView->setScene(fieldscene);
 	scaleView(8);
 	macsArray = new QString[Constants::maxNumOfRobots];
 
-	mainalg.init(&sharedRes);
 	sceneview.init();
 	connector.init(&sharedRes);
 
@@ -55,7 +55,6 @@ LARCmaCS::LARCmaCS(QWidget *parent)
 	connect(this, SIGNAL(changeGrSimPort(unsigned short)), &connector, SLOT(changeGrSimPort(unsigned short)));
 
 	sceneview.start();
-	mainalg.start();
 	connector.start();
 	UpdateStatusBar("Waiting SSL connection...");
 	UpdateSSLFPS("FPS = 0");

@@ -44,7 +44,7 @@ public slots:
 	void setEnableSimFlag(bool flag);
 	void processPacket(const QSharedPointer<PacketSSL> & packetssl);
 	void Pause();
-	void run_matlab();
+	void runMatlab();
 	void stop_matlab();
 	void run();
 	void EvalString(const QString & s);

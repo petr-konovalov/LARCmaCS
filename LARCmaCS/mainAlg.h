@@ -14,36 +14,23 @@
 
 #pragma once
 
-#include <QObject>
 #include <QThread>
-#include <QDebug>
-#include <QSharedPointer>
-#include <QFile>
-#include <iostream>
 
-#include "packetSSL.h"
-#include "mlData.h"
-#include "client.h"
 #include "mainAlgWorker.h"
 #include "sharedRes.h"
+
 #include "messages_robocup_ssl_wrapper.pb.h"
 
 using namespace std;
 
-struct MainAlg : public QObject
+class MainAlg : public QObject
 {
 	Q_OBJECT
-private:
-	QSharedPointer<PacketSSL> mPacketSSL;
-	SharedRes * mSharedRes;
-	SSL_DetectionFrame mDetection;
-	MainAlgWorker * mWorker;
-	QThread * mThread;
+
 public:
-	bool getIsSimEnabledFlag();
-	explicit MainAlg();
+	explicit MainAlg(SharedRes * sharedRes);
 	~MainAlg();
-	void init(SharedRes * sharedRes);
+	bool getIsSimEnabledFlag();
 	void start();
 	void stop();
 
@@ -66,4 +53,10 @@ signals:
 	void StatusMessage(const QString & status);
 	void UpdatePauseState(const QString & state);
 	void wstop();
+
+private:
+	SharedRes * mSharedRes;
+	SSL_DetectionFrame mDetection;
+	MainAlgWorker * mWorker;
+	QThread mThread;
 };
