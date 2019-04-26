@@ -13,7 +13,8 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 	scalingRequested(true),
 	sizescene(10),
 	drawscale(1),
-	receiver(&sharedRes)
+	receiver(&sharedRes),
+	robotReceiver(&sharedRes)
 {
 	ui->setupUi(this);
 	fieldscene = new FieldScene();
@@ -25,7 +26,6 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 	mainalg.init(&sharedRes);
 	sceneview.init();
 	connector.init(&sharedRes);
-	robotReceiver.init(&sharedRes);
 
 	//algorithm connect
 	connect(this, SIGNAL(MLEvalString(const QString &)), &mainalg, SLOT(EvalString(const QString &)));
@@ -55,14 +55,9 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 	connect(this, SIGNAL(changeGrSimIP(const QString &)), &connector, SLOT(changeGrSimIP(const QString &)));
 	connect(this, SIGNAL(changeGrSimPort(unsigned short)), &connector, SLOT(changeGrSimPort(unsigned short)));
 
-	//ball inside check
-	connect(&robotReceiver, SIGNAL(ballStatus(bool)), &mainalg, SLOT(changeBallStatus(bool)));
-
 	sceneview.start();
-	receiver.start();
 	mainalg.start();
 	connector.start();
-	robotReceiver.start();
 	fieldscene->start();
 	UpdateStatusBar("Waiting SSL connection...");
 	UpdateSSLFPS("FPS = 0");

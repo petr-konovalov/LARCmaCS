@@ -38,7 +38,6 @@ signals:
 	void clientOpen(unsigned short port);
 	void clientClose();
 	void clearField();
-	void finished();
 	void updateDetection(const QSharedPointer<SSL_WrapperPacket> & detection, int camID);
 	void updateGeometry(const QSharedPointer<SSL_WrapperPacket> & geometry);
 	void updateSSLFPS(const QString & message);

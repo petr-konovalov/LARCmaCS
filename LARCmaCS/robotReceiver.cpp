@@ -14,37 +14,28 @@
 
 #include "robotReceiver.h"
 
-RobotReceiver::RobotReceiver(){}
+RobotReceiver::RobotReceiver(SharedRes * sharedRes)
+	: mSharedRes(sharedRes)
+{
+	mWorker = new RobotReceiverWorker();
+	mWorker->moveToThread(&mThread);
+
+	connect(&mThread, SIGNAL(started()), mWorker, SLOT(start()));
+	connect(&mThread, SIGNAL(finished()), mWorker, SLOT(deleteLater()));
+
+	connect(mWorker, SIGNAL(setBallInsideData(const QString &, bool)),
+			this, SLOT(setBallInsideData(const QString &, bool)));
+
+	mThread.start();
+}
 
 RobotReceiver::~RobotReceiver()
 {
-	stop();
-}
-
-void RobotReceiver::stop()
-{
-	emit wstop();
-}
-
-void RobotReceiver::start()
-{
-	mThread.start();
+	mThread.quit();
+	mThread.wait();
 }
 
 void RobotReceiver::setBallInsideData(const QString & ip, bool isBallInside)
 {
 	mSharedRes->setBallInsideData(ip, isBallInside);
-}
-
-void RobotReceiver::init(SharedRes * sharedRes)
-{
-	mSharedRes = sharedRes;
-	mWorker.moveToThread(&mThread);
-	connect(&mThread, SIGNAL(started()), &mWorker, SLOT(start()));
-	connect(this, SIGNAL(wstop()), &mWorker, SLOT(stop()));
-	connect(&mWorker, SIGNAL(finished()), &mThread, SLOT(quit()));
-	connect(&mThread, SIGNAL(finished()), &mThread, SLOT(deleteLater()));
-	connect(&mWorker, SIGNAL(finished()), &mWorker, SLOT(deleteLater()));
-	connect(&mWorker, SIGNAL(setBallInsideData(const QString &, bool)),
-			this, SLOT(setBallInsideData(const QString &, bool)));
 }

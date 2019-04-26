@@ -14,8 +14,8 @@
 
 #pragma once
 
-#include <QObject>
 #include <QThread>
+
 #include "sharedRes.h"
 #include "robotReceiverWorker.h"
 
@@ -23,20 +23,16 @@ class RobotReceiver : public QObject
 {
 	Q_OBJECT
 
-private:
-	QThread mThread;
-	RobotReceiverWorker mWorker;
-	SharedRes * mSharedRes;
 public:
-	RobotReceiver();
+	RobotReceiver(SharedRes * sharedRes);
 	~RobotReceiver();
 	void start();
-	void stop();
-	void init(SharedRes * sharedRes);
 
 private slots:
 	void setBallInsideData(const QString & ip, bool isBallInside);
 
-signals:
-	void wstop();
+private:
+	QThread mThread;
+	RobotReceiverWorker * mWorker;
+	SharedRes * mSharedRes;
 };
