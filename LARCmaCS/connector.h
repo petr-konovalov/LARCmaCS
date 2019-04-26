@@ -11,19 +11,19 @@
 class Connector : public QObject
 {
 	Q_OBJECT
-private:
-	ConnectorWorker * mWorker;
-	SharedRes * mSharedRes;
-	QThread * mThread;
+
 public:
-	explicit Connector();
+	explicit Connector(SharedRes * sharedRes);
 	~Connector();
 	static const unsigned short robotPort = 10000;
-	void init(SharedRes * sharedRes);
-	void start();
-	void stop();
 	const QString & getGrSimIP();
 	unsigned short getGrSimPort();
+
+public slots:
+	void changeGrSimIP(const QString & IP);
+	void changeGrSimPort(unsigned short port);
+	void run(int N, const QByteArray & command);
+	void runSim(const QByteArray & command);
 
 signals:
 	void wstop();
@@ -32,9 +32,8 @@ signals:
 	void setGrSimIP(const QString & IP);
 	void setGrSimPort(unsigned short port);
 
-public slots:
-	void changeGrSimIP(const QString & IP);
-	void changeGrSimPort(unsigned short port);
-	void run(int N, const QByteArray & command);
-	void runSim(const QByteArray & command);
+private:
+	SharedRes * mSharedRes;
+	ConnectorWorker * mWorker;
+	QThread mThread;
 };
