@@ -14,15 +14,14 @@
 
 #include "receiver.h"
 
+#include <QDebug>
+
 Receiver::Receiver(SharedRes * sharedRes)
 {
 	mWorker = new ReceiverWorker();
 	mSharedRes = sharedRes;
 
 	mWorker->moveToThread(&mThread);
-
-	connect(mWorker, SIGNAL(finished()), mWorker, SLOT(deleteLater()));
-	connect(mWorker, SIGNAL(finished()), &mThread, SLOT(quit()));
 
 	connect(&mThread, SIGNAL(started()), mWorker, SLOT(start()));
 	connect(&mThread, SIGNAL(finished()), mWorker, SLOT(deleteLater()));
@@ -33,6 +32,8 @@ Receiver::Receiver(SharedRes * sharedRes)
 				, this, SLOT(updateDetection(const QSharedPointer<SSL_WrapperPacket> &, int)));
 	connect(mWorker, SIGNAL(updateGeometry(const QSharedPointer<SSL_WrapperPacket> &))
 				, this, SLOT(updateGeometry(const QSharedPointer<SSL_WrapperPacket> &)));
+
+	mThread.start();
 }
 
 Receiver::~Receiver()
@@ -59,14 +60,4 @@ void Receiver::setDisplayFlag()
 void Receiver::changeSimulatorMode(bool mode)
 {
 	emit updateSimulatorMode(mode);
-}
-
-void Receiver::start()
-{
-	mThread.start();
-}
-
-void Receiver::stop()
-{
-	emit wstop();
 }
