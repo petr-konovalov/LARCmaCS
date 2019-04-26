@@ -14,8 +14,6 @@
 
 #include "receiver.h"
 
-#include <QDebug>
-
 Receiver::Receiver(SharedRes * sharedRes)
 {
 	mWorker = new ReceiverWorker();
