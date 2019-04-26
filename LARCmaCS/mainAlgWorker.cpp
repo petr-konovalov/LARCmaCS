@@ -72,6 +72,7 @@ int initConfig(RCConfig *config){
 }
 
 MainAlgWorker::MainAlgWorker()
+	: mStatisticsTimer(this)
 {
 	mPacketSSL = QSharedPointer<PacketSSL>();
 	QFile addrFile("gamepads.txt");
@@ -89,18 +90,17 @@ MainAlgWorker::~MainAlgWorker(){}
 
 void MainAlgWorker::start()
 {
-	mStatisticsTimer = QSharedPointer<QTimer>(new QTimer());
 	mShutdownFlag = false;
 	init();
-	mStatisticsTimer->setInterval(1000);
-	connect(mStatisticsTimer.data(), SIGNAL(timeout()), this, SLOT(formStatistics()));
-	mStatisticsTimer->start();
+	mStatisticsTimer.setInterval(1000);
+	connect(&mStatisticsTimer, SIGNAL(timeout()), this, SLOT(formStatistics()));
+	mStatisticsTimer.start();
 	run();
 }
 
 void MainAlgWorker::stop()
 {
-	mStatisticsTimer->stop();
+	mStatisticsTimer.stop();
 	mShutdownFlag = true;
 }
 
@@ -145,7 +145,7 @@ void MainAlgWorker::init(){
 	MlData mtl(rcconfig);
 	fmldata = mtl;
 
-	run_matlab();
+	runMatlab();
 }
 
 bool MainAlgWorker::getIsSimEnabledFlag()
@@ -319,7 +319,7 @@ void MainAlgWorker::Pause()
 	engEvalString(fmldata.ep, "PAUSE();");
 }
 
-void MainAlgWorker::run_matlab()
+void MainAlgWorker::runMatlab()
 {
 	if (!(fmldata.ep = engOpen(NULL))) {
 		cerr << "Can't open Matlab Engine" << endl;

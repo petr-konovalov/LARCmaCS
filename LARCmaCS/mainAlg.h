@@ -14,48 +14,30 @@
 
 #pragma once
 
-#include <QObject>
 #include <QThread>
-#include <QDebug>
-#include <QSharedPointer>
-#include <QFile>
-#include <iostream>
 
-#include "packetSSL.h"
-#include "mlData.h"
-#include "client.h"
 #include "mainAlgWorker.h"
 #include "sharedRes.h"
+
 #include "messages_robocup_ssl_wrapper.pb.h"
 
 using namespace std;
 
-struct MainAlg : public QObject
+class MainAlg : public QObject
 {
 	Q_OBJECT
-private:
-	QSharedPointer<PacketSSL> mPacketSSL;
-	SharedRes * mSharedRes;
-	SSL_DetectionFrame mDetection;
-	MainAlgWorker * mWorker;
-	QThread * mThread;
+
 public:
-	bool getIsSimEnabledFlag();
-	explicit MainAlg();
+	explicit MainAlg(SharedRes * sharedRes);
 	~MainAlg();
-	void init(SharedRes * sharedRes);
-	void start();
-	void stop();
+	bool getIsSimEnabledFlag();
 
 public slots:
 	void EvalString(const QString & s);
-	void moveToConnector(int N, const QByteArray & command);
-	void moveToSimConnector(const QByteArray & command);
 	void receivePauseState(const QString & state);
 	void setEnableSimFlag(bool flag);
 	void changeBallStatus(bool status);
 	void loadVisionData();
-	void sendStatistics(const QString & statistics);
 
 signals:
 	void updateBallStatus(bool status);
@@ -63,7 +45,12 @@ signals:
 	void sendToConnector(int N, const QByteArray & command);
 	void sendToSimConnector(const QByteArray & command);
 	void updateEnableSimFlag(bool flag);
-	void StatusMessage(const QString & status);
+	void engineStatistics(const QString & status);
 	void UpdatePauseState(const QString & state);
-	void wstop();
+
+private:
+	SharedRes * mSharedRes;
+	SSL_DetectionFrame mDetection;
+	MainAlgWorker * mWorker;
+	QThread mThread;
 };
