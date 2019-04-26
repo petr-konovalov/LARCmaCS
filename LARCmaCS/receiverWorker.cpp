@@ -27,7 +27,6 @@ ReceiverWorker::ReceiverWorker()
 	, mStatisticsTimer(this)
 	, mGroupAddress(visionIP)
 {
-	mInputPacket = QSharedPointer<SSL_WrapperPacket>(new SSL_WrapperPacket());
 	mStatisticsTimer.setInterval(1000);
 
 	connect(&mStatisticsTimer, SIGNAL(timeout()), this, SLOT(formStatistics()));
@@ -80,16 +79,16 @@ void ReceiverWorker::processPendingDatagrams()
 		QByteArray datagram;
 		datagram.resize(datagramSize);
 		mSocket.readDatagram(datagram.data(), datagram.size());
-		mInputPacket->ParseFromArray(datagram.data(), datagramSize);
-		if (mInputPacket->has_detection()) {
-			unsigned int camID = mInputPacket->detection().camera_id();
-			emit updateDetection(mInputPacket, camID);
+		QSharedPointer<SSL_WrapperPacket> packet = QSharedPointer<SSL_WrapperPacket>(new SSL_WrapperPacket());
+		packet->ParseFromArray(datagram.data(), datagramSize);
+		if (packet->has_detection()) {
+			unsigned int camID = packet->detection().camera_id();
+			emit updateDetection(packet, camID);
 		} else {
-			emit updateGeometry(mInputPacket);
+			emit updateGeometry(packet);
 		}
 		mTotalPacketsNum++;
 		mPacketsPerSecond++;
-		mInputPacket = QSharedPointer<SSL_WrapperPacket>(new SSL_WrapperPacket());
 	}
 }
 
