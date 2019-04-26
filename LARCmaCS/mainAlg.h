@@ -34,8 +34,6 @@ public:
 
 public slots:
 	void EvalString(const QString & s);
-	void moveToConnector(int N, const QByteArray & command);
-	void moveToSimConnector(const QByteArray & command);
 	void receivePauseState(const QString & state);
 	void setEnableSimFlag(bool flag);
 	void changeBallStatus(bool status);

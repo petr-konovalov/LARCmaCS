@@ -27,9 +27,9 @@ MainAlg::MainAlg(SharedRes * sharedRes)
 	connect(mWorker, SIGNAL(newPauseState(const QString &)), this, SLOT(receivePauseState(const QString &)));
 	connect(mWorker, SIGNAL(sendStatistics(const QString &)), this, SIGNAL(engineStatistics(const QString &)));
 	connect(mWorker, SIGNAL(sendToConnector(int, const QByteArray &)),
-			this, SLOT(moveToConnector(int, const QByteArray &)));
+			this, SIGNAL(sendToConnector(int, const QByteArray &)));
 	connect(mWorker, SIGNAL(sendToSimConnector(const QByteArray &)),
-			this, SLOT(moveToSimConnector(const QByteArray &)));
+			this, SIGNAL(sendToSimConnector(const QByteArray &)));
 	connect(this, SIGNAL(updateEnableSimFlag(bool)), mWorker, SLOT(setEnableSimFlag(bool)));
 	connect(this, SIGNAL(updateBallStatus(bool)), mWorker, SLOT(changeBallStatus(bool)));
 
@@ -60,16 +60,6 @@ void MainAlg::setEnableSimFlag(bool flag)
 void MainAlg::EvalString(const QString & s)
 {
 	emit MLEvalString(s);
-}
-
-void MainAlg::moveToConnector(int N, const QByteArray & command)
-{
-	emit sendToConnector(N, command);
-}
-
-void MainAlg::moveToSimConnector(const QByteArray & command)
-{
-	emit sendToSimConnector(command);
 }
 
 void MainAlg::loadVisionData()
