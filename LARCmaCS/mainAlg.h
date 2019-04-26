@@ -32,7 +32,6 @@ public:
 	~MainAlg();
 	bool getIsSimEnabledFlag();
 	void start();
-	void stop();
 
 public slots:
 	void EvalString(const QString & s);
@@ -42,7 +41,6 @@ public slots:
 	void setEnableSimFlag(bool flag);
 	void changeBallStatus(bool status);
 	void loadVisionData();
-	void sendStatistics(const QString & statistics);
 
 signals:
 	void updateBallStatus(bool status);
@@ -50,7 +48,7 @@ signals:
 	void sendToConnector(int N, const QByteArray & command);
 	void sendToSimConnector(const QByteArray & command);
 	void updateEnableSimFlag(bool flag);
-	void StatusMessage(const QString & status);
+	void engineStatistics(const QString & status);
 	void UpdatePauseState(const QString & state);
 	void wstop();
 

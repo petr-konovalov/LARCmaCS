@@ -39,7 +39,7 @@ LARCmaCS::LARCmaCS(QWidget *parent)
 
 	//info GUI
 	connect(&mainalg, SIGNAL(UpdatePauseState(const QString &)), this, SLOT(UpdatePauseState(const QString &)));
-	connect(&mainalg, SIGNAL(StatusMessage(const QString &)), this, SLOT(UpdateStatusBar(const QString &)));
+	connect(&mainalg, SIGNAL(engineStatistics(const QString &)), this, SLOT(UpdateStatusBar(const QString &)));
 	connect(&receiver, SIGNAL(updateSSLFPS(const QString &)), this, SLOT(UpdateSSLFPS(const QString &)));
 
 	//remotecontrol
