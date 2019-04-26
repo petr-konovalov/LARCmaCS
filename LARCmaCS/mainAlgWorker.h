@@ -13,14 +13,6 @@ using namespace std;
 class MainAlgWorker : public QObject
 {
 	Q_OBJECT
-private:
-	Client client;
-	bool mIsPause;
-	int mTotalPacketsNum = 0;
-	int mPacketsPerSecond = 0;
-	QSharedPointer<QTimer> mStatisticsTimer;
-	QSharedPointer<PacketSSL> mPacketSSL;
-	double mIsBallInside;
 
 public:
 	MainAlgWorker();
@@ -58,4 +50,11 @@ private:
 	bool fmtlab;
 	bool mShutdownFlag;
 	bool pause;
+	Client client;
+	bool mIsPause;
+	int mTotalPacketsNum = 0;
+	int mPacketsPerSecond = 0;
+	QTimer mStatisticsTimer;
+	QSharedPointer<PacketSSL> mPacketSSL;
+	double mIsBallInside;
 };

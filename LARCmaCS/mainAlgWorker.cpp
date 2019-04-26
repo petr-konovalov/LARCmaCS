@@ -72,6 +72,7 @@ int initConfig(RCConfig *config){
 }
 
 MainAlgWorker::MainAlgWorker()
+	: mStatisticsTimer(this)
 {
 	mPacketSSL = QSharedPointer<PacketSSL>();
 	QFile addrFile("gamepads.txt");
@@ -89,18 +90,17 @@ MainAlgWorker::~MainAlgWorker(){}
 
 void MainAlgWorker::start()
 {
-	mStatisticsTimer = QSharedPointer<QTimer>(new QTimer());
 	mShutdownFlag = false;
 	init();
-	mStatisticsTimer->setInterval(1000);
-	connect(mStatisticsTimer.data(), SIGNAL(timeout()), this, SLOT(formStatistics()));
-	mStatisticsTimer->start();
+	mStatisticsTimer.setInterval(1000);
+	connect(&mStatisticsTimer, SIGNAL(timeout()), this, SLOT(formStatistics()));
+	mStatisticsTimer.start();
 	run();
 }
 
 void MainAlgWorker::stop()
 {
-	mStatisticsTimer->stop();
+	mStatisticsTimer.stop();
 	mShutdownFlag = true;
 }
 

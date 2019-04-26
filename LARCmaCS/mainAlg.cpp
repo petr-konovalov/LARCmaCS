@@ -152,4 +152,3 @@ void MainAlg::receivePauseState(const QString & state)
 {
 	emit UpdatePauseState(state);
 }
-

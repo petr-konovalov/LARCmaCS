@@ -31,7 +31,6 @@ public:
 	explicit MainAlg(SharedRes * sharedRes);
 	~MainAlg();
 	bool getIsSimEnabledFlag();
-	void start();
 
 public slots:
 	void EvalString(const QString & s);
@@ -50,7 +49,6 @@ signals:
 	void updateEnableSimFlag(bool flag);
 	void engineStatistics(const QString & status);
 	void UpdatePauseState(const QString & state);
-	void wstop();
 
 private:
 	SharedRes * mSharedRes;
