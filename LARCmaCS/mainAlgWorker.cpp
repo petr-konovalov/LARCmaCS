@@ -104,6 +104,10 @@ void MainAlgWorker::stop()
 	mShutdownFlag = true;
 }
 
+void MainAlgWorker::setMatlabDebugFrequency(int frequency) {
+	mFrequency = frequency;
+}
+
 void MainAlgWorker::formStatistics()
 {
 	QString tmp;
@@ -350,7 +354,7 @@ void MainAlgWorker::evalString(const QString & s)
 {
 	engEvalString(fmldata.ep, s.toUtf8().data());
 	QString tmp = QString(mMatlabOutputBuffer);
-	if (!tmp.contains("\nispause =") && tmp != "") {
+	if (!tmp.contains("\nispause =") && tmp != "" && (mTotalPacketsNum % mFrequency == 0)) {
 		emit toMatlabConsole(tmp);
 	}
 }

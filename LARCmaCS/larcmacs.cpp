@@ -29,6 +29,7 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 
 	//algorithm connect
 	connect(this, SIGNAL(MLEvalString(const QString &)), &mainalg, SLOT(EvalString(const QString &)));
+	connect(this, SIGNAL(updateMatlabDebugFrequency(int)), &mainalg, SIGNAL(updateMatlabDebugFrequency(int)));
 	//connect(this, SIGNAL(MatlabPause()), &mainalg.worker, SLOT(Pause()));
 
 	//send command to robots
@@ -156,6 +157,15 @@ void LARCmaCS::on_pushButton_SetMLdir_clicked()
 		QString s = "cd " + dir;
 		qDebug() << "New Matlab directory = " << s;
 		emit MLEvalString(s);
+	}
+}
+
+void LARCmaCS::on_matlabOutputFrequencyLineEdit_textEdited(const QString & text)
+{
+	bool isInt = false;
+	int frequency = text.split(" ")[0].toInt(&isInt);
+	if (isInt) {
+		emit updateMatlabDebugFrequency(frequency);
 	}
 }
 

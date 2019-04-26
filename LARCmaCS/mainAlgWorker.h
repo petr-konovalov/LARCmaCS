@@ -39,6 +39,7 @@ signals:
 
 public slots:
 	void start();
+	void setMatlabDebugFrequency(int frequency);
 	void formStatistics();
 	void updatePauseState();
 	void stop();
@@ -53,10 +54,11 @@ public slots:
 
 private:
 	void init();
-	bool mIsSimEnabledFlag = 0;
+	bool mIsSimEnabledFlag = false;
 	char mMatlabOutputBuffer[Constants::matlabOutputBufferSize];
 	MlData fmldata;
 	bool fmtlab;
+	int mFrequency = 1;
 	bool mShutdownFlag;
 	bool pause;
 };
