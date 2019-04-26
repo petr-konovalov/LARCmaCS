@@ -22,39 +22,36 @@
 #include <QTimer>
 #include "sharedRes.h"
 
-using namespace std;
 
 class FieldScene : public QGraphicsScene
 {
 	Q_OBJECT
 public:
-	explicit FieldScene(QObject *parent = 0);
+	FieldScene(SharedRes * sharedRes, QObject *parent = 0);
 	~FieldScene();
-	void setSharedRes(SharedRes * sharedRes);
-	void start();
 
 public slots:
-	void UpdateField(const QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > & detection,
+	void updateField(const QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > & detection,
 					 const QSharedPointer<SSL_WrapperPacket> & geometry);
 	void ClearField();
 	void updateFrame();
 
 signals:
-	void reDrawScene();
+	void redrawScene();
 
 private:
+	SharedRes * mSharedRes;
 	SSL_DetectionFrame mDetection;
 	QTimer mDrawTimer;
-	SharedRes * mSharedRes;
 #ifndef OLD_SSL_PROTO
-	void UpdateFieldGeometry(const QSharedPointer<SSL_WrapperPacket> & packet);
+	void updateFieldGeometry(const QSharedPointer<SSL_WrapperPacket> & packet);
 #endif
-	void UpdateGeometry(const SSL_GeometryFieldSize & fieldSize);
+	void updateGeometry(const SSL_GeometryFieldSize & fieldSize);
 	void robotsInit();
-	void LoadFieldGeometry();
-	void LoadFieldGeometry(const SSL_GeometryFieldSize & fieldSize);
-	void AddRobot(Robot * robot);
-	void UpdateRobots(const QSharedPointer<SSL_WrapperPacket> & packet);
+	void loadFieldGeometry();
+	void loadFieldGeometry(const SSL_GeometryFieldSize & fieldSize);
+	void addRobot(Robot * robot);
+	void updateRobots(const QSharedPointer<SSL_WrapperPacket> & packet);
 	//Robots
 	QVector<Robot*> robots;
 	//balls
@@ -68,7 +65,7 @@ private:
 	bool shutdownSoccerView;
 
 	void updateRobot(const SSL_DetectionRobot & robot, int team, unsigned int camID);
-	void ConstructField();
+	void constructField();
 
 	//gain size
 	double ksize;

@@ -7,18 +7,17 @@
 #include "settings.h"
 #include "grSimRobot.h"
 
-LARCmaCS::LARCmaCS(QWidget *parent) :
-	QWidget(parent),
-	ui(new Ui::LARCmaCS),
-	scalingRequested(true),
-	sizescene(10),
-	drawscale(1),
-	receiver(&sharedRes),
-	robotReceiver(&sharedRes)
+LARCmaCS::LARCmaCS(QWidget *parent)
+	: QWidget(parent)
+	, ui(new Ui::LARCmaCS)
+	, scalingRequested(true)
+	, sizescene(10)
+	, drawscale(1)
+	, receiver(&sharedRes)
+	, robotReceiver(&sharedRes)
+	, fieldscene(new FieldScene(&sharedRes))
 {
 	ui->setupUi(this);
-	fieldscene = new FieldScene();
-	fieldscene->setSharedRes(&sharedRes);
 	ui->fieldView->setScene(fieldscene);
 	scaleView(8);
 	macsArray = new QString[Constants::maxNumOfRobots];
@@ -58,7 +57,6 @@ LARCmaCS::LARCmaCS(QWidget *parent) :
 	sceneview.start();
 	mainalg.start();
 	connector.start();
-	fieldscene->start();
 	UpdateStatusBar("Waiting SSL connection...");
 	UpdateSSLFPS("FPS = 0");
 }
