@@ -4,6 +4,7 @@
 #include "packetSSL.h"
 #include "message.h"
 #include <QFileDialog>
+#include <QMenu>
 #include "settings.h"
 #include "grSimRobot.h"
 
@@ -30,6 +31,9 @@ LARCmaCS::LARCmaCS(QWidget *parent)
 	connect(this, SIGNAL(MLEvalString(const QString &)), &mainalg, SLOT(EvalString(const QString &)));
 	connect(this, SIGNAL(updateMatlabDebugFrequency(int)), &mainalg, SIGNAL(updateMatlabDebugFrequency(int)));
 	//connect(this, SIGNAL(MatlabPause()), &mainalg.worker, SLOT(Pause()));
+
+	connect(ui->matlabConsole, SIGNAL(customContextMenuRequested(QPoint)),
+			this, SLOT(matlabConsoleMenuRequested(QPoint)));
 
 	//send command to robots
 	connect(&mainalg, SIGNAL(sendToConnector(int, const QByteArray &)), &connector, SLOT(run(int, const QByteArray &)));
@@ -149,6 +153,15 @@ void LARCmaCS::on_pushButton_SetMLdir_clicked()
 		qDebug() << "New Matlab directory = " << s;
 		emit MLEvalString(s);
 	}
+}
+
+void LARCmaCS::matlabConsoleMenuRequested(QPoint point)
+{
+	QMenu * menu = new QMenu(this);
+	QAction * editDevice = new QAction(trUtf8("Clear console"), this);
+	connect(editDevice, SIGNAL(triggered()), ui->matlabConsole, SLOT(clear()));
+	menu->addAction(editDevice);
+	menu->popup(ui->matlabConsole->viewport()->mapToGlobal(point));
 }
 
 void LARCmaCS::on_matlabOutputFrequencyLineEdit_textEdited(const QString & text)
