@@ -22,7 +22,7 @@ MainAlg::MainAlg(SharedRes * sharedRes)
 	connect(&mThread, SIGNAL(started()), mWorker, SLOT(start()));
 	connect(&mThread, SIGNAL(finished()), mWorker, SLOT(deleteLater()));
 
-	connect(this, SIGNAL(MLEvalString(const QString &)), mWorker, SLOT(EvalString(const QString &)));
+	connect(this, SIGNAL(MLEvalString(const QString &)), mWorker, SLOT(evalString(const QString &)));
 	connect(mWorker, SIGNAL(getDataFromReceiver()), this, SLOT(loadVisionData()), Qt::DirectConnection);
 	connect(mWorker, SIGNAL(newPauseState(const QString &)), this, SLOT(receivePauseState(const QString &)));
 	connect(mWorker, SIGNAL(sendStatistics(const QString &)), this, SIGNAL(engineStatistics(const QString &)));
