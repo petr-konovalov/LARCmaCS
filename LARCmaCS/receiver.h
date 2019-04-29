@@ -34,7 +34,7 @@ public slots:
 	void updateDetection(const QSharedPointer<SSL_WrapperPacket> & detection, int camID);
 	void updateGeometry(const QSharedPointer<SSL_WrapperPacket> & geometry);
 	void setDisplayFlag();
-	void changeSimulatorMode(bool mode);
+	void changeSimulatorMode(bool isSim, const QString &, int);
 
 signals:
 	void updateSimulatorMode(bool mode);

@@ -23,15 +23,15 @@ public:
 public slots:
 	void start();
 	void stop();
-	void changeGrSimIP(const QString & IP);
-	void changeGrSimPort(unsigned short port);
 	void run(int N, const QByteArray & command);
 	void runSim(const QByteArray & command);
+	void onConnectorChange(bool isSim, const QString & ip, int port);
 
 private:
-	QString grSimIP = "127.0.0.1";
-	unsigned short grSimPort = 20011;
+	QString mGrSimIP = "127.0.0.1";
+	unsigned short mGrSimPort = 20011;
 	SharedRes * mSharedRes;
 	QUdpSocket mUdpSocket;
 	QTimer mStatisticsTimer;
+	bool mIsSim;
 };
