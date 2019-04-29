@@ -32,8 +32,8 @@ LARCmaCS::LARCmaCS(QWidget *parent)
 	connect(this, SIGNAL(updateMatlabDebugFrequency(int)), &mainalg, SIGNAL(updateMatlabDebugFrequency(int)));
 	//connect(this, SIGNAL(MatlabPause()), &mainalg.worker, SLOT(Pause()));
 
-	connect(ui->matlabConsole, SIGNAL(customContextMenuRequested(QPoint)),
-			this, SLOT(matlabConsoleMenuRequested(QPoint)));
+	connect(ui->matlabConsole, SIGNAL(customContextMenuRequested(const QPoint &)),
+			this, SLOT(matlabConsoleMenuRequested(const QPoint &)));
 
 	//send command to robots
 	connect(&mainalg, SIGNAL(sendToConnector(int, const QByteArray &)), &connector, SLOT(run(int, const QByteArray &)));
@@ -155,7 +155,7 @@ void LARCmaCS::on_pushButton_SetMLdir_clicked()
 	}
 }
 
-void LARCmaCS::matlabConsoleMenuRequested(QPoint point)
+void LARCmaCS::matlabConsoleMenuRequested(const QPoint & point)
 {
 	QMenu * menu = new QMenu(this);
 	QAction * editDevice = new QAction(trUtf8("Clear console"), this);
@@ -168,7 +168,7 @@ void LARCmaCS::on_matlabOutputFrequencyLineEdit_textEdited(const QString & text)
 {
 	bool isInt = false;
 	int frequency = text.split(" ")[0].toInt(&isInt);
-	if (isInt) {
+	if (isInt && frequency != 0) {
 		emit updateMatlabDebugFrequency(frequency);
 	}
 }

@@ -50,7 +50,7 @@ private slots:
 	void UpdateSSLFPS(const QString & message);
 	void UpdateStatusBar(const QString & message);
 	void UpdatePauseState(const QString & message);
-	void matlabConsoleMenuRequested(QPoint point);
+	void matlabConsoleMenuRequested(const QPoint & point);
 	void updateView();
 	void scaleView(int);
 
