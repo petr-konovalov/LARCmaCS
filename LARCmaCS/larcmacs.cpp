@@ -50,11 +50,13 @@ LARCmaCS::LARCmaCS(QWidget *parent)
 	connect(this, SIGNAL(connectorChanged(bool, const QString &, int))
 				, &receiver, SLOT(changeSimulatorMode(bool, const QString &, int)));
 	connect(&receiver, SIGNAL(clearField()), fieldscene, SLOT(ClearField()));
-	connect(this, SIGNAL(ChangeSimulatorMode(bool)), &mainalg, SLOT(setEnableSimFlag(bool)));
 	connect(&mainalg, SIGNAL(sendToSimConnector(const QByteArray &)), &connector, SLOT(runSim(const QByteArray &)));
 
 	connect(this, SIGNAL(connectorChanged(bool, const QString &, int))
 				, &connector, SIGNAL(connectorChanged(bool, const QString &, int)));
+
+	connect(this, SIGNAL(connectorChanged(bool, const QString &, int))
+				, &mainalg, SIGNAL(connectorChanged(bool, const QString &, int)));
 
 	sceneview.start();
 	UpdateStatusBar("Waiting SSL connection...");

@@ -1,4 +1,5 @@
 #include "connectorWorker.h"
+
 #include <QMap>
 
 ConnectorWorker::ConnectorWorker(SharedRes * sharedRes)

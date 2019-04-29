@@ -153,11 +153,6 @@ bool MainAlgWorker::getIsSimEnabledFlag()
 	return mIsSimEnabledFlag;
 }
 
-void MainAlgWorker::setEnableSimFlag(bool flag)
-{
-	mIsSimEnabledFlag = flag;
-}
-
 void MainAlgWorker::run()
 {
 	while (!mShutdownFlag) {
@@ -355,4 +350,9 @@ void MainAlgWorker::EvalString(const QString & s)
 void MainAlgWorker::changeBallStatus(bool ballStatus)
 {
 	mIsBallInside = ballStatus;
+}
+
+void MainAlgWorker::changeConnector(bool isSim, const QString &, int)
+{
+	mIsSimEnabledFlag = isSim;
 }

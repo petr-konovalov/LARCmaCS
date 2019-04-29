@@ -33,7 +33,6 @@ public slots:
 	void formStatistics();
 	void updatePauseState();
 	void stop();
-	void setEnableSimFlag(bool flag);
 	void processPacket(const QSharedPointer<PacketSSL> & packetssl);
 	void Pause();
 	void runMatlab();
@@ -41,6 +40,7 @@ public slots:
 	void run();
 	void EvalString(const QString & s);
 	void changeBallStatus(bool ballStatus);
+	void changeConnector(bool isSim, const QString &, int);
 
 private:
 	void init();
