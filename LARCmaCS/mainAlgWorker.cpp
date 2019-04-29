@@ -4,19 +4,15 @@
 #include <QApplication>
 
 #include "message.h"
+#include "constants.h"
+#include "grSimRobot.h"
+#include "defaultRobot.h"
 
 MainAlgWorker::MainAlgWorker()
 	: mStatisticsTimer(this)
+	, mIsBallInside(false)
 {
 	mPacketSSL = QSharedPointer<PacketSSL>();
-	QFile addrFile("gamepads.txt");
-	if (!addrFile.open(QIODevice::ReadOnly)) {
-		qDebug() << "File with addresses is not opened!!!";
-	}
-
-	QTextStream in(&addrFile);
-	auto allAddrs = in.readAll().split("\n", QString::SkipEmptyParts).filter(QRegExp("^[^#;]"));
-	client.initFromList(allAddrs);
 	mIsBallInside = false;
 }
 
@@ -54,17 +50,6 @@ void MainAlgWorker::formStatistics()
 
 void MainAlgWorker::init(){
 	RCConfig rcconfig;
-
-	cout << "Initialization config file..." << endl;
-
-	cerr << "...bad" << endl;
-	rcconfig.name = "Robofootball";
-	rcconfig.file_of_matlab = "main";
-	rcconfig.RULE_AMOUNT = 5;
-	rcconfig.RULE_LENGTH = 7;
-	rcconfig.BACK_AMOUNT = 10;
-	rcconfig.BACK_LENGTH = 8;
-
 	MlData mtl(rcconfig);
 	fmldata = mtl;
 
@@ -240,14 +225,14 @@ void MainAlgWorker::Pause()
 void MainAlgWorker::runMatlab()
 {
 	if (!(fmldata.ep = engOpen(NULL))) {
-		cerr << "Can't open Matlab Engine" << endl;
+		qDebug() << "Can't open Matlab Engine" << endl;
 		fmtlab = false;
 		return;
 	}
 
 	m_buffer[255] = '\0';
 	engOutputBuffer(fmldata.ep, m_buffer, 255);
-	printf("Matlab Engine is opened\n");
+	qDebug() << "Matlab Engine is opened";
 
 	//-----create Rules-----
 	char sendString[256];
