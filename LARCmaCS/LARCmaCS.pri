@@ -47,7 +47,6 @@ SOURCES +=  \
 	$$PWD/receiver.cpp \
 	$$PWD/mainAlg.cpp \
 	$$PWD/mlData.cpp \
-	$$PWD/connector.cpp \
 	$$PWD/remotecontrol.cpp \
 	$$PWD/message.cpp \
 	$$PWD/ipdialog.cpp \
@@ -75,7 +74,6 @@ HEADERS  += \
 	$$PWD/receiver.h \
 	$$PWD/mainAlg.h \
 	$$PWD/mlData.h \
-	$$PWD/connector.h \
 	$$PWD/remotecontrol.h \
 	$$PWD/message.h \
 	$$PWD/ipdialog.h \

@@ -1,9 +1,9 @@
 #pragma once
 
-#include <QObject>
 #include <QUdpSocket>
 #include <QMap>
 #include <QTimer>
+
 #include "constants.h"
 #include "sharedRes.h"
 #include "settings.h"
@@ -17,8 +17,10 @@ class ConnectorWorker : public QObject
 
 public:
 	ConnectorWorker(SharedRes * sharedRes);
+	~ConnectorWorker();
 	const QString & getGrSimIP();
 	unsigned short getGrSimPort();
+	unsigned short getRobotPort();
 
 public slots:
 	void start();
@@ -28,10 +30,11 @@ public slots:
 	void onConnectorChange(bool isSim, const QString & ip, int port);
 
 private:
-	QString mGrSimIP = "127.0.0.1";
-	unsigned short mGrSimPort = 20011;
+	QString mGrSimIP;
+	unsigned short mGrSimPort;
 	SharedRes * mSharedRes;
 	QUdpSocket mUdpSocket;
 	QTimer mStatisticsTimer;
 	bool mIsSim;
+	static const unsigned short mRobotPort = 10000;
 };

@@ -1,10 +1,12 @@
-#include <math.h>
 #include "larcmacs.h"
+
+#include <QFileDialog>
+#include <QMenu>
+#include <math.h>
+
 #include "ui_larcmacs.h"
 #include "packetSSL.h"
 #include "message.h"
-#include <QFileDialog>
-#include <QMenu>
 #include "settings.h"
 #include "grSimRobot.h"
 
@@ -60,7 +62,7 @@ LARCmaCS::LARCmaCS(QWidget *parent)
 	connect(&mainalg, SIGNAL(sendToSimConnector(const QByteArray &)), &connector, SLOT(runSim(const QByteArray &)));
 
 	connect(this, SIGNAL(connectorChanged(bool, const QString &, int))
-				, &connector, SIGNAL(connectorChanged(bool, const QString &, int)));
+				, &connector, SLOT(onConnectorChange(bool, const QString &, int)));
 
 	connect(this, SIGNAL(connectorChanged(bool, const QString &, int))
 				, &mainalg, SIGNAL(connectorChanged(bool, const QString &, int)));
@@ -86,7 +88,7 @@ void LARCmaCS::remcontrolsender(int l, int r,int k, int b, bool kickUp)
 	QString IP;
 	if (!simFlag) {
 		IP = ip;
-		port = Connector::robotPort;
+		port = connector.getRobotPort();
 	} else {
 		IP = connector.getGrSimIP();
 		port = connector.getGrSimPort();

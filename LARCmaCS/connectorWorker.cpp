@@ -6,13 +6,10 @@ ConnectorWorker::ConnectorWorker(SharedRes * sharedRes)
 	: mSharedRes(sharedRes)
 	, mUdpSocket(this)
 	, mStatisticsTimer(this)
-{
-}
+{}
 
-void ConnectorWorker::stop()
-{
-	mUdpSocket.close();
-}
+ConnectorWorker::~ConnectorWorker()
+{}
 
 const QString & ConnectorWorker::getGrSimIP()
 {
@@ -24,8 +21,9 @@ unsigned short ConnectorWorker::getGrSimPort()
 	return mGrSimPort;
 }
 
-void ConnectorWorker::start()
+unsigned short ConnectorWorker::getRobotPort()
 {
+	return mRobotPort;
 }
 
 void ConnectorWorker::run(int N, const QByteArray & command)
