@@ -9,7 +9,7 @@ typedef struct
 {
 	std::string	name = "Robofootball";
 	const char *file_of_matlab = "main";
-	int RULE_AMOUNT = 5;
+	int RULE_AMOUNT = 16;
 	int RULE_LENGTH = 7;
 	int BACK_AMOUNT = 10;
 	int BACK_LENGTH = 8;
