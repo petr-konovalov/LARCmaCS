@@ -28,7 +28,7 @@ signals:
 	void sendPacket(int N, const QByteArray & command);
 	void sendSimPacket(const QByteArray & command);
 
-	void connectorChanged(bool, const QString &, int);
+	void connectorChanged(bool isSim, const QString & simIP, int port);
 
 private:
 	SharedRes * mSharedRes;
