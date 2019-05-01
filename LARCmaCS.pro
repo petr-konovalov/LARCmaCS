@@ -42,7 +42,6 @@ defineTest(copyToDestdir) {
 }
 
 INIT_FILES = \
-	$$PWD/resources/LARCmaCS.cnf \
 	$$PWD/resources/LARCmaCS.exe.embed.manifest \
 	$$PWD/resources/gamepads.txt \
 	$$PWD/resources/help.png \

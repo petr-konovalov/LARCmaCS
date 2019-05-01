@@ -10,8 +10,9 @@ Connector::Connector(SharedRes * sharedRes)
 
 	connect(this, SIGNAL(sendPacket(int, const QByteArray &)), mWorker, SLOT(run(int, const QByteArray &)));
 	connect(this, SIGNAL(sendSimPacket(const QByteArray &)), mWorker, SLOT(runSim(const QByteArray &)));
-	connect(this, SIGNAL(setGrSimIP(const QString &)), mWorker, SLOT(changeGrSimIP(const QString &)));
-	connect(this, SIGNAL(setGrSimPort(unsigned short)), mWorker, SLOT(changeGrSimPort(unsigned short)));
+
+	connect(this, SIGNAL(connectorChanged(bool, const QString &, int))
+			, mWorker, SLOT(onConnectorChange(bool, const QString &, int)));
 
 	mThread.start();
 }
@@ -30,16 +31,6 @@ const QString & Connector::getGrSimIP()
 unsigned short Connector::getGrSimPort()
 {
 	return mWorker->getGrSimPort();
-}
-
-void Connector::changeGrSimIP(const QString & IP)
-{
-	emit setGrSimIP(IP);
-}
-
-void Connector::changeGrSimPort(unsigned short port)
-{
-	emit setGrSimPort(port);
 }
 
 void Connector::run(int N, const QByteArray & command)

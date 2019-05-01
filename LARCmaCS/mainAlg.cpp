@@ -30,8 +30,10 @@ MainAlg::MainAlg(SharedRes * sharedRes)
 			this, SIGNAL(sendToConnector(int, const QByteArray &)));
 	connect(mWorker, SIGNAL(sendToSimConnector(const QByteArray &)),
 			this, SIGNAL(sendToSimConnector(const QByteArray &)));
-	connect(this, SIGNAL(updateEnableSimFlag(bool)), mWorker, SLOT(setEnableSimFlag(bool)));
 	connect(this, SIGNAL(updateBallStatus(bool)), mWorker, SLOT(changeBallStatus(bool)));
+
+	connect(this, SIGNAL(connectorChanged(bool, const QString &, int))
+				, mWorker, SLOT(changeConnector(bool, const QString &, int)));
 
 	mThread.start();
 }
@@ -50,11 +52,6 @@ void MainAlg::changeBallStatus(bool status)
 bool MainAlg::getIsSimEnabledFlag()
 {
 	return mWorker->getIsSimEnabledFlag();
-}
-
-void MainAlg::setEnableSimFlag(bool flag)
-{
-	emit updateEnableSimFlag(flag);
 }
 
 void MainAlg::EvalString(const QString & s)

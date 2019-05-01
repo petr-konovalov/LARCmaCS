@@ -1,14 +1,11 @@
 #pragma once
 
 #include <QObject>
+#include <QSharedPointer>
+#include <QTimer>
+
 #include "packetSSL.h"
 #include "mlData.h"
-#include "client.h"
-#include "grSimRobot.h"
-#include "defaultRobot.h"
-#include "constants.h"
-
-using namespace std;
 
 class MainAlgWorker : public QObject
 {
@@ -33,7 +30,6 @@ public slots:
 	void formStatistics();
 	void updatePauseState();
 	void stop();
-	void setEnableSimFlag(bool flag);
 	void processPacket(const QSharedPointer<PacketSSL> & packetssl);
 	void Pause();
 	void runMatlab();
@@ -41,6 +37,7 @@ public slots:
 	void run();
 	void EvalString(const QString & s);
 	void changeBallStatus(bool ballStatus);
+	void changeConnector(bool isSim, const QString &, int);
 
 private:
 	void init();
@@ -50,7 +47,6 @@ private:
 	bool fmtlab;
 	bool mShutdownFlag;
 	bool pause;
-	Client client;
 	bool mIsPause;
 	int mTotalPacketsNum = 0;
 	int mPacketsPerSecond = 0;

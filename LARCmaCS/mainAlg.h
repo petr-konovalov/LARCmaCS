@@ -35,7 +35,6 @@ public:
 public slots:
 	void EvalString(const QString & s);
 	void receivePauseState(const QString & state);
-	void setEnableSimFlag(bool flag);
 	void changeBallStatus(bool status);
 	void loadVisionData();
 
@@ -47,6 +46,7 @@ signals:
 	void updateEnableSimFlag(bool flag);
 	void engineStatistics(const QString & status);
 	void UpdatePauseState(const QString & state);
+	void connectorChanged(bool, const QString &, int);
 
 private:
 	SharedRes * mSharedRes;

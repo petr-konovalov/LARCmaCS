@@ -28,7 +28,7 @@ public:
 
 public slots:
 	void start();
-	void changeSimulatorMode(bool flag);
+	void changeSimulatorMode(bool isSim);
 
 private slots:
 	void formStatistics();

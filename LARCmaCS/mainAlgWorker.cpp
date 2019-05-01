@@ -1,88 +1,18 @@
 #include "mainAlgWorker.h"
 
-#include <QtWidgets/QApplication>
-#include <fstream>
-#include "QDebug"
+#include <QDebug>
+#include <QApplication>
+
 #include "message.h"
-
-int initConfig(RCConfig *config){
-	ifstream configFile;
-	string line;
-
-	configFile.open("LARCmaCS.cnf", ios::in);
-
-	if(!configFile.is_open()) {
-		cerr << "Can't open configuration file" << endl;
-		return -1;
-	}
-
-	if(!config) {
-		cerr << "Can't parse configuration file" << endl;
-		return -2;
-	}
-
-	while(!configFile.eof()) {
-		getline(configFile, line);
-
-		if (line.empty())
-			continue;
-
-		if(line.find("rfclient.name") != string::npos) {
-			config->name = line.substr(line.find('=') + 1);
-
-			if(config->name.size() > 16) {
-				cerr << "[WARNING] rfclient.name value is too long."
-					 << endl << "It will be truncated up to 16 characters." << endl;
-				config->name.resize(16);
-			}
-		}
-
-		if(line.find("rfclient.file_of_matlab") != string::npos) {
-			string fom = line.substr(line.find('=') + 1);
-
-			if(fom.size() > 16) {
-				cerr << "[WARNING] rfclient.file_of_matlab value is too long."
-					 << endl << "It will be truncated up to 16 characters." << endl;
-				fom.resize(16);
-			}
-			char *str = new char[fom.length() + 1];
-			strcpy(str, fom.c_str());
-			config->file_of_matlab = str;
-		}
-
-		if(line.find("rfclient.RULE_AMOUNT") != string::npos){
-			config->RULE_AMOUNT = atoi(line.substr(line.find('=') + 1).c_str());
-		}
-
-		if(line.find("rfclient.RULE_LENGTH") != string::npos){
-			config->RULE_LENGTH = atoi(line.substr(line.find('=') + 1).c_str());
-		}
-
-		if(line.find("rfclient.BACK_AMOUNT") != string::npos){
-			config->BACK_AMOUNT = atoi(line.substr(line.find('=') + 1).c_str());
-		}
-
-		if(line.find("rfclient.BACK_LENGTH") != string::npos){
-			config->BACK_LENGTH = atoi(line.substr(line.find('=') + 1).c_str());
-		}
-	}
-
-	configFile.close();
-	return 0;
-}
+#include "constants.h"
+#include "grSimRobot.h"
+#include "defaultRobot.h"
 
 MainAlgWorker::MainAlgWorker()
 	: mStatisticsTimer(this)
+	, mIsBallInside(false)
 {
 	mPacketSSL = QSharedPointer<PacketSSL>();
-	QFile addrFile("gamepads.txt");
-	if (!addrFile.open(QIODevice::ReadOnly)) {
-		qDebug() << "File with addresses is not opened!!!";
-	}
-
-	QTextStream in(&addrFile);
-	auto allAddrs = in.readAll().split("\n", QString::SkipEmptyParts).filter(QRegExp("^[^#;]"));
-	client.initFromList(allAddrs);
 	mIsBallInside = false;
 }
 
@@ -120,28 +50,6 @@ void MainAlgWorker::formStatistics()
 
 void MainAlgWorker::init(){
 	RCConfig rcconfig;
-
-	cout << "Initialization config file..." << endl;
-
-	if(!initConfig(&rcconfig)) {
-		cout << rcconfig.file_of_matlab << endl;
-		cout << rcconfig.name << endl;
-		cout << rcconfig.BACK_AMOUNT << endl;
-		cout << rcconfig.BACK_LENGTH << endl;
-		cout << rcconfig.RULE_AMOUNT << endl;
-		cout << rcconfig.RULE_LENGTH << endl;
-
-		cout << "...successful" << endl;
-	} else {
-		cerr << "...bad" << endl;
-		rcconfig.name = "Robofootball";
-		rcconfig.file_of_matlab = "main";
-		rcconfig.RULE_AMOUNT = 5;
-		rcconfig.RULE_LENGTH = 7;
-		rcconfig.BACK_AMOUNT = 10;
-		rcconfig.BACK_LENGTH = 8;
-	}
-
 	MlData mtl(rcconfig);
 	fmldata = mtl;
 
@@ -151,11 +59,6 @@ void MainAlgWorker::init(){
 bool MainAlgWorker::getIsSimEnabledFlag()
 {
 	return mIsSimEnabledFlag;
-}
-
-void MainAlgWorker::setEnableSimFlag(bool flag)
-{
-	mIsSimEnabledFlag = flag;
 }
 
 void MainAlgWorker::run()
@@ -322,14 +225,14 @@ void MainAlgWorker::Pause()
 void MainAlgWorker::runMatlab()
 {
 	if (!(fmldata.ep = engOpen(NULL))) {
-		cerr << "Can't open Matlab Engine" << endl;
+		qDebug() << "Can't open Matlab Engine" << endl;
 		fmtlab = false;
 		return;
 	}
 
 	m_buffer[255] = '\0';
 	engOutputBuffer(fmldata.ep, m_buffer, 255);
-	printf("Matlab Engine is opened\n");
+	qDebug() << "Matlab Engine is opened";
 
 	//-----create Rules-----
 	char sendString[256];
@@ -355,4 +258,9 @@ void MainAlgWorker::EvalString(const QString & s)
 void MainAlgWorker::changeBallStatus(bool ballStatus)
 {
 	mIsBallInside = ballStatus;
+}
+
+void MainAlgWorker::changeConnector(bool isSim, const QString &, int)
+{
+	mIsSimEnabledFlag = isSim;
 }
