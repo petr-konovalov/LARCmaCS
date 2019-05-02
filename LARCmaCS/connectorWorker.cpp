@@ -1,4 +1,5 @@
 #include "connectorWorker.h"
+
 #include <QMap>
 
 ConnectorWorker::ConnectorWorker(SharedRes * sharedRes)
@@ -6,7 +7,6 @@ ConnectorWorker::ConnectorWorker(SharedRes * sharedRes)
 	, mUdpSocket(this)
 	, mStatisticsTimer(this)
 {
-//	connect(&mUdpSocket, SIGNAL(readyRead()), this, SLOT(udpProcessPendingDatagrams()));
 }
 
 void ConnectorWorker::stop()
@@ -16,12 +16,12 @@ void ConnectorWorker::stop()
 
 const QString & ConnectorWorker::getGrSimIP()
 {
-	return grSimIP;
+	return mGrSimIP;
 }
 
 unsigned short ConnectorWorker::getGrSimPort()
 {
-	return grSimPort;
+	return mGrSimPort;
 }
 
 void ConnectorWorker::start()
@@ -35,15 +35,15 @@ void ConnectorWorker::run(int N, const QByteArray & command)
 
 void ConnectorWorker::runSim(const QByteArray & command)
 {
-	mUdpSocket.writeDatagram(command, QHostAddress(grSimIP), grSimPort);
+	mUdpSocket.writeDatagram(command, QHostAddress(mGrSimIP), mGrSimPort);
 }
 
-void ConnectorWorker::changeGrSimIP(const QString & IP)
+void ConnectorWorker::onConnectorChange(bool isSim, const QString &ip, int port)
 {
-	grSimIP = IP;
-}
+	mIsSim = isSim;
 
-void ConnectorWorker::changeGrSimPort(unsigned short port)
-{
-	grSimPort = port;
+	if (mIsSim) {
+		mGrSimIP = ip;
+		mGrSimPort = port;
+	}
 }

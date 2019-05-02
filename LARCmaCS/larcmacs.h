@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QWidget>
+
 #include "fieldScene.h"
 #include "receiver.h"
 #include "mainAlg.h"
@@ -66,11 +67,10 @@ private slots:
 	void on_but_reference_clicked();
 
 signals:
-	void changeGrSimIP(const QString & IP);
 	void updateMatlabDebugFrequency(int frequency);
-	void changeGrSimPort(unsigned short port);
 	void ChangeSimulatorMode(bool state);
 	//void MatlabPause();
 	void MLEvalString(const QString & s);
 	void updateRobots();
+	void connectorChanged(bool isSim, const QString & ip, int port);
 };

@@ -51,7 +51,6 @@ SOURCES +=  \
 	$$PWD/remotecontrol.cpp \
 	$$PWD/message.cpp \
 	$$PWD/ipdialog.cpp \
-	$$PWD/client.cpp \
 	$$PWD/reference.cpp \
 	$$PWD/sceneViewWorker.cpp \
 	$$PWD/robot.cpp \
@@ -60,15 +59,15 @@ SOURCES +=  \
 	$$PWD/connectorWorker.cpp \
 	$$PWD/packetSSL.cpp \
 	$$PWD/settings.cpp \
-    $$PWD/robots/grSimRobot.cpp \
-    $$PWD/robots/defaultRobot.cpp \
-    $$PWD/sharedRes.cpp \
-    $$PWD/robotReceiverWorker.cpp \
-    $$PWD/robotReceiver.cpp
+	$$PWD/robots/grSimRobot.cpp \
+	$$PWD/robots/defaultRobot.cpp \
+	$$PWD/sharedRes.cpp \
+	$$PWD/robotReceiverWorker.cpp \
+	$$PWD/robotReceiver.cpp
 
 HEADERS  += \
-    $${SHARED_DIR}/util/timer.h \
-    $${SHARED_DIR}/util/field_default_constants.h \
+	$${SHARED_DIR}/util/timer.h \
+	$${SHARED_DIR}/util/field_default_constants.h \
 	$$PWD/larcmacs.h \
 	$$PWD/fieldScene.h \
 	$$PWD/sceneView.h \
@@ -80,7 +79,6 @@ HEADERS  += \
 	$$PWD/remotecontrol.h \
 	$$PWD/message.h \
 	$$PWD/ipdialog.h \
-	$$PWD/client.h \
 	$$PWD/reference.h \
 	$$PWD/sceneViewWorker.h \
 	$$PWD/receiverWorker.h \
@@ -89,11 +87,11 @@ HEADERS  += \
         $$PWD/connectorWorker.h \
         $$PWD/settings.h \
 	$$PWD/constants.h \
-    $$PWD/robots/grSimRobot.h \
-    $$PWD/robots/defaultRobot.h \
-    $$PWD/sharedRes.h \
-    $$PWD/robotReceiverWorker.h \
-    $$PWD/robotReceiver.h
+	$$PWD/robots/grSimRobot.h \
+	$$PWD/robots/defaultRobot.h \
+	$$PWD/sharedRes.h \
+	$$PWD/robotReceiverWorker.h \
+	$$PWD/robotReceiver.h
 
 FORMS += \
 	$$PWD/larcmacs.ui \

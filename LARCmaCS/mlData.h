@@ -7,12 +7,12 @@
 
 typedef struct
 {
-	std::string	name;
-	const char *file_of_matlab;
-	int RULE_AMOUNT;
-	int RULE_LENGTH;
-	int BACK_AMOUNT;
-	int BACK_LENGTH;
+	std::string	name = "Robofootball";
+	const char *file_of_matlab = "main";
+	int RULE_AMOUNT = 16;
+	int RULE_LENGTH = 7;
+	int BACK_AMOUNT = 10;
+	int BACK_LENGTH = 8;
 } RCConfig;
 
 class MlData

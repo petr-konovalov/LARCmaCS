@@ -54,12 +54,16 @@ LARCmaCS::LARCmaCS(QWidget *parent)
 			this, SLOT(remcontrolsender(int, int, int, int, bool)));
 
 	//simulator Enable
-	connect(this, SIGNAL(ChangeSimulatorMode(bool)), &receiver, SLOT(changeSimulatorMode(bool)));
+	connect(this, SIGNAL(connectorChanged(bool, const QString &, int))
+				, &receiver, SLOT(changeSimulatorMode(bool, const QString &, int)));
 	connect(&receiver, SIGNAL(clearField()), fieldscene, SLOT(ClearField()));
-	connect(this, SIGNAL(ChangeSimulatorMode(bool)), &mainalg, SLOT(setEnableSimFlag(bool)));
 	connect(&mainalg, SIGNAL(sendToSimConnector(const QByteArray &)), &connector, SLOT(runSim(const QByteArray &)));
-	connect(this, SIGNAL(changeGrSimIP(const QString &)), &connector, SLOT(changeGrSimIP(const QString &)));
-	connect(this, SIGNAL(changeGrSimPort(unsigned short)), &connector, SLOT(changeGrSimPort(unsigned short)));
+
+	connect(this, SIGNAL(connectorChanged(bool, const QString &, int))
+				, &connector, SIGNAL(connectorChanged(bool, const QString &, int)));
+
+	connect(this, SIGNAL(connectorChanged(bool, const QString &, int))
+				, &mainalg, SIGNAL(connectorChanged(bool, const QString &, int)));
 
 	sceneview.start();
 	UpdateStatusBar("Waiting SSL connection...");
@@ -175,11 +179,7 @@ void LARCmaCS::on_matlabOutputFrequencyLineEdit_textEdited(const QString & text)
 
 void LARCmaCS::on_checkBox_SimEnable_stateChanged(int state)
 {
-	if (state > 0) {
-		emit changeGrSimIP(ui->lineEditSimIP->text());
-		emit changeGrSimPort(ui->lineEditSimPort->text().toInt());
-	}
-	emit ChangeSimulatorMode(state > 0);
+	emit connectorChanged(state > 0, ui->lineEditSimIP->text(), ui->lineEditSimPort->text().toInt());
 }
 
 void LARCmaCS::on_pushButton_RemoteControl_clicked()

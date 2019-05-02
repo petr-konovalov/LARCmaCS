@@ -97,10 +97,10 @@ void ReceiverWorker::start()
 	open(Constants::SSLVisionPort);
 }
 
-void ReceiverWorker::changeSimulatorMode(bool flag)
+void ReceiverWorker::changeSimulatorMode(bool isSim)
 {
-	if (flag != mIsSimEnabledFlag) {
-		mIsSimEnabledFlag = flag;
+	if (isSim != mIsSimEnabledFlag) {
+		mIsSimEnabledFlag = isSim;
 		if (mIsSimEnabledFlag) {
 			close();
 			open(Constants::SimVisionPort);
