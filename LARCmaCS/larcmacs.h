@@ -6,7 +6,7 @@
 #include "receiver.h"
 #include "mainAlg.h"
 #include "sceneView.h"
-#include "connectorWorker.h"
+#include "connector.h"
 #include "remotecontrol.h"
 #include "ipdialog.h"
 #include "reference.h"
@@ -37,7 +37,7 @@ protected:
 	Receiver receiver;
 	FieldScene * fieldscene;
 	MainAlg mainalg;
-	ConnectorWorker connector;
+	Connector connector;
 
 private:
 	Ui::LARCmaCS * ui;

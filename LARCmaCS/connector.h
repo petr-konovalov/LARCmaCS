@@ -11,20 +11,18 @@
 
 using std::map;
 
-class ConnectorWorker : public QObject
+class Connector : public QObject
 {
 	Q_OBJECT
 
 public:
-	ConnectorWorker(SharedRes * sharedRes);
-	~ConnectorWorker();
+	Connector(SharedRes * sharedRes);
+	~Connector();
 	const QString & getGrSimIP();
 	unsigned short getGrSimPort();
 	unsigned short getRobotPort();
 
 public slots:
-	void start();
-	void stop();
 	void run(int N, const QByteArray & command);
 	void runSim(const QByteArray & command);
 	void onConnectorChange(bool isSim, const QString & ip, int port);

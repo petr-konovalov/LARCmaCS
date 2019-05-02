@@ -154,9 +154,11 @@ void MainAlgWorker::processPacket(const QSharedPointer<PacketSSL> & packetssl)
 
 	for (int i = 0; i < Constants::ruleAmount; i++) {
 		char newmess[Constants::ruleLength];
+
 		for (int j = 0; j < Constants::ruleLength; j++) {
 			newmess[j] = ruleArray[j * Constants::ruleAmount + i];
 		}
+
 		if (newmess[0] == 1) {
 			QByteArray command;
 
