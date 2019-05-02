@@ -49,6 +49,8 @@ signals:
 	void UpdatePauseState(const QString & state);
 	void toMatlabConsole(const QString & str);
 	void connectorChanged(bool, const QString &, int);
+	void newData(const QVector<double> & data);
+	void pause(bool status);
 
 private:
 	SharedRes * mSharedRes;

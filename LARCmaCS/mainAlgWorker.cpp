@@ -5,8 +5,6 @@
 
 #include "message.h"
 #include "constants.h"
-#include "grSimRobot.h"
-#include "defaultRobot.h"
 
 MainAlgWorker::MainAlgWorker()
 	: mStatisticsTimer(this)
@@ -85,6 +83,7 @@ void MainAlgWorker::updatePauseState()
 	evalString("ispause=RP.Pause");
 	mxArray *mxitpause = engGetVariable(fmldata.ep, "ispause");
 	mIsPause = true;
+	emit pause(mIsPause);
 	if (mxitpause != 0) {
 		double* itpause = mxGetPr(mxitpause);
 		if (itpause != 0) {
@@ -97,6 +96,7 @@ void MainAlgWorker::updatePauseState()
 							emit newPauseState("main br");
 						} else {
 							mIsPause = false;
+							emit pause(mIsPause);
 							emit newPauseState("WORK");
 						}
 					} else {
@@ -153,71 +153,32 @@ void MainAlgWorker::processPacket(const QSharedPointer<PacketSSL> & packetssl)
 // Разбор пришедшего пакета и переправка его строк на connector
 
 	for (int i = 0; i < Constants::ruleAmount; i++) {
-		char newmess[Constants::ruleLength];
+		QVector<double> newmess;
+		newmess.resize(Constants::ruleLength);
 
 		for (int j = 0; j < Constants::ruleLength; j++) {
 			newmess[j] = ruleArray[j * Constants::ruleAmount + i];
 		}
 
-		if (newmess[0] == 1) {
-			QByteArray command;
-
-			int voltage = 12; //fixed while we don't have abilities to change it from algos
-			bool simFlag = mIsSimEnabledFlag;
-			if (!simFlag) {
-				if (!mIsPause) {
-					DefaultRobot::formControlPacket(command, newmess[1], newmess[3], newmess[2], newmess[5],
-							newmess[6], newmess[4], voltage, 0);
-				} else {
-					DefaultRobot::formControlPacket(command, newmess[1], 0, 0, 0, 0, 0, voltage, 0);
-				}
-			} else {
-				if (!mIsPause) {
-					GrSimRobot::formControlPacket(command, newmess[1], newmess[3], newmess[2], newmess[5],
-							newmess[6], newmess[4], voltage, 0);
-				} else {
-					GrSimRobot::formControlPacket(command, newmess[1], 0, 0, 0, 0, 0, voltage, 0);
-				}
-			}
-
-			if (newmess[1] == 0) {
-				for (int i = 1; i <= Constants::maxNumOfRobots; i++) {
-					if (!simFlag) {
-						emit sendToConnector(i, command);
-					} else {
-						QByteArray multiCommand;
-						GrSimRobot::formControlPacket(multiCommand, i, newmess[3], newmess[2], newmess[5],
-								newmess[6], newmess[4], voltage, 0);
-						emit sendToSimConnector(multiCommand);
-					}
-				}
-			}
-			if ((newmess[1] > 0) && (newmess[1] <= Constants::maxNumOfRobots)) {
-				if (!simFlag) {
-					emit sendToConnector(newmess[1], command);
-				} else {
-					emit sendToSimConnector(command);
-				}
-			}
-		}
+		emit newData(newmess);
 	}
 	free(ruleArray);
 	mxDestroyArray(fmldata.Rule);
 
-	if (mIsPause) { //TODO: add check of remote control
-		QByteArray command;
-		if (!mIsSimEnabledFlag) {
-			for (int i = 1; i <= 12; i++) {
-				DefaultRobot::formControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
-				emit sendToConnector(i, command);
-			}
-		} else {
-			for (int i = 0; i <= 12; i++) {
-				GrSimRobot::formControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
-				emit sendToSimConnector(command); //for more power of remote control
-			}
-		}
-	}
+//	if (mIsPause) { //TODO: add check of remote control
+//		QByteArray command;
+//		if (!mIsSimEnabledFlag) {
+//			for (int i = 1; i <= 12; i++) {
+//				DefaultRobot::formControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
+//				emit sendToConnector(i, command);
+//			}
+//		} else {
+//			for (int i = 0; i <= 12; i++) {
+//				GrSimRobot::formControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
+//				emit sendToSimConnector(command); //for more power of remote control
+//			}
+//		}
+//	}
 
 	updatePauseState();
 }
@@ -247,7 +208,6 @@ void MainAlgWorker::runMatlab()
 	QString dirPath = "cd " + QCoreApplication::applicationDirPath() + "/MLscripts";
 	evalString(dirPath);
 	fmtlab = true;
-	pause = false;
 }
 
 void MainAlgWorker::stop_matlab()

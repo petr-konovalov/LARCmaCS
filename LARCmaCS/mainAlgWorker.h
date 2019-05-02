@@ -25,6 +25,8 @@ signals:
 	void sendStatistics(const QString & statistics);
 	void getDataFromReceiver();
 	void toMatlabConsole(const QString & str);
+	void newData(const QVector<double> & data);
+	void pause(bool status);
 
 public slots:
 	void start();
@@ -49,7 +51,6 @@ private:
 	bool fmtlab;
 	int mFrequency = 1;
 	bool mShutdownFlag;
-	bool pause;
 	bool mIsPause;
 	int mTotalPacketsNum = 0;
 	int mPacketsPerSecond = 0;

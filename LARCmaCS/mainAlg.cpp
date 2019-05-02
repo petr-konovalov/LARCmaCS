@@ -37,6 +37,9 @@ MainAlg::MainAlg(SharedRes * sharedRes)
 	connect(this, SIGNAL(connectorChanged(bool, const QString &, int))
 				, mWorker, SLOT(changeConnector(bool, const QString &, int)));
 
+	connect(mWorker, SIGNAL(newData(const QVector<double> &)), this, SIGNAL(newData(const QVector<double> &)));
+	connect(mWorker, SIGNAL(pause(bool)), this, SIGNAL(pause(bool)));
+
 	mThread.start();
 }
 

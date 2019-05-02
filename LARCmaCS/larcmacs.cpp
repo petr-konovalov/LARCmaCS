@@ -22,6 +22,8 @@ LARCmaCS::LARCmaCS(QWidget *parent)
 	, mainalg(&sharedRes)
 	, connector(&sharedRes)
 {
+	qRegisterMetaType<QVector<double> >("QVector<double>");
+
 	ui->setupUi(this);
 	ui->fieldView->setScene(fieldscene);
 	scaleView(8);
@@ -66,6 +68,12 @@ LARCmaCS::LARCmaCS(QWidget *parent)
 
 	connect(this, SIGNAL(connectorChanged(bool, const QString &, int))
 				, &mainalg, SIGNAL(connectorChanged(bool, const QString &, int)));
+
+	connect(&mainalg, SIGNAL(newData(const QVector<double> &))
+				, &connector, SLOT(sendNewCommand(const QVector<double> &)));
+
+	connect(&mainalg, SIGNAL(pause(bool))
+				, &connector, SLOT(onPauseChanged(bool)));
 
 	sceneview.start();
 	UpdateStatusBar("Waiting SSL connection...");

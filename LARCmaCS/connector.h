@@ -26,6 +26,8 @@ public slots:
 	void run(int N, const QByteArray & command);
 	void runSim(const QByteArray & command);
 	void onConnectorChange(bool isSim, const QString & ip, int port);
+	void sendNewCommand(const QVector<double> & newmess);
+	void onPauseChanged(bool status);
 
 private:
 	QString mGrSimIP;
@@ -35,4 +37,5 @@ private:
 	QTimer mStatisticsTimer;
 	bool mIsSim;
 	static const unsigned short mRobotPort = 10000;
+	bool mIsPause;
 };
