@@ -4,6 +4,7 @@
 #include "packetSSL.h"
 #include "message.h"
 #include <QFileDialog>
+#include <QMenu>
 #include "settings.h"
 #include "grSimRobot.h"
 
@@ -28,7 +29,11 @@ LARCmaCS::LARCmaCS(QWidget *parent)
 
 	//algorithm connect
 	connect(this, SIGNAL(MLEvalString(const QString &)), &mainalg, SLOT(EvalString(const QString &)));
-//	connect(this, SIGNAL(MatlabPause()), &mainalg.worker, SLOT(Pause()));
+	connect(this, SIGNAL(updateMatlabDebugFrequency(int)), &mainalg, SIGNAL(updateMatlabDebugFrequency(int)));
+	//connect(this, SIGNAL(MatlabPause()), &mainalg.worker, SLOT(Pause()));
+
+	connect(ui->matlabConsole, SIGNAL(customContextMenuRequested(const QPoint &)),
+			this, SLOT(matlabConsoleMenuRequested(const QPoint &)));
 
 	//send command to robots
 	connect(&mainalg, SIGNAL(sendToConnector(int, const QByteArray &)), &connector, SLOT(run(int, const QByteArray &)));
@@ -36,6 +41,8 @@ LARCmaCS::LARCmaCS(QWidget *parent)
 	//gui connector
 	connect(&sceneview.worker, SIGNAL(updateView()), this, SLOT(updateView()));
 	connect(ui->sceneslider, SIGNAL(valueChanged(int)), this, SLOT(scaleView(int)));
+
+	connect(&mainalg, SIGNAL(toMatlabConsole(const QString &)), this, SLOT(toMatlabConsole(const QString &)));
 
 	//info GUI
 	connect(&mainalg, SIGNAL(UpdatePauseState(const QString &)), this, SLOT(UpdatePauseState(const QString &)));
@@ -122,6 +129,11 @@ void LARCmaCS::scaleView(int _sizescene)
 	scalingRequested = true;
 }
 
+void LARCmaCS::toMatlabConsole(const QString & str)
+{
+	ui->matlabConsole->appendPlainText(str);
+}
+
 void LARCmaCS::updateView()
 {
 	if (scalingRequested) {
@@ -144,6 +156,24 @@ void LARCmaCS::on_pushButton_SetMLdir_clicked()
 		QString s = "cd " + dir;
 		qDebug() << "New Matlab directory = " << s;
 		emit MLEvalString(s);
+	}
+}
+
+void LARCmaCS::matlabConsoleMenuRequested(const QPoint & point)
+{
+	QMenu * menu = new QMenu(this);
+	QAction * editDevice = new QAction(trUtf8("Clear console"), this);
+	connect(editDevice, SIGNAL(triggered()), ui->matlabConsole, SLOT(clear()));
+	menu->addAction(editDevice);
+	menu->popup(ui->matlabConsole->viewport()->mapToGlobal(point));
+}
+
+void LARCmaCS::on_matlabOutputFrequencyLineEdit_textEdited(const QString & text)
+{
+	bool isInt = false;
+	int frequency = text.split(" ")[0].toInt(&isInt);
+	if (isInt && frequency != 0) {
+		emit updateMatlabDebugFrequency(frequency);
 	}
 }
 

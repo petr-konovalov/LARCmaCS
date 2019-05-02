@@ -34,6 +34,10 @@ void MainAlgWorker::stop()
 	mShutdownFlag = true;
 }
 
+void MainAlgWorker::setMatlabDebugFrequency(int frequency) {
+	mFrequency = frequency;
+}
+
 void MainAlgWorker::formStatistics()
 {
 	QString tmp;
@@ -78,7 +82,7 @@ void MainAlgWorker::setPacketSSL(const QSharedPointer<PacketSSL> & packetSSL)
 
 void MainAlgWorker::updatePauseState()
 {
-	engEvalString(fmldata.ep, "ispause=RP.Pause");
+	evalString("ispause=RP.Pause");
 	mxArray *mxitpause = engGetVariable(fmldata.ep, "ispause");
 	mIsPause = true;
 	if (mxitpause != 0) {
@@ -131,8 +135,7 @@ void MainAlgWorker::processPacket(const QSharedPointer<PacketSSL> & packetssl)
 	engPutVariable(fmldata.ep, "Blues", fmldata.Blue);
 	engPutVariable(fmldata.ep, "Yellows", fmldata.Yellow);
 	engPutVariable(fmldata.ep, "ballInside", fmldata.ballInside);
-
-	engEvalString(fmldata.ep, fmldata.config.file_of_matlab);
+	evalString(fmldata.config.file_of_matlab);
 // Забираем Rules и очищаем его в воркспейсе
 
 	fmldata.Rule = engGetVariable(fmldata.ep, "Rules");
@@ -145,7 +148,7 @@ void MainAlgWorker::processPacket(const QSharedPointer<PacketSSL> & packetssl)
 	}
 	char sendString[256];
 	sprintf(sendString, "Rules=zeros(%d, %d);", Constants::ruleAmount, Constants::ruleLength);
-	engEvalString(fmldata.ep, sendString);
+	evalString(sendString);
 
 // Разбор пришедшего пакета и переправка его строк на connector
 
@@ -219,7 +222,7 @@ void MainAlgWorker::processPacket(const QSharedPointer<PacketSSL> & packetssl)
 
 void MainAlgWorker::Pause()
 {
-	engEvalString(fmldata.ep, "PAUSE();");
+	evalString("PAUSE();");
 }
 
 void MainAlgWorker::runMatlab()
@@ -230,17 +233,17 @@ void MainAlgWorker::runMatlab()
 		return;
 	}
 
-	m_buffer[255] = '\0';
-	engOutputBuffer(fmldata.ep, m_buffer, 255);
-	qDebug() << "Matlab Engine is opened";
+	mMatlabOutputBuffer[Constants::matlabOutputBufferSize - 1] = '\0';
+	engOutputBuffer(fmldata.ep, mMatlabOutputBuffer, Constants::matlabOutputBufferSize - 1);
+	printf("Matlab Engine is opened\n");
 
 	//-----create Rules-----
 	char sendString[256];
 	sprintf (sendString, "Rules=zeros(%d, %d)", Constants::ruleAmount, Constants::ruleLength);
-	engEvalString(fmldata.ep, sendString);
+	evalString(sendString);
 
 	QString dirPath = "cd " + QCoreApplication::applicationDirPath() + "/MLscripts";
-	engEvalString(fmldata.ep, dirPath.toUtf8().data());
+	evalString(dirPath);
 	fmtlab = true;
 	pause = false;
 }
@@ -250,9 +253,13 @@ void MainAlgWorker::stop_matlab()
 	fmtlab = false;
 }
 
-void MainAlgWorker::EvalString(const QString & s)
+void MainAlgWorker::evalString(const QString & s)
 {
 	engEvalString(fmldata.ep, s.toUtf8().data());
+	QString tmp = QString(mMatlabOutputBuffer);
+	if (!tmp.contains("\nispause =") && tmp != "" && (mTotalPacketsNum % mFrequency == 0)) {
+		emit toMatlabConsole(tmp);
+	}
 }
 
 void MainAlgWorker::changeBallStatus(bool ballStatus)

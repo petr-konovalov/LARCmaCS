@@ -40,12 +40,14 @@ public slots:
 
 signals:
 	void updateBallStatus(bool status);
+	void updateMatlabDebugFrequency(int frequency);
 	void MLEvalString(const QString & s);
 	void sendToConnector(int N, const QByteArray & command);
 	void sendToSimConnector(const QByteArray & command);
 	void updateEnableSimFlag(bool flag);
 	void engineStatistics(const QString & status);
 	void UpdatePauseState(const QString & state);
+	void toMatlabConsole(const QString & str);
 	void connectorChanged(bool, const QString &, int);
 
 private:

@@ -22,7 +22,7 @@ MainAlg::MainAlg(SharedRes * sharedRes)
 	connect(&mThread, SIGNAL(started()), mWorker, SLOT(start()));
 	connect(&mThread, SIGNAL(finished()), mWorker, SLOT(deleteLater()));
 
-	connect(this, SIGNAL(MLEvalString(const QString &)), mWorker, SLOT(EvalString(const QString &)));
+	connect(this, SIGNAL(MLEvalString(const QString &)), mWorker, SLOT(evalString(const QString &)));
 	connect(mWorker, SIGNAL(getDataFromReceiver()), this, SLOT(loadVisionData()), Qt::DirectConnection);
 	connect(mWorker, SIGNAL(newPauseState(const QString &)), this, SLOT(receivePauseState(const QString &)));
 	connect(mWorker, SIGNAL(sendStatistics(const QString &)), this, SIGNAL(engineStatistics(const QString &)));
@@ -31,6 +31,8 @@ MainAlg::MainAlg(SharedRes * sharedRes)
 	connect(mWorker, SIGNAL(sendToSimConnector(const QByteArray &)),
 			this, SIGNAL(sendToSimConnector(const QByteArray &)));
 	connect(this, SIGNAL(updateBallStatus(bool)), mWorker, SLOT(changeBallStatus(bool)));
+	connect(mWorker, SIGNAL(toMatlabConsole(const QString &)), this, SIGNAL(toMatlabConsole(const QString &)));
+	connect(this, SIGNAL(updateMatlabDebugFrequency(int)), mWorker, SLOT(setMatlabDebugFrequency(int)));
 
 	connect(this, SIGNAL(connectorChanged(bool, const QString &, int))
 				, mWorker, SLOT(changeConnector(bool, const QString &, int)));

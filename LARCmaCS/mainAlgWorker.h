@@ -24,9 +24,11 @@ signals:
 	void newPauseState(const QString & state);
 	void sendStatistics(const QString & statistics);
 	void getDataFromReceiver();
+	void toMatlabConsole(const QString & str);
 
 public slots:
 	void start();
+	void setMatlabDebugFrequency(int frequency);
 	void formStatistics();
 	void updatePauseState();
 	void stop();
@@ -35,16 +37,17 @@ public slots:
 	void runMatlab();
 	void stop_matlab();
 	void run();
-	void EvalString(const QString & s);
+	void evalString(const QString & s);
 	void changeBallStatus(bool ballStatus);
 	void changeConnector(bool isSim, const QString &, int);
 
 private:
 	void init();
-	bool mIsSimEnabledFlag = 0;
-	char m_buffer[256]; // matlab buffer
+	bool mIsSimEnabledFlag = false;
+	char mMatlabOutputBuffer[Constants::matlabOutputBufferSize];
 	MlData fmldata;
 	bool fmtlab;
+	int mFrequency = 1;
 	bool mShutdownFlag;
 	bool pause;
 	bool mIsPause;
