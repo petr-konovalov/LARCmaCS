@@ -29,7 +29,6 @@ private:
 public:
 	QRectF boundingRect() const;
 	QPainterPath shape() const;
-	//unsigned long int tStamp;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	Robot();
 	Robot(double _x, double _y, double _orientation, int _teamID, int _id, int _key, double _conf);
