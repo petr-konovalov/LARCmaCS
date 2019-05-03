@@ -53,3 +53,4 @@ MATLAB_BIN = $${MATLAB_DIR}\..\bin\win$$BIT
 msvc: OTHER_BIN = '$$[QT_INSTALL_BINS];$${PROTO_DIR}/$${PREFIX_STR}bin/'
 mingw: OTHER_BIN = '$${MSYS_DIR}\mingw$${BIT}\bin'
 QMAKE_SUBSTITUTES += LARCmaCS.cmd.in
+OTHER_FILES += $$QMAKE_SUBSTITUTES
