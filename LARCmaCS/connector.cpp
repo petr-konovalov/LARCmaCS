@@ -9,6 +9,7 @@ Connector::Connector(SharedRes * sharedRes)
 	: mSharedRes(sharedRes)
 	, mUdpSocket(this)
 	, mStatisticsTimer(this)
+	, mIsPause(false)
 {}
 
 Connector::~Connector()
@@ -97,5 +98,21 @@ void Connector::sendNewCommand(const QVector<double> & newmess)
 
 void Connector::onPauseChanged(bool status)
 {
+	qDebug() << "onPauseChanged" << status;
 	mIsPause = status;
+
+	if (mIsPause) { //TODO: add check of remote control
+		QByteArray command;
+		if (!mIsSim) {
+			for (int i = 1; i <= 12; i++) {
+				DefaultRobot::formControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
+				run(i, command);
+			}
+		} else {
+			for (int i = 0; i <= 12; i++) {
+				GrSimRobot::formControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
+				runSim(command); //for more power of remote control
+			}
+		}
+	}
 }

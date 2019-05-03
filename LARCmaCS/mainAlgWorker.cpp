@@ -12,6 +12,7 @@ MainAlgWorker::MainAlgWorker()
 {
 	mPacketSSL = QSharedPointer<PacketSSL>();
 	mIsBallInside = false;
+	mIsPause = false;
 }
 
 MainAlgWorker::~MainAlgWorker(){}
@@ -82,8 +83,7 @@ void MainAlgWorker::updatePauseState()
 {
 	evalString("ispause=RP.Pause");
 	mxArray *mxitpause = engGetVariable(fmldata.ep, "ispause");
-	mIsPause = true;
-	emit pause(mIsPause);
+	bool pauseStatus = true;
 	if (mxitpause != 0) {
 		double* itpause = mxGetPr(mxitpause);
 		if (itpause != 0) {
@@ -95,8 +95,7 @@ void MainAlgWorker::updatePauseState()
 						if ((*zMain_End) == 0) {
 							emit newPauseState("main br");
 						} else {
-							mIsPause = false;
-							emit pause(mIsPause);
+							pauseStatus = false;
 							emit newPauseState("WORK");
 						}
 					} else {
@@ -113,6 +112,10 @@ void MainAlgWorker::updatePauseState()
 		}
 	} else {
 		emit newPauseState("-err-mp"); //Matlab does not respond
+	}
+
+	if (mIsPause != pauseStatus) {
+		emit pause(pauseStatus);
 	}
 }
 
@@ -164,21 +167,6 @@ void MainAlgWorker::processPacket(const QSharedPointer<PacketSSL> & packetssl)
 	}
 	free(ruleArray);
 	mxDestroyArray(fmldata.Rule);
-
-//	if (mIsPause) { //TODO: add check of remote control
-//		QByteArray command;
-//		if (!mIsSimEnabledFlag) {
-//			for (int i = 1; i <= 12; i++) {
-//				DefaultRobot::formControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
-//				emit sendToConnector(i, command);
-//			}
-//		} else {
-//			for (int i = 0; i <= 12; i++) {
-//				GrSimRobot::formControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
-//				emit sendToSimConnector(command); //for more power of remote control
-//			}
-//		}
-//	}
 
 	updatePauseState();
 }
