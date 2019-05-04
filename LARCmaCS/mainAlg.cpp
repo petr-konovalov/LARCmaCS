@@ -40,11 +40,14 @@ MainAlg::MainAlg(SharedRes * sharedRes)
 	connect(mWorker, SIGNAL(newData(const QVector<double> &)), this, SIGNAL(newData(const QVector<double> &)));
 	connect(mWorker, SIGNAL(pause(bool)), this, SIGNAL(pause(bool)));
 
+	connect(this, SIGNAL(stopped()), mWorker, SLOT(stop()));
+
 	mThread.start();
 }
 
 MainAlg::~MainAlg()
 {
+	emit stopped();
 	mThread.quit();
 	mThread.wait();
 }

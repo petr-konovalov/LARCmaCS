@@ -51,6 +51,7 @@ signals:
 	void connectorChanged(bool, const QString &, int);
 	void newData(const QVector<double> & data);
 	void pause(bool status);
+	void stopped();
 
 private:
 	SharedRes * mSharedRes;

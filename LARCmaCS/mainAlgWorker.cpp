@@ -71,7 +71,6 @@ void MainAlgWorker::run()
 		processPacket(mPacketSSL);
 		QApplication::processEvents();
 	}
-	emit finished();
 }
 
 void MainAlgWorker::setPacketSSL(const QSharedPointer<PacketSSL> & packetSSL)
