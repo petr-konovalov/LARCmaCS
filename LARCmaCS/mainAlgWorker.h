@@ -6,23 +6,20 @@
 
 #include "packetSSL.h"
 #include "mlData.h"
+#include "sharedRes.h"
 
 class MainAlgWorker : public QObject
 {
 	Q_OBJECT
 
 public:
-	MainAlgWorker();
+	MainAlgWorker(SharedRes * sharedRes);
 	void setPacketSSL(const QSharedPointer<PacketSSL> & packetSSL);
 	~MainAlgWorker();
 
 signals:
-	void finished();
-	void sendToConnector(int N, const QByteArray & command);
-	void sendToSimConnector(const QByteArray & command);
 	void newPauseState(const QString & state);
 	void sendStatistics(const QString & statistics);
-	void getDataFromReceiver();
 	void toMatlabConsole(const QString & str);
 	void newData(const QVector<double> & data);
 	void pause(bool status);
@@ -44,6 +41,7 @@ public slots:
 
 private:
 	void init();
+	const QSharedPointer<PacketSSL> &loadVisionData();
 	bool mIsSimEnabledFlag = false;
 	char mMatlabOutputBuffer[Constants::matlabOutputBufferSize];
 	MlData fmldata;
@@ -56,4 +54,5 @@ private:
 	QTimer mStatisticsTimer;
 	QSharedPointer<PacketSSL> mPacketSSL;
 	double mIsBallInside;
+	SharedRes * mSharedRes;
 };

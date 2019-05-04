@@ -15,21 +15,15 @@
 #include "mainAlg.h"
 
 MainAlg::MainAlg(SharedRes * sharedRes)
-	: mSharedRes(sharedRes)
-	, mWorker(new MainAlgWorker())
+	: mWorker(new MainAlgWorker(sharedRes))
 {
 	mWorker->moveToThread(&mThread);
 	connect(&mThread, SIGNAL(started()), mWorker, SLOT(start()));
 	connect(&mThread, SIGNAL(finished()), mWorker, SLOT(deleteLater()));
 
 	connect(this, SIGNAL(MLEvalString(const QString &)), mWorker, SLOT(evalString(const QString &)));
-	connect(mWorker, SIGNAL(getDataFromReceiver()), this, SLOT(loadVisionData()), Qt::DirectConnection);
 	connect(mWorker, SIGNAL(newPauseState(const QString &)), this, SLOT(receivePauseState(const QString &)));
 	connect(mWorker, SIGNAL(sendStatistics(const QString &)), this, SIGNAL(engineStatistics(const QString &)));
-	connect(mWorker, SIGNAL(sendToConnector(int, const QByteArray &)),
-			this, SIGNAL(sendToConnector(int, const QByteArray &)));
-	connect(mWorker, SIGNAL(sendToSimConnector(const QByteArray &)),
-			this, SIGNAL(sendToSimConnector(const QByteArray &)));
 	connect(this, SIGNAL(updateBallStatus(bool)), mWorker, SLOT(changeBallStatus(bool)));
 	connect(mWorker, SIGNAL(toMatlabConsole(const QString &)), this, SIGNAL(toMatlabConsole(const QString &)));
 	connect(this, SIGNAL(updateMatlabDebugFrequency(int)), mWorker, SLOT(setMatlabDebugFrequency(int)));
@@ -60,82 +54,6 @@ void MainAlg::changeBallStatus(bool status)
 void MainAlg::EvalString(const QString & s)
 {
 	emit MLEvalString(s);
-}
-
-void MainAlg::loadVisionData()
-{
-	QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > detectionPackets = mSharedRes->getDetection();
-	int balls_n, idCam, robots_blue_n, robots_yellow_n;
-	SSL_DetectionBall ball;
-
-	QSharedPointer<SSL_WrapperPacket> packet;
-
-	QSharedPointer<PacketSSL> mPacketSSL = QSharedPointer<PacketSSL>(new PacketSSL());
-	for (int i = 0; i < Constants::maxRobotsInTeam; i++) {
-			mPacketSSL->robots_blue[i] = 0;
-			mPacketSSL->robots_yellow[i] = 0;
-	}
-	mPacketSSL->balls[0] = 0;
-	if (detectionPackets.isNull())
-	{
-		return;
-	}
-	for (int i = 0; i < detectionPackets->size(); i++) {
-		packet = detectionPackets->at(i);
-		if (packet.isNull()) {
-			continue;
-		}
-		SSL_DetectionRobot robot;
-		mDetection.Clear();
-		mDetection = packet->detection();
-
-		idCam = mDetection.camera_id() + 1;
-		balls_n = mDetection.balls_size();
-
-		// [Start] Ball info
-		if (balls_n != 0) {
-			mPacketSSL->balls[0] = idCam;
-			ball = mDetection.balls(0);
-			mPacketSSL->balls[1] = ball.x();
-			mPacketSSL->balls[2] = ball.y();
-		}
-		// [End] Ball info
-
-		// [Start] Robot info
-		robots_blue_n = mDetection.robots_blue_size();
-		robots_yellow_n = mDetection.robots_yellow_size();
-
-		for (int i = 0; i < robots_blue_n; i++) {
-			robot = mDetection.robots_blue(i);
-			if (robot.has_robot_id() && robot.robot_id() >= 0 && robot.robot_id() <= Constants::maxRobotsInTeam) {
-				mPacketSSL->robots_blue[robot.robot_id()] = idCam;
-				mPacketSSL->robots_blue[robot.robot_id() + Constants::maxRobotsInTeam] = robot.x();
-				mPacketSSL->robots_blue[robot.robot_id() + Constants::maxRobotsInTeam * 2] = robot.y();
-				mPacketSSL->robots_blue[robot.robot_id() + Constants::maxRobotsInTeam * 3] = robot.orientation();
-			} else {
-				if (robot.has_robot_id()) {
-					cout << robot.robot_id() << " blue" << endl;
-				}
-			}
-		}
-
-		for (int i = 0; i < robots_yellow_n; i++) {
-			robot = mDetection.robots_yellow(i);
-			if (robot.has_robot_id() && robot.robot_id() >= 0 && robot.robot_id() <= Constants::maxRobotsInTeam) {
-				mPacketSSL->robots_yellow[robot.robot_id()] = idCam;
-				mPacketSSL->robots_yellow[robot.robot_id() + 12] = robot.x();
-				mPacketSSL->robots_yellow[robot.robot_id() + 24] = robot.y();
-				mPacketSSL->robots_yellow[robot.robot_id() + 36] = robot.orientation();
-			} else {
-				if (robot.has_robot_id()) {
-					cout << robot.robot_id() << " yellow" << endl;
-				}
-			}
-		}
-		// [End] Robot info
-	}
-
-	mWorker->setPacketSSL(mPacketSSL);
 }
 
 void MainAlg::receivePauseState(const QString & state)

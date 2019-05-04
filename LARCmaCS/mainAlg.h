@@ -35,7 +35,6 @@ public slots:
 	void EvalString(const QString & s);
 	void receivePauseState(const QString & state);
 	void changeBallStatus(bool status);
-	void loadVisionData();
 
 signals:
 	void updateBallStatus(bool status);
@@ -53,7 +52,6 @@ signals:
 	void stopped();
 
 private:
-	SharedRes * mSharedRes;
 	SSL_DetectionFrame mDetection;
 	MainAlgWorker * mWorker;
 	QThread mThread;
