@@ -14,7 +14,6 @@ class MainAlgWorker : public QObject
 public:
 	MainAlgWorker();
 	void setPacketSSL(const QSharedPointer<PacketSSL> & packetSSL);
-	bool getIsSimEnabledFlag();
 	~MainAlgWorker();
 
 signals:

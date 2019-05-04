@@ -30,7 +30,6 @@ class MainAlg : public QObject
 public:
 	explicit MainAlg(SharedRes * sharedRes);
 	~MainAlg();
-	bool getIsSimEnabledFlag();
 
 public slots:
 	void EvalString(const QString & s);

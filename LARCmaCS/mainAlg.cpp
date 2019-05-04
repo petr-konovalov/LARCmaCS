@@ -57,11 +57,6 @@ void MainAlg::changeBallStatus(bool status)
 	emit updateBallStatus(status);
 }
 
-bool MainAlg::getIsSimEnabledFlag()
-{
-	return mWorker->getIsSimEnabledFlag();
-}
-
 void MainAlg::EvalString(const QString & s)
 {
 	emit MLEvalString(s);

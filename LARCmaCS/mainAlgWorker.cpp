@@ -59,11 +59,6 @@ void MainAlgWorker::init(){
 	runMatlab();
 }
 
-bool MainAlgWorker::getIsSimEnabledFlag()
-{
-	return mIsSimEnabledFlag;
-}
-
 void MainAlgWorker::run()
 {
 	while (!mShutdownFlag) {
