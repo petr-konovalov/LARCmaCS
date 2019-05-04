@@ -69,10 +69,6 @@ QSharedPointer<PacketSSL> MainAlgWorker::loadVisionData()
 	}
 
 	QSharedPointer<PacketSSL> packetSSL = QSharedPointer<PacketSSL>(new PacketSSL());
-	for (int i = 0; i < Constants::maxRobotsInTeam; i++) {
-		packetSSL->robots_blue[i] = 0;
-		packetSSL->robots_yellow[i] = 0;
-	}
 
 	packetSSL->balls[0] = 0;
 
