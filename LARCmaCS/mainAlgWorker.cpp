@@ -141,11 +141,6 @@ void MainAlgWorker::run()
 	}
 }
 
-void MainAlgWorker::setPacketSSL(const QSharedPointer<PacketSSL> & packetSSL)
-{
-	mPacketSSL = packetSSL;
-}
-
 void MainAlgWorker::updatePauseState()
 {
 	evalString("ispause=RP.Pause");

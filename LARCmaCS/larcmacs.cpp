@@ -40,9 +40,6 @@ LARCmaCS::LARCmaCS(QWidget *parent)
 	connect(ui->matlabConsole, SIGNAL(customContextMenuRequested(const QPoint &)),
 			this, SLOT(matlabConsoleMenuRequested(const QPoint &)));
 
-	//send command to robots
-	connect(&mainalg, SIGNAL(sendToConnector(int, const QByteArray &)), &connector, SLOT(run(int, const QByteArray &)));
-
 	//gui connector
 	connect(&sceneview.worker, SIGNAL(updateView()), this, SLOT(updateView()));
 	connect(ui->sceneslider, SIGNAL(valueChanged(int)), this, SLOT(scaleView(int)));
@@ -62,7 +59,6 @@ LARCmaCS::LARCmaCS(QWidget *parent)
 	connect(this, SIGNAL(connectorChanged(bool, const QString &, int))
 				, &receiver, SLOT(changeSimulatorMode(bool, const QString &, int)));
 	connect(&receiver, SIGNAL(clearField()), fieldscene, SLOT(ClearField()));
-	connect(&mainalg, SIGNAL(sendToSimConnector(const QByteArray &)), &connector, SLOT(runSim(const QByteArray &)));
 
 	connect(this, SIGNAL(connectorChanged(bool, const QString &, int))
 				, &connector, SLOT(onConnectorChange(bool, const QString &, int)));

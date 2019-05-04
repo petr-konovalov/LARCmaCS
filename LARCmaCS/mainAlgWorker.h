@@ -14,7 +14,6 @@ class MainAlgWorker : public QObject
 
 public:
 	MainAlgWorker(SharedRes * sharedRes);
-	void setPacketSSL(const QSharedPointer<PacketSSL> & packetSSL);
 	~MainAlgWorker();
 
 signals:
