@@ -40,12 +40,12 @@ const QSharedPointer<QVector<bool> > & SharedRes::getBallInsideData()
 	return mBallInsideData;
 }
 
-const QSharedPointer<SSL_WrapperPacket> & SharedRes::getGeometry()
+QSharedPointer<SSL_WrapperPacket> SharedRes::getGeometry()
 {
 	return mGeometry;
 }
 
-const QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > & SharedRes::getDetection()
+QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > SharedRes::getDetection()
 {
 	return mDetection;
 }

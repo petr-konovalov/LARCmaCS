@@ -41,7 +41,7 @@ public slots:
 
 private:
 	void init();
-	const QSharedPointer<PacketSSL> &loadVisionData();
+	QSharedPointer<PacketSSL> loadVisionData();
 	bool mIsSimEnabledFlag = false;
 	char mMatlabOutputBuffer[Constants::matlabOutputBufferSize];
 	MlData fmldata;

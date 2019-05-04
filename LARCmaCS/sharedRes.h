@@ -35,8 +35,8 @@ public:
 	void setDetection(const QSharedPointer<SSL_WrapperPacket> & detection, int camID);
 	void setGeometry(const QSharedPointer<SSL_WrapperPacket> & geometry);
 	const QSharedPointer<QVector<bool> > & getBallInsideData();
-	const QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > & getDetection();
-	const QSharedPointer<SSL_WrapperPacket> & getGeometry();
+	QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > getDetection();
+	QSharedPointer<SSL_WrapperPacket> getGeometry();
 
 private:
 	QMutex mIPMutex;

@@ -59,9 +59,8 @@ void MainAlgWorker::init(){
 	runMatlab();
 }
 
-const QSharedPointer<PacketSSL> &MainAlgWorker::loadVisionData()
+QSharedPointer<PacketSSL> MainAlgWorker::loadVisionData()
 {
-	SSL_DetectionFrame mDetection;
 	QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > detectionPackets = mSharedRes->getDetection();
 
 	if (detectionPackets.isNull())
@@ -69,13 +68,13 @@ const QSharedPointer<PacketSSL> &MainAlgWorker::loadVisionData()
 		return nullptr;
 	}
 
-	QSharedPointer<PacketSSL> mPacketSSL = QSharedPointer<PacketSSL>(new PacketSSL());
+	QSharedPointer<PacketSSL> packetSSL = QSharedPointer<PacketSSL>(new PacketSSL());
 	for (int i = 0; i < Constants::maxRobotsInTeam; i++) {
-		mPacketSSL->robots_blue[i] = 0;
-		mPacketSSL->robots_yellow[i] = 0;
+		packetSSL->robots_blue[i] = 0;
+		packetSSL->robots_yellow[i] = 0;
 	}
 
-	mPacketSSL->balls[0] = 0;
+	packetSSL->balls[0] = 0;
 
 	int balls_n, idCam, robots_blue_n, robots_yellow_n;
 	SSL_DetectionBall ball;
@@ -85,19 +84,18 @@ const QSharedPointer<PacketSSL> &MainAlgWorker::loadVisionData()
 		if (packet.isNull()) {
 			continue;
 		}
-		SSL_DetectionRobot robot;
-		mDetection.Clear();
-		mDetection = packet->detection();
+
+		SSL_DetectionFrame mDetection = packet->detection();
 
 		idCam = mDetection.camera_id() + 1;
 		balls_n = mDetection.balls_size();
 
 		// [Start] Ball info
 		if (balls_n != 0) {
-			mPacketSSL->balls[0] = idCam;
+			packetSSL->balls[0] = idCam;
 			ball = mDetection.balls(0);
-			mPacketSSL->balls[1] = ball.x();
-			mPacketSSL->balls[2] = ball.y();
+			packetSSL->balls[1] = ball.x();
+			packetSSL->balls[2] = ball.y();
 		}
 		// [End] Ball info
 
@@ -106,12 +104,12 @@ const QSharedPointer<PacketSSL> &MainAlgWorker::loadVisionData()
 		robots_yellow_n = mDetection.robots_yellow_size();
 
 		for (int i = 0; i < robots_blue_n; i++) {
-			robot = mDetection.robots_blue(i);
+			SSL_DetectionRobot robot = mDetection.robots_blue(i);
 			if (robot.has_robot_id() && robot.robot_id() >= 0 && robot.robot_id() <= Constants::maxRobotsInTeam) {
-				mPacketSSL->robots_blue[robot.robot_id()] = idCam;
-				mPacketSSL->robots_blue[robot.robot_id() + Constants::maxRobotsInTeam] = robot.x();
-				mPacketSSL->robots_blue[robot.robot_id() + Constants::maxRobotsInTeam * 2] = robot.y();
-				mPacketSSL->robots_blue[robot.robot_id() + Constants::maxRobotsInTeam * 3] = robot.orientation();
+				packetSSL->robots_blue[robot.robot_id()] = idCam;
+				packetSSL->robots_blue[robot.robot_id() + Constants::maxRobotsInTeam] = robot.x();
+				packetSSL->robots_blue[robot.robot_id() + Constants::maxRobotsInTeam * 2] = robot.y();
+				packetSSL->robots_blue[robot.robot_id() + Constants::maxRobotsInTeam * 3] = robot.orientation();
 			} else {
 				if (robot.has_robot_id()) {
 					qDebug() << robot.robot_id() << " blue" << endl;
@@ -120,12 +118,12 @@ const QSharedPointer<PacketSSL> &MainAlgWorker::loadVisionData()
 		}
 
 		for (int i = 0; i < robots_yellow_n; i++) {
-			robot = mDetection.robots_yellow(i);
+			SSL_DetectionRobot robot = mDetection.robots_yellow(i);
 			if (robot.has_robot_id() && robot.robot_id() >= 0 && robot.robot_id() <= Constants::maxRobotsInTeam) {
-				mPacketSSL->robots_yellow[robot.robot_id()] = idCam;
-				mPacketSSL->robots_yellow[robot.robot_id() + 12] = robot.x();
-				mPacketSSL->robots_yellow[robot.robot_id() + 24] = robot.y();
-				mPacketSSL->robots_yellow[robot.robot_id() + 36] = robot.orientation();
+				packetSSL->robots_yellow[robot.robot_id()] = idCam;
+				packetSSL->robots_yellow[robot.robot_id() + 12] = robot.x();
+				packetSSL->robots_yellow[robot.robot_id() + 24] = robot.y();
+				packetSSL->robots_yellow[robot.robot_id() + 36] = robot.orientation();
 			} else {
 				if (robot.has_robot_id()) {
 					qDebug() << robot.robot_id() << " yellow" << endl;
@@ -135,14 +133,15 @@ const QSharedPointer<PacketSSL> &MainAlgWorker::loadVisionData()
 		// [End] Robot info
 	}
 
-	return mPacketSSL;
+	return packetSSL;
 }
 
 void MainAlgWorker::run()
 {
 	while (!mShutdownFlag) {
 		QSharedPointer<PacketSSL> packetSSL = loadVisionData();
-		processPacket(packetSSL);
+		if (!packetSSL.isNull())
+			processPacket(packetSSL);
 		QApplication::processEvents();
 	}
 }
