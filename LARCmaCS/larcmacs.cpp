@@ -67,9 +67,6 @@ LARCmaCS::LARCmaCS(QWidget *parent)
 	connect(this, SIGNAL(connectorChanged(bool, const QString &, int))
 				, &connector, SLOT(onConnectorChange(bool, const QString &, int)));
 
-	connect(this, SIGNAL(connectorChanged(bool, const QString &, int))
-				, &mainalg, SIGNAL(connectorChanged(bool, const QString &, int)));
-
 	connect(&mainalg, SIGNAL(newData(const QVector<double> &))
 				, &connector, SLOT(sendNewCommand(const QVector<double> &)));
 

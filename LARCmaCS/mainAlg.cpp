@@ -24,12 +24,8 @@ MainAlg::MainAlg(SharedRes * sharedRes)
 	connect(this, SIGNAL(MLEvalString(const QString &)), mWorker, SLOT(evalString(const QString &)));
 	connect(mWorker, SIGNAL(newPauseState(const QString &)), this, SLOT(receivePauseState(const QString &)));
 	connect(mWorker, SIGNAL(sendStatistics(const QString &)), this, SIGNAL(engineStatistics(const QString &)));
-	connect(this, SIGNAL(updateBallStatus(bool)), mWorker, SLOT(changeBallStatus(bool)));
 	connect(mWorker, SIGNAL(toMatlabConsole(const QString &)), this, SIGNAL(toMatlabConsole(const QString &)));
 	connect(this, SIGNAL(updateMatlabDebugFrequency(int)), mWorker, SLOT(setMatlabDebugFrequency(int)));
-
-	connect(this, SIGNAL(connectorChanged(bool, const QString &, int))
-				, mWorker, SLOT(changeConnector(bool, const QString &, int)));
 
 	connect(mWorker, SIGNAL(newData(const QVector<double> &)), this, SIGNAL(newData(const QVector<double> &)));
 	connect(mWorker, SIGNAL(pause(bool)), this, SIGNAL(pause(bool)));

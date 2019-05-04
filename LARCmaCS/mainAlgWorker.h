@@ -36,8 +36,6 @@ public slots:
 	void stop_matlab();
 	void run();
 	void evalString(const QString & s);
-	void changeBallStatus(bool ballStatus);
-	void changeConnector(bool isSim, const QString &, int);
 
 private:
 	void init();

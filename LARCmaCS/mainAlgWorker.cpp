@@ -63,8 +63,7 @@ QSharedPointer<PacketSSL> MainAlgWorker::loadVisionData()
 {
 	QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > detectionPackets = mSharedRes->getDetection();
 
-	if (detectionPackets.isNull())
-	{
+	if (detectionPackets.isNull()) {
 		return nullptr;
 	}
 
@@ -184,6 +183,7 @@ void MainAlgWorker::updatePauseState()
 
 	if (mIsPause != pauseStatus) {
 		emit pause(pauseStatus);
+		mIsPause = pauseStatus;
 	}
 }
 
@@ -278,14 +278,4 @@ void MainAlgWorker::evalString(const QString & s)
 	if (!tmp.contains("\nispause =") && tmp != "" && (mTotalPacketsNum % mFrequency == 0)) {
 		emit toMatlabConsole(tmp);
 	}
-}
-
-void MainAlgWorker::changeBallStatus(bool ballStatus)
-{
-	mIsBallInside = ballStatus;
-}
-
-void MainAlgWorker::changeConnector(bool isSim, const QString &, int)
-{
-	mIsSimEnabledFlag = isSim;
 }
