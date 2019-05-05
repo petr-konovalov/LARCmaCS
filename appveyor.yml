@@ -9,8 +9,8 @@ environment:
     - platform: x86
       platform_name: i686
       bit: 32
-      MATLAB_VER: R2015b
-      MATLAB_SHORT_VER: 90
+      MATLAB_VER: R2013b
+      MATLAB_SHORT_VER: 82
       QT_DIR: C:\Qt\5.11.3\mingw53_32
       mingw_ver: mingw530_32
     - platform: x64
