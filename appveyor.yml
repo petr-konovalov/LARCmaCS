@@ -4,28 +4,36 @@ shallow_clone: true
 environment:
   global:
     MSYS_DIR: C:\msys64
-    
+    MATLAB_DIR: C:\MCR\v%MATLAB_SHORT_VER%\extern
   matrix:
     - platform: x86
       platform_name: i686
-      MATLAB_DIR: C:\MCR\%platform%\extern
-      QT_DIR: C:\Qt\5.11.3\mingw53_32
       bit: 32
+      MATLAB_VER: R2015b
+      MATLAB_SHORT_VER: 90
+      QT_DIR: C:\Qt\5.11.3\mingw53_32
       mingw_ver: mingw530_32
     - platform: x64
       platform_name: x86_64
-      MATLAB_DIR: C:\MCR\%platform%\extern
       bit: 64      
+      MATLAB_VER: R2018b
+      MATLAB_SHORT_VER: 95
       QT_DIR: C:\Qt\5.12.1\mingw73_64
       mingw_ver: mingw730_64
 
 init:
-  - set PATH=%PATH%;%MSYS_DIR%\usr\bin
-  - git clone https://github.com/IKhonakhbeeva/MCR_for_LARCmaCS C:\MCR
+  - set PATH=%MSYS_DIR%\usr\bin;%PATH%
+#  - git clone https://github.com/IKhonakhbeeva/MCR_for_LARCmaCS C:\MCR
 #  - pacman --noconfirm -Su mingw%bit%/mingw-w64-%platform_name%-gcc
 #  - pacman --noconfirm -Su mingw%bit%/mingw-w64-%platform_name%-make
 #  - pacman --noconfirm -Su mingw%bit%/mingw-w64-%platform_name%-qt5
   - pacman --noconfirm -Su mingw%bit%/mingw-w64-%platform_name%-protobuf
+  - pacman --noconfirm -Su unzip
+install:
+  - set matlab_ref="http://ssd.mathworks.com/supportfiles/downloads/%MATLAB_VER%/deployment_files/%MATLAB_VER%/installers/win%bit%/MCR_%MATLAB_VER%_win%bit%_installer.exe"
+  - cd %APPVEYOR_BUILD_FOLDER%
+  - echo %matlab_ref%
+  - install_mcr.sh %matlab_ref%
   
 build_script:
   - set PATH=%QT_DIR%\bin;%MSYS_DIR%\mingw%bit%\bin;%PATH%;
