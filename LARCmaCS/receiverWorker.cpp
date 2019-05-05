@@ -79,14 +79,18 @@ void ReceiverWorker::processPendingDatagrams()
 		QByteArray datagram;
 		datagram.resize(datagramSize);
 		mSocket.readDatagram(datagram.data(), datagram.size());
-		QSharedPointer<SSL_WrapperPacket> packet = QSharedPointer<SSL_WrapperPacket>(new SSL_WrapperPacket());
+		QSharedPointer<SSL_WrapperPacket> packet(new SSL_WrapperPacket());
 		packet->ParseFromArray(datagram.data(), datagramSize);
-		if (packet->has_detection()) {
-			unsigned int camID = packet->detection().camera_id();
-			emit updateDetection(packet, camID);
-		} else {
+
+		if (!packet->IsInitialized())
+			qDebug() << "Packet is uninitialized";
+
+		if (packet->has_detection())
+			emit updateDetection(packet, packet->detection().camera_id());
+
+		if (packet->has_geometry())
 			emit updateGeometry(packet);
-		}
+
 		mTotalPacketsNum++;
 		mPacketsPerSecond++;
 	}

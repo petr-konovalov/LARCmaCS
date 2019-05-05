@@ -75,7 +75,9 @@ QSharedPointer<PacketSSL> MainAlgWorker::loadVisionData()
 	SSL_DetectionBall ball;
 	for (int i = 0; i < detectionPackets->size(); i++) {
 		QSharedPointer<SSL_WrapperPacket> packet = detectionPackets->at(i);
-		if (packet.isNull()) {
+		if (!packet || !packet->IsInitialized()) {
+			if (packet)
+				qDebug() << "Packet is uninitialized!";
 			continue;
 		}
 
@@ -107,7 +109,7 @@ QSharedPointer<PacketSSL> MainAlgWorker::loadVisionData()
 					packetSSL->robots_blue[robot.robot_id() + Constants::maxRobotsInTeam * 3] = robot.orientation();
 				} else {
 					if (robot.has_robot_id()) {
-						qDebug() << robot.robot_id() << " blue" << endl;
+						qDebug() << "Error: incorrect blue robot id" << robot.robot_id();
 					}
 				}
 			}
