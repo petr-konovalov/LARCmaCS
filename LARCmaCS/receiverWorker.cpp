@@ -80,10 +80,16 @@ void ReceiverWorker::processPendingDatagrams()
 		datagram.resize(datagramSize);
 		mSocket.readDatagram(datagram.data(), datagram.size());
 		QSharedPointer<SSL_WrapperPacket> packet(new SSL_WrapperPacket());
-		packet->ParseFromArray(datagram.data(), datagramSize);
+		auto parseResult = packet->ParseFromArray(datagram.data(), datagramSize);
+		if (!parseResult) {
+			qDebug() << "ERROR: Failed to parse packet from datagram; skipping";
+			continue;
+		}
 
-		if (!packet->IsInitialized())
-			qDebug() << "Packet is uninitialized";
+		if (!packet->IsInitialized()) {
+			qDebug() << "ERROR: Packet is uninitialized; skipping";
+			continue;
+		}
 
 		if (packet->has_detection())
 			emit updateDetection(packet, packet->detection().camera_id());

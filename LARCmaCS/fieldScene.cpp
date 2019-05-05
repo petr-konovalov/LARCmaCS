@@ -18,12 +18,13 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <QTextStream>
+#include <QDebug>
 
 FieldScene::FieldScene(SharedRes * sharedRes, QObject *parent)
 	: QGraphicsScene(parent)
 	, mSharedRes(sharedRes)
 {
-	setBackgroundBrush (QBrush(QColor(0, 0x91, 0x19, 255), Qt::SolidPattern));
+	setBackgroundBrush(QBrush(QColor(0, 0x91, 0x19, 255), Qt::SolidPattern));
 	shutdownSoccerView = false;
 	ksize = 10;
 	loadFieldGeometry();
@@ -46,10 +47,10 @@ FieldScene::FieldScene(SharedRes * sharedRes, QObject *parent)
 void FieldScene::robotsInit()
 {
 	for (int i = 0; i < Constants::maxRobotsInTeam; i++) {
-		addRobot(new Robot(0, 0, 0, Robot::teamBlue, i, 0, 0));
+		addRobot(QSharedPointer<Robot>(new Robot(0, 0, 0, Robot::teamBlue, i, 0, 0)));
 	}
 	for (int i = 0; i < Constants::maxRobotsInTeam; i++) {
-		addRobot(new Robot(0, 0, 0, Robot::teamYellow, i, 0, 0));
+		addRobot(QSharedPointer<Robot>(new Robot(0, 0, 0, Robot::teamYellow, i, 0, 0)));
 	}
 }
 
@@ -63,10 +64,10 @@ void FieldScene::updateFrame()
 	updateField(mSharedRes->getDetection(), mSharedRes->getGeometry());
 }
 
-void FieldScene::addRobot(Robot *robot)
+void FieldScene::addRobot(const QSharedPointer<Robot> & robot)
 {
 	robots.append(robot);
-	this->addItem(robot);
+	this->addItem(robot.data());
 }
 
 #ifndef OLD_SSL_PROTO
@@ -134,7 +135,7 @@ void FieldScene::updateRobot(const SSL_DetectionRobot & robot, int team, unsigne
 	}
 
 	if (robotNum == Robot::robotNotFound) {
-		addRobot(new Robot(x, y, orientation, team, id, camID, conf));
+		addRobot(QSharedPointer<Robot>(new Robot(x, y, orientation, team, id, camID, conf)));
 		robotNum = robots.size() - 1;
 	}
 
@@ -156,7 +157,7 @@ void FieldScene::updateRobots(const QSharedPointer<SSL_WrapperPacket> & packet)
 	int i = Constants::maxNumOfRobots;
 	while (i < robots.size()) {
 		if (robots.at(i)->getCamID() == camID) {
-			this->removeItem(robots.at(i));
+			this->removeItem(robots.at(i).data());
 			robots.remove(i);
 		} else {
 			i++;

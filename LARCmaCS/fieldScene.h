@@ -50,10 +50,10 @@ private:
 	void robotsInit();
 	void loadFieldGeometry();
 	void loadFieldGeometry(const SSL_GeometryFieldSize & fieldSize);
-	void addRobot(Robot * robot);
+	void addRobot(const QSharedPointer<Robot> &robot);
 	void updateRobots(const QSharedPointer<SSL_WrapperPacket> & packet);
 	//Robots
-	QVector<Robot*> robots;
+	QVector<QSharedPointer<Robot> > robots;
 	//balls
 	QVector < QVector<QGraphicsEllipseItem*> > ballItems;
 	//field
