@@ -3,7 +3,6 @@
 #include <iostream>
 #include <QPainter>
 #include <QStyleOptionGraphicsItem>
-#include "timer.h"
 #define _USE_MATH_DEFINES
 #include <math.h>
 
@@ -86,7 +85,6 @@ Robot::Robot(double _x, double _y, double _orientation, int _teamID, int _id, in
 	idPen->setWidth(0);
 	confPen = new QPen(Qt::white);
 	confPen->setWidth(1);
-	tStamp = GetTimeUSec();
 }
 
 Robot::~Robot()
@@ -142,5 +140,4 @@ void Robot::SetPose (double _x, double _y, double _orientation, double _conf)
 	mRobotY = _y / 10;
 	mOrientation = _orientation;
 	mRobotConfidence = _conf;
-	tStamp = GetTimeUSec();
 }
