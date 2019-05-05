@@ -1,10 +1,12 @@
-#include <math.h>
 #include "larcmacs.h"
+
+#include <QFileDialog>
+#include <QMenu>
+#include <math.h>
+
 #include "ui_larcmacs.h"
 #include "packetSSL.h"
 #include "message.h"
-#include <QFileDialog>
-#include <QMenu>
 #include "settings.h"
 #include "grSimRobot.h"
 
@@ -19,7 +21,10 @@ LARCmaCS::LARCmaCS(QWidget *parent)
 	, fieldscene(new FieldScene(&sharedRes))
 	, mainalg(&sharedRes)
 	, connector(&sharedRes)
+	, mIsSim(false)
 {
+	qRegisterMetaType<QVector<double> >("QVector<double>");
+
 	ui->setupUi(this);
 	ui->fieldView->setScene(fieldscene);
 	scaleView(8);
@@ -34,9 +39,6 @@ LARCmaCS::LARCmaCS(QWidget *parent)
 
 	connect(ui->matlabConsole, SIGNAL(customContextMenuRequested(const QPoint &)),
 			this, SLOT(matlabConsoleMenuRequested(const QPoint &)));
-
-	//send command to robots
-	connect(&mainalg, SIGNAL(sendToConnector(int, const QByteArray &)), &connector, SLOT(run(int, const QByteArray &)));
 
 	//gui connector
 	connect(&sceneview.worker, SIGNAL(updateView()), this, SLOT(updateView()));
@@ -57,13 +59,15 @@ LARCmaCS::LARCmaCS(QWidget *parent)
 	connect(this, SIGNAL(connectorChanged(bool, const QString &, int))
 				, &receiver, SLOT(changeSimulatorMode(bool, const QString &, int)));
 	connect(&receiver, SIGNAL(clearField()), fieldscene, SLOT(ClearField()));
-	connect(&mainalg, SIGNAL(sendToSimConnector(const QByteArray &)), &connector, SLOT(runSim(const QByteArray &)));
 
 	connect(this, SIGNAL(connectorChanged(bool, const QString &, int))
-				, &connector, SIGNAL(connectorChanged(bool, const QString &, int)));
+				, &connector, SLOT(onConnectorChange(bool, const QString &, int)));
 
-	connect(this, SIGNAL(connectorChanged(bool, const QString &, int))
-				, &mainalg, SIGNAL(connectorChanged(bool, const QString &, int)));
+	connect(&mainalg, SIGNAL(newData(const QVector<double> &))
+				, &connector, SLOT(sendNewCommand(const QVector<double> &)));
+
+	connect(&mainalg, SIGNAL(pause(bool))
+				, &connector, SLOT(onPauseChanged(bool)));
 
 	sceneview.start();
 	UpdateStatusBar("Waiting SSL connection...");
@@ -74,8 +78,7 @@ void LARCmaCS::remcontrolsender(int l, int r,int k, int b, bool kickUp)
 {
 	QString ip = ui->lineEditRobotIp->text();
 	QByteArray byteData;
-	bool simFlag = mainalg.getIsSimEnabledFlag();
-	if (!simFlag) {
+	if (!mIsSim) {
 		DefaultRobot::formControlPacket(byteData, 0, r, l, k, kickUp, 0, 4, 0);
 	} else {
 		int numOfRobot = ip.toInt();
@@ -84,9 +87,9 @@ void LARCmaCS::remcontrolsender(int l, int r,int k, int b, bool kickUp)
 
 	unsigned short port;
 	QString IP;
-	if (!simFlag) {
+	if (!mIsSim) {
 		IP = ip;
-		port = Connector::robotPort;
+		port = connector.getRobotPort();
 	} else {
 		IP = connector.getGrSimIP();
 		port = connector.getGrSimPort();
@@ -179,7 +182,8 @@ void LARCmaCS::on_matlabOutputFrequencyLineEdit_textEdited(const QString & text)
 
 void LARCmaCS::on_checkBox_SimEnable_stateChanged(int state)
 {
-	emit connectorChanged(state > 0, ui->lineEditSimIP->text(), ui->lineEditSimPort->text().toInt());
+	mIsSim = state > 0;
+	emit connectorChanged(mIsSim, ui->lineEditSimIP->text(), ui->lineEditSimPort->text().toInt());
 }
 
 void LARCmaCS::on_pushButton_RemoteControl_clicked()

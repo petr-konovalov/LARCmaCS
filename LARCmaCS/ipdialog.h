@@ -1,8 +1,8 @@
 #pragma once
 
 #include <QDialog>
-#include "connector.h"
-#include "receiver.h"
+
+#include "sharedRes.h"
 
 namespace Ui {
 	class IpDialog;

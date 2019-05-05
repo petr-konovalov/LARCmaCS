@@ -1,37 +1,42 @@
 #pragma once
 
-#include <QObject>
-#include <QThread>
-#include <QtCore>
-#include <QtNetwork>
-#include "sharedRes.h"
+#include <QUdpSocket>
+#include <QMap>
+#include <QTimer>
 
-#include "connectorWorker.h"
+#include "constants.h"
+#include "sharedRes.h"
+#include "settings.h"
+#include "defaultRobot.h"
+
+using std::map;
 
 class Connector : public QObject
 {
 	Q_OBJECT
 
 public:
-	explicit Connector(SharedRes * sharedRes);
+	Connector(SharedRes * sharedRes);
 	~Connector();
-	static const unsigned short robotPort = 10000;
 	const QString & getGrSimIP();
 	unsigned short getGrSimPort();
+	unsigned short getRobotPort();
 
 public slots:
+	void onConnectorChange(bool isSim, const QString & ip, int port);
+	void sendNewCommand(const QVector<double> & newmess);
+	void onPauseChanged(bool status);
+
+private:
 	void run(int N, const QByteArray & command);
 	void runSim(const QByteArray & command);
 
-signals:
-	void wstop();
-	void sendPacket(int N, const QByteArray & command);
-	void sendSimPacket(const QByteArray & command);
-
-	void connectorChanged(bool isSim, const QString & simIP, int port);
-
-private:
+	QString mGrSimIP;
+	unsigned short mGrSimPort;
 	SharedRes * mSharedRes;
-	ConnectorWorker * mWorker;
-	QThread mThread;
+	QUdpSocket mUdpSocket;
+	QTimer mStatisticsTimer;
+	bool mIsSim;
+	static const unsigned short mRobotPort = 10000;
+	bool mIsPause;
 };

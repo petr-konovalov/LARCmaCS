@@ -46,6 +46,7 @@ private:
 	QString wifiaddrdata[NUM_CONTROL_ROBOTS];
 	QUdpSocket socket;
 	RobotReceiver robotReceiver;
+	bool mIsSim;
 
 private slots:
 	void UpdateSSLFPS(const QString & message);

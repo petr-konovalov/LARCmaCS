@@ -30,13 +30,11 @@ class MainAlg : public QObject
 public:
 	explicit MainAlg(SharedRes * sharedRes);
 	~MainAlg();
-	bool getIsSimEnabledFlag();
 
 public slots:
 	void EvalString(const QString & s);
 	void receivePauseState(const QString & state);
 	void changeBallStatus(bool status);
-	void loadVisionData();
 
 signals:
 	void updateBallStatus(bool status);
@@ -49,9 +47,11 @@ signals:
 	void UpdatePauseState(const QString & state);
 	void toMatlabConsole(const QString & str);
 	void connectorChanged(bool, const QString &, int);
+	void newData(const QVector<double> & data);
+	void pause(bool status);
+	void stopped();
 
 private:
-	SharedRes * mSharedRes;
 	SSL_DetectionFrame mDetection;
 	MainAlgWorker * mWorker;
 	QThread mThread;
