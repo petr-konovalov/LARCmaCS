@@ -57,11 +57,11 @@ private:
 	//balls
 	QVector < QVector<QGraphicsEllipseItem*> > ballItems;
 	//field
-	QPainterPath * field = nullptr;
+	QPainterPath field;
 	QGraphicsPathItem * fieldItem = nullptr;
 	//brushes and pens
-	QBrush *fieldBrush, *ballBrush;
-	QPen *fieldPen, *fieldLinePen, *ballPen;
+	QBrush fieldBrush, ballBrush;
+	QPen fieldPen, fieldLinePen, ballPen;
 	bool shutdownSoccerView;
 
 	void updateRobot(const SSL_DetectionRobot & robot, int team, unsigned int camID);
