@@ -63,35 +63,32 @@ Robot::Robot(double _x, double _y, double _orientation, int _teamID, int _id, in
 	switch (mTeamID) {
 	case teamBlue:
 	{
-		brush = new QBrush(QColor(0x41, 0x7e, 0xff, 255), Qt::SolidPattern);
-		pen = new QPen(QColor(0x12, 0x3b, 0xa0, 255));
+		brush = QBrush(QColor(0x41, 0x7e, 0xff, 255), Qt::SolidPattern);
+		pen = QPen(QColor(0x12, 0x3b, 0xa0, 255));
 		break;
 	}
 	case teamYellow:
 	{
-		brush = new QBrush(QColor(0xff, 0xf3, 0x3e, 255), Qt::SolidPattern);
-		pen = new QPen(QColor(0xcc, 0x9d, 0x00, 255));
+		brush = QBrush(QColor(0xff, 0xf3, 0x3e, 255), Qt::SolidPattern);
+		pen = QPen(QColor(0xcc, 0x9d, 0x00, 255));
 		break;
 	}
 	default:
 	{
-		brush = new QBrush(QColor(150, 150, 150, 255), Qt::SolidPattern);
-		pen = new QPen(QColor(70, 70, 70, 255));
+		brush = QBrush(QColor(150, 150, 150, 255), Qt::SolidPattern);
+		pen = QPen(QColor(70, 70, 70, 255));
 		break;
 	}
 	}
-	pen->setWidth(2);
-	idPen = new QPen(Qt::black);
-	idPen->setWidth(0);
-	confPen = new QPen(Qt::white);
-	confPen->setWidth(1);
+	pen.setWidth(2);
+	idPen = QPen(Qt::black);
+	idPen.setWidth(0);
+	confPen = QPen(Qt::white);
+	confPen.setWidth(1);
 }
 
 Robot::~Robot()
 {
-	delete brush;
-	delete pen;
-	delete idPen;
 }
 
 QRectF Robot::boundingRect() const
@@ -104,8 +101,8 @@ void Robot::paint (QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*)
 	if (mRobotConfidence == 0.0)
 		return;
 	painter->translate(mRobotX, -mRobotY);
-	painter->setPen(*pen);
-	painter->setBrush(*brush);
+	painter->setPen(pen);
+	painter->setBrush(brush);
 	if (fabs(mOrientation) < 360) {
 		painter->rotate(-45 - mOrientation);
 		painter->drawPath(robotOutline);
@@ -113,16 +110,16 @@ void Robot::paint (QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*)
 	} else
 		painter->drawPath(robotOutlineCircle);
 
-	painter->setPen(*idPen);
+	painter->setPen(idPen);
 	painter->setBrush(Qt::black);
 	painter->setFont(drawFont);
 	//painter->drawPath(robotID);
 	painter->drawText(-4.5, -6, 100, 100, 0, mRobotLabel);
 
 	painter->setPen(Qt::NoPen);
-	painter->setBrush(*brush);
+	painter->setBrush(brush);
 	painter->drawRect(-9, -15, (int)(((double)3) * mRobotConfidence), 3);
-	painter->setPen(*pen);
+	painter->setPen(pen);
 	painter->setBrush(QBrush(Qt::white, Qt::NoBrush));
 	painter->drawRect(-9, -15, 18, 3);
 }

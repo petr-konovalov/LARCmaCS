@@ -67,7 +67,7 @@ QSharedPointer<PacketSSL> MainAlgWorker::loadVisionData()
 		return nullptr;
 	}
 
-	QSharedPointer<PacketSSL> packetSSL = QSharedPointer<PacketSSL>(new PacketSSL());
+	QSharedPointer<PacketSSL> packetSSL(new PacketSSL());
 
 	packetSSL->balls[0] = 0;
 

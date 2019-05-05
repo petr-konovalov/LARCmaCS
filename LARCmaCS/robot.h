@@ -21,8 +21,8 @@ private:
 	double mRobotConfidence;
 	int mCamID;
 	QString mRobotLabel;
-	QBrush *brush;
-	QPen *pen, *idPen, *confPen;
+	QBrush brush;
+	QPen pen, idPen, confPen;
 	QPainterPath robotOutline, robotOutlineCircle, robotID;
 	QFont drawFont;
 
