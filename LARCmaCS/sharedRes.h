@@ -20,6 +20,8 @@
 #include <QSharedPointer>
 #include <QMutex>
 #include <QMap>
+#include <QReadWriteLock>
+
 #include "constants.h"
 
 class SharedRes : public QObject
@@ -31,12 +33,12 @@ public:
 	QString getRobotIP(int id);
 	void setRobotIP(int id, const QString & ip);
 	void setBallInsideData(const QString & ip, bool isBallInside);
-	void setDetection(const QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > & detection);
 	void setDetection(const QSharedPointer<SSL_WrapperPacket> & detection, int camID);
 	void setGeometry(const QSharedPointer<SSL_WrapperPacket> & geometry);
 	const QSharedPointer<QVector<bool> > & getBallInsideData();
 	QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > getDetection();
 	QSharedPointer<SSL_WrapperPacket> getGeometry();
+	QSharedPointer<SSL_WrapperPacket> getDetection(int camID);
 
 private:
 	QMutex mIPMutex;
@@ -44,4 +46,5 @@ private:
 	QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > mDetection;
 	QSharedPointer<SSL_WrapperPacket> mGeometry;
 	QSharedPointer<QVector<bool> > mBallInsideData;
+	QReadWriteLock mDetectionLock;
 };

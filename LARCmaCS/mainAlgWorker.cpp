@@ -74,7 +74,7 @@ QSharedPointer<PacketSSL> MainAlgWorker::loadVisionData()
 	int balls_n, idCam, robots_blue_n, robots_yellow_n;
 	SSL_DetectionBall ball;
 	for (int i = 0; i < detectionPackets->size(); i++) {
-		QSharedPointer<SSL_WrapperPacket> packet = detectionPackets->at(i);
+		QSharedPointer<SSL_WrapperPacket> packet = mSharedRes->getDetection(i);
 		if (!packet || !packet->IsInitialized()) {
 			if (packet)
 				qDebug() << "Packet is uninitialized!";
