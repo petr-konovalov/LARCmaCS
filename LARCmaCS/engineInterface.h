@@ -26,6 +26,7 @@ class EngineInterface : public QObject {
 
 public:
 	EngineInterface(SharedRes * sharedRes) : mSharedRes(sharedRes){}
+	virtual ~EngineInterface(){}
 
     /// Вызывает main скрипт конкретного движка
 	virtual void evaluate() = 0;

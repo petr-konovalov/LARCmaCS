@@ -33,8 +33,8 @@ LARCmaCS::LARCmaCS(QWidget *parent)
 	sceneview.init();
 
 	//algorithm connect
-	connect(this, SIGNAL(MLEvalString(const QString &)), &mainalg, SLOT(EvalString(const QString &)));
-	connect(this, SIGNAL(updateMatlabDebugFrequency(int)), &mainalg, SIGNAL(updateMatlabDebugFrequency(int)));
+	connect(this, SIGNAL(setDirectory(const QString &)), &mainalg, SIGNAL(setDirectory(const QString &)));
+	connect(this, SIGNAL(updateDebugFrequency(int)), &mainalg, SIGNAL(updateDebugFrequency(int)));
 	//connect(this, SIGNAL(MatlabPause()), &mainalg.worker, SLOT(Pause()));
 
 	connect(ui->matlabConsole, SIGNAL(customContextMenuRequested(const QPoint &)),
@@ -44,10 +44,10 @@ LARCmaCS::LARCmaCS(QWidget *parent)
 	connect(&sceneview.worker, SIGNAL(updateView()), this, SLOT(updateView()));
 	connect(ui->sceneslider, SIGNAL(valueChanged(int)), this, SLOT(scaleView(int)));
 
-	connect(&mainalg, SIGNAL(toMatlabConsole(const QString &)), this, SLOT(toMatlabConsole(const QString &)));
+	connect(&mainalg, SIGNAL(toConsole(const QString &)), this, SLOT(toConsole(const QString &)));
 
 	//info GUI
-	connect(&mainalg, SIGNAL(UpdatePauseState(const QString &)), this, SLOT(UpdatePauseState(const QString &)));
+	connect(&mainalg, SIGNAL(updatePauseState(const QString &)), this, SLOT(UpdatePauseState(const QString &)));
 	connect(&mainalg, SIGNAL(engineStatistics(const QString &)), this, SLOT(UpdateStatusBar(const QString &)));
 	connect(&receiver, SIGNAL(updateSSLFPS(const QString &)), this, SLOT(UpdateSSLFPS(const QString &)));
 
@@ -132,7 +132,7 @@ void LARCmaCS::scaleView(int _sizescene)
 	scalingRequested = true;
 }
 
-void LARCmaCS::toMatlabConsole(const QString & str)
+void LARCmaCS::toConsole(const QString & str)
 {
 	ui->matlabConsole->appendPlainText(str);
 }
@@ -156,9 +156,7 @@ void LARCmaCS::on_pushButton_SetMLdir_clicked()
 	dir = QFileDialog::getExistingDirectory(Q_NULLPTR, QString(), dir);
 	if (!dir.isEmpty()) {
 		settings.setValue(key, dir);
-		QString s = "cd " + dir;
-		qDebug() << "New Matlab directory = " << s;
-		emit MLEvalString(s);
+		emit setDirectory(dir);
 	}
 }
 
@@ -176,7 +174,7 @@ void LARCmaCS::on_matlabOutputFrequencyLineEdit_textEdited(const QString & text)
 	bool isInt = false;
 	int frequency = text.split(" ")[0].toInt(&isInt);
 	if (isInt && frequency != 0) {
-		emit updateMatlabDebugFrequency(frequency);
+		emit updateDebugFrequency(frequency);
 	}
 }
 
