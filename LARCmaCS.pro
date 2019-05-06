@@ -10,7 +10,7 @@ mingw {
 isEmpty(MATLAB_DIR): error("You need to specify the path to MATLAB_DIR!")
 include(proto/proto.pri)
 
-SHARED_DIR = macsCommon
+SHARED_DIR = $$PWD/macsCommon
 
 include (LARCmaCS/LARCmaCS.pri)
 
@@ -53,3 +53,4 @@ MATLAB_BIN = $${MATLAB_DIR}\..\bin\win$$BIT
 msvc: OTHER_BIN = '$$[QT_INSTALL_BINS];$${PROTO_DIR}/$${PREFIX_STR}bin/'
 mingw: OTHER_BIN = '$${MSYS_DIR}\mingw$${BIT}\bin'
 QMAKE_SUBSTITUTES += LARCmaCS.cmd.in
+OTHER_FILES += $$QMAKE_SUBSTITUTES

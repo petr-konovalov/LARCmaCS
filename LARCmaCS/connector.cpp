@@ -9,7 +9,6 @@ Connector::Connector(SharedRes * sharedRes)
 	: mSharedRes(sharedRes)
 	, mUdpSocket(this)
 	, mStatisticsTimer(this)
-	, mIsPause(false)
 {}
 
 Connector::~Connector()

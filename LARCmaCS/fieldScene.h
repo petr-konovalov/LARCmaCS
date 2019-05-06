@@ -50,18 +50,18 @@ private:
 	void robotsInit();
 	void loadFieldGeometry();
 	void loadFieldGeometry(const SSL_GeometryFieldSize & fieldSize);
-	void addRobot(Robot * robot);
+	void addRobot(const QSharedPointer<Robot> & robot);
 	void updateRobots(const QSharedPointer<SSL_WrapperPacket> & packet);
 	//Robots
-	QVector<Robot*> robots;
+	QVector<QSharedPointer<Robot> > robots;
 	//balls
 	QVector < QVector<QGraphicsEllipseItem*> > ballItems;
 	//field
-	QPainterPath * field = nullptr;
+	QPainterPath field;
 	QGraphicsPathItem * fieldItem = nullptr;
 	//brushes and pens
-	QBrush *fieldBrush, *ballBrush;
-	QPen *fieldPen, *fieldLinePen, *ballPen;
+	QBrush fieldBrush, ballBrush;
+	QPen fieldPen, fieldLinePen, ballPen;
 	bool shutdownSoccerView;
 
 	void updateRobot(const SSL_DetectionRobot & robot, int team, unsigned int camID);

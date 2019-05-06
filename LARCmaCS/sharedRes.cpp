@@ -45,6 +45,13 @@ QSharedPointer<SSL_WrapperPacket> SharedRes::getGeometry()
 	return mGeometry;
 }
 
+QSharedPointer<SSL_WrapperPacket> SharedRes::getDetection(int camID)
+{
+	QReadLocker locker(&mDetectionLock);
+	QSharedPointer<SSL_WrapperPacket> res = mDetection->at(camID);
+	return res;
+}
+
 QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > SharedRes::getDetection()
 {
 	return mDetection;
@@ -86,13 +93,9 @@ void SharedRes::setBallInsideData(const QString & ip, bool isBallInside)
 	//mIPMutex.unlock();
 }
 
-void SharedRes::setDetection(const QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > & detection)
-{
-	mDetection = detection;
-}
-
 void SharedRes::setDetection(const QSharedPointer<SSL_WrapperPacket> & detection, int camID)
 {
+	QWriteLocker locker(&mDetectionLock);
 	mDetection->replace(camID, detection);
 }
 

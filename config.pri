@@ -66,6 +66,9 @@ win32:msvc {
   QMAKE_CXXFLAGS += /MP
 } else:mingw {
   QMAKE_CXXFLAGS += -Wno-unused-parameter -Wno-format
+  QMAKE_CXXFLAGS += -fsanitize=undefined -fsanitize-undefined-trap-on-error \
+		 -fsanitize-address-use-after-scope -ftrapv -fstack-protector-all
+  QMAKE_LFLAGS += -fstack-protector-all
 }
 
 old_ssl: DEFINES += OLD_SSL_PROTO
