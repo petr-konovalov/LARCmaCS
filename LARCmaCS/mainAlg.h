@@ -42,7 +42,7 @@ signals:
 	void updatePauseState(const QString & state);
 	void toConsole(const QString & str);
 	void connectorChanged(bool, const QString &, int);
-	void newData(const QVector<double> & data);
+	void newData(const QVector<Rule> & data);
 	void pause(bool status);
 	void stopped();
 

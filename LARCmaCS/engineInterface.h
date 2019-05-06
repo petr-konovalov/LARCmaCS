@@ -4,20 +4,20 @@
 
 
 typedef struct Rule {
-	int mSpeedX;
-	int mSpeedY;
-	int mSpeedR;
+	int mSpeedX = 0;
+	int mSpeedY = 0;
+	int mSpeedR = 0;
 
-	int mSpeedDribbler;
-	int mDribblerEnable;
+	int mSpeedDribbler = 0;
+	int mDribblerEnable = 0;
 
-	int mKickerVoltageLevel;
-	int mKickerChargeEnable;
-	int mKickUp;
-	int mKickForward;
+	int mKickerVoltageLevel = 12;
+	int mKickerChargeEnable = 1;
+	int mKickUp = 0;
+	int mKickForward = 0;
 
-	int mBeep;
-	int bs_kick_state;
+	int mBeep = 0;
+	int bs_kick_state = 0;
 } Rule;
 
 

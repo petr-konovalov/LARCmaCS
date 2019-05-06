@@ -23,7 +23,7 @@ LARCmaCS::LARCmaCS(QWidget *parent)
 	, connector(&sharedRes)
 	, mIsSim(false)
 {
-	qRegisterMetaType<QVector<double> >("QVector<double>");
+	qRegisterMetaType<QVector<Rule> >("QVector<Rule>");
 
 	ui->setupUi(this);
 	ui->fieldView->setScene(fieldscene);
@@ -63,8 +63,8 @@ LARCmaCS::LARCmaCS(QWidget *parent)
 	connect(this, SIGNAL(connectorChanged(bool, const QString &, int))
 				, &connector, SLOT(onConnectorChange(bool, const QString &, int)));
 
-	connect(&mainalg, SIGNAL(newData(const QVector<double> &))
-				, &connector, SLOT(sendNewCommand(const QVector<double> &)));
+	connect(&mainalg, SIGNAL(newData(const QVector<Rule> &))
+				, &connector, SLOT(sendNewCommand(const QVector<Rule> &)));
 
 	connect(&mainalg, SIGNAL(pause(bool))
 				, &connector, SLOT(onPauseChanged(bool)));
