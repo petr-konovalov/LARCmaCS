@@ -2,7 +2,8 @@
 #include <QObject>
 #include "sharedRes.h"
 
-typedef struct Rule {
+typedef struct Rule
+{
 	int mSpeedX = 0;
 	int mSpeedY = 0;
 	int mSpeedR = 0;
@@ -20,7 +21,8 @@ typedef struct Rule {
 } Rule;
 
 
-class EngineInterface : public QObject {
+class EngineInterface : public QObject
+{
 	Q_OBJECT
 
 public:
