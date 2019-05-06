@@ -2,7 +2,6 @@
 #include <QObject>
 #include "sharedRes.h"
 
-
 typedef struct Rule {
 	int mSpeedX = 0;
 	int mSpeedY = 0;
@@ -22,19 +21,19 @@ typedef struct Rule {
 
 
 class EngineInterface : public QObject {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
 	EngineInterface(SharedRes * sharedRes) : mSharedRes(sharedRes){}
 	virtual ~EngineInterface(){}
 
-    /// Вызывает main скрипт конкретного движка
+	/// Вызывает main скрипт конкретного движка
 	virtual void evaluate() = 0;
 
-    /// Остановка и продолжение evaluate из GUI (скорее всего из воркера)
+	/// Остановка и продолжение evaluate из GUI (скорее всего из воркера)
 	virtual void pauseUnpause() = 0;
 
-    /// Установка пути, где лежит main
+	/// Установка пути, где лежит main
 	virtual void setDirectory(const QString & path) = 0;
 
 protected:
@@ -43,15 +42,15 @@ protected:
 
 signals:
 
-    /// Внутренние ошибки движка (для них подразумевается отдельное поле)
+	/// Внутренние ошибки движка (для них подразумевается отдельное поле)
 	void algoStatus(const QString & message);
 
-    /// Поменялось состояние выполения алгоритмов -- пауза/вычисляются
-    void isPause(bool status);
+	/// Поменялось состояние выполения алгоритмов -- пауза/вычисляются
+	void isPause(bool status);
 
-    /// Вывод в консоль всех print из скриптов + внутренние ошибки (stdout+stderr)
-    void consoleMessage(const QString & message);
+	/// Вывод в консоль всех print из скриптов + внутренние ошибки (stdout+stderr)
+	void consoleMessage(const QString & message);
 
-    /// Отправление новых вычисленных управляющих сигналов
+	/// Отправление новых вычисленных управляющих сигналов
 	void newData(const QVector<Rule> & rule);
 };
