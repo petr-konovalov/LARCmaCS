@@ -39,13 +39,12 @@ void MatlabEngine::runMatlab()
 {
 	if (!(mMatlabData.ep = engOpen(NULL))) {
 		qDebug() << "Can't open Matlab Engine" << endl;
-		fmtlab = false;
 		return;
 	}
 
 	mMatlabOutputBuffer[Constants::matlabOutputBufferSize - 1] = '\0';
 	engOutputBuffer(mMatlabData.ep, mMatlabOutputBuffer, Constants::matlabOutputBufferSize - 1);
-	printf("Matlab Engine is opened\n");
+	qDebug() << "Matlab Engine is opened\n" << endl;
 
 	//-----create Rules-----
 	char sendString[256];
@@ -54,7 +53,6 @@ void MatlabEngine::runMatlab()
 
 	QString dirPath = "cd " + QCoreApplication::applicationDirPath() + "/MLscripts";
 	evalString(dirPath);
-	fmtlab = true;
 }
 
 void MatlabEngine::evalString(const QString & str)

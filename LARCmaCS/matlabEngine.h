@@ -36,5 +36,4 @@ private:
 
 	char mMatlabOutputBuffer[Constants::matlabOutputBufferSize];
 	MlData mMatlabData;
-	bool fmtlab;
 };
