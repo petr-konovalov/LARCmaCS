@@ -62,7 +62,8 @@ SOURCES +=  \
 	$$PWD/sharedRes.cpp \
 	$$PWD/robotReceiverWorker.cpp \
 	$$PWD/robotReceiver.cpp \
-	$$PWD/connector.cpp
+	$$PWD/connector.cpp \
+    $$PWD/matlabEngine.cpp
 
 HEADERS  += \
 	$${SHARED_DIR}/util/timer.h \
@@ -89,7 +90,9 @@ HEADERS  += \
 	$$PWD/sharedRes.h \
 	$$PWD/robotReceiverWorker.h \
 	$$PWD/robotReceiver.h \
-	$$PWD/connector.h
+	$$PWD/connector.h \
+    $$PWD/engineInterface.h \
+    $$PWD/matlabEngine.h
 
 FORMS += \
 	$$PWD/larcmacs.ui \

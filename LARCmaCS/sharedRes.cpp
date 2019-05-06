@@ -48,13 +48,22 @@ QSharedPointer<SSL_WrapperPacket> SharedRes::getGeometry()
 QSharedPointer<SSL_WrapperPacket> SharedRes::getDetection(int camID)
 {
 	QReadLocker locker(&mDetectionLock);
-	QSharedPointer<SSL_WrapperPacket> res = mDetection->at(camID);
-	return res;
+	if (camID >= 0 && camID < mDetection->size()) {
+		QSharedPointer<SSL_WrapperPacket> res = mDetection->at(camID);
+		return res;
+	} else {
+		return QSharedPointer<SSL_WrapperPacket>();
+	}
 }
 
 QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > SharedRes::getDetection()
 {
 	return mDetection;
+}
+
+int SharedRes::getDetectionSize()
+{
+	return mDetection->size();
 }
 
 QString SharedRes::getRobotIP(int id)

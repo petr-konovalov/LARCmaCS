@@ -31,6 +31,7 @@ class SharedRes : public QObject
 public:
 	SharedRes();
 	QString getRobotIP(int id);
+	int getDetectionSize();
 	void setRobotIP(int id, const QString & ip);
 	void setBallInsideData(const QString & ip, bool isBallInside);
 	void setDetection(const QSharedPointer<SSL_WrapperPacket> & detection, int camID);
