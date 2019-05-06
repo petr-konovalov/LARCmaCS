@@ -15,8 +15,8 @@ public:
 	void setKickerChargeEnable(int kickerChargeEnable);
 	void setKickUp(int kickUp);
 	void setKickForward(int kickForward);
+	void setRobotNumber(int number);
 	QByteArray generateByteArray();
-	static quint32 calculateCRC(const QByteArray &buf, int len);
 
 private:
 	int mSpeedX;
@@ -28,4 +28,5 @@ private:
 	int mKickerChargeEnable;
 	int mKickUp;
 	int mKickForward;
+	int mRobotNumber;
 };

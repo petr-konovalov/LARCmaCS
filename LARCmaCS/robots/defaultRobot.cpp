@@ -22,6 +22,7 @@ void DefaultRobot::formControlPacket(QByteArray & command, int numOfRobot, int s
 									 bool enableSpinner, int spinnerSpeed)
 {
 	Message msg;
+	msg.setRobotNumber(numOfRobot);
 	msg.setKickVoltageLevel(kickVoltage);
 	msg.setKickerChargeEnable(1);
 	msg.setSpeedX(speedX);

@@ -36,6 +36,8 @@ private:
 	SharedRes * mSharedRes;
 	QUdpSocket mUdpSocket;
 	QTimer mStatisticsTimer;
+	static const QString robotBoxIP;
+
 	bool mIsSim { false };
 	static const unsigned short mRobotPort = 10000;
 	bool mIsPause { false };
