@@ -50,7 +50,7 @@ private:
 	void robotsInit();
 	void loadFieldGeometry();
 	void loadFieldGeometry(const SSL_GeometryFieldSize & fieldSize);
-	void addRobot(const QSharedPointer<Robot> &robot);
+	void addRobot(const QSharedPointer<Robot> & robot);
 	void updateRobots(const QSharedPointer<SSL_WrapperPacket> & packet);
 	//Robots
 	QVector<QSharedPointer<Robot> > robots;

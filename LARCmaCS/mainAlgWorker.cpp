@@ -123,7 +123,7 @@ QSharedPointer<PacketSSL> MainAlgWorker::loadVisionData()
 					packetSSL->robots_yellow[robot.robot_id() + 36] = robot.orientation();
 				} else {
 					if (robot.has_robot_id()) {
-						qDebug() << robot.robot_id() << " yellow" << endl;
+						qDebug() << "Error: incorrect yellow robot id" << robot.robot_id();
 					}
 				}
 			}
