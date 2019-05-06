@@ -5,6 +5,8 @@
 #include "grSimRobot.h"
 #include "defaultRobot.h"
 
+const QString Connector::robotBoxIP = QStringLiteral("192.168.0.10");
+
 Connector::Connector(SharedRes * sharedRes)
 	: mSharedRes(sharedRes)
 	, mUdpSocket(this)
@@ -31,7 +33,7 @@ unsigned short Connector::getRobotPort()
 
 void Connector::run(int N, const QByteArray & command)
 {
-	mUdpSocket.writeDatagram(command, QHostAddress(mSharedRes->getRobotIP(N)), DefaultRobot::robotPort);
+	mUdpSocket.writeDatagram(command, QHostAddress(robotBoxIP), DefaultRobot::robotPort);
 }
 
 void Connector::runSim(const QByteArray & command)
