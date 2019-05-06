@@ -57,7 +57,7 @@ private slots:
 	void scaleView(int);
 
 private slots:
-	//void on_pushButton_Pause_clicked();
+	void on_pushButton_Pause_clicked();
 	void on_pushButton_SetMLdir_clicked();
 	void toConsole(const QString & str);
 	void remcontrolsender(int l, int r,int k, int b, bool kickUp);
@@ -70,7 +70,7 @@ private slots:
 signals:
 	void updateDebugFrequency(int frequency);
 	void ChangeSimulatorMode(bool state);
-	//void MatlabPause();
+	void pauseUnpause();
 	void setDirectory(const QString & s);
 	void updateRobots();
 	void connectorChanged(bool isSim, const QString & ip, int port);

@@ -34,6 +34,7 @@ public:
 signals:
 	void updateBallStatus(bool status);
 	void updateDebugFrequency(int frequency);
+	void pauseUnpause();
 	void setDirectory(const QString & s);
 	void sendToConnector(int N, const QByteArray & command);
 	void sendToSimConnector(const QByteArray & command);

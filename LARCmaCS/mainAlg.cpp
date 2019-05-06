@@ -22,6 +22,7 @@ MainAlg::MainAlg(SharedRes * sharedRes)
 	connect(&mThread, SIGNAL(finished()), mWorker, SLOT(deleteLater()));
 
 	connect(this, SIGNAL(setDirectory(const QString &)), mWorker, SLOT(setDirectory(const QString &)));
+	connect(this, SIGNAL(pauseUnpause()), mWorker, SLOT(pauseUnpause()));
 	connect(mWorker, SIGNAL(newPauseState(const QString &)), this, SIGNAL(updatePauseState(const QString &)));
 	connect(mWorker, SIGNAL(sendStatistics(const QString &)), this, SIGNAL(engineStatistics(const QString &)));
 	connect(mWorker, SIGNAL(toConsole(const QString &)), this, SIGNAL(toConsole(const QString &)));

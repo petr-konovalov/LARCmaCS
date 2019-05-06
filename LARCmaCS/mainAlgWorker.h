@@ -32,7 +32,7 @@ public slots:
 	void formStatistics();
 	void receiveMSGToConsole(const QString & str);
 	void stop();
-	void Pause();
+	void pauseUnpause();
 
 
 private:

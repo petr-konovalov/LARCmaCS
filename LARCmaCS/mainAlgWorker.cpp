@@ -74,7 +74,7 @@ void MainAlgWorker::run()
 	delete mEngine;
 }
 
-void MainAlgWorker::Pause()
+void MainAlgWorker::pauseUnpause()
 {
 	mEngine->pauseUnpause();
 }

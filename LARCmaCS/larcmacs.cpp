@@ -35,7 +35,7 @@ LARCmaCS::LARCmaCS(QWidget *parent)
 	//algorithm connect
 	connect(this, SIGNAL(setDirectory(const QString &)), &mainalg, SIGNAL(setDirectory(const QString &)));
 	connect(this, SIGNAL(updateDebugFrequency(int)), &mainalg, SIGNAL(updateDebugFrequency(int)));
-	//connect(this, SIGNAL(MatlabPause()), &mainalg.worker, SLOT(Pause()));
+	connect(this, SIGNAL(pauseUnpause()), &mainalg, SIGNAL(pauseUnpause()));
 
 	connect(ui->matlabConsole, SIGNAL(customContextMenuRequested(const QPoint &)),
 			this, SLOT(matlabConsoleMenuRequested(const QPoint &)));
@@ -176,6 +176,11 @@ void LARCmaCS::on_matlabOutputFrequencyLineEdit_textEdited(const QString & text)
 	if (isInt && frequency != 0) {
 		emit updateDebugFrequency(frequency);
 	}
+}
+
+void LARCmaCS::on_pushButton_Pause_clicked()
+{
+	emit pauseUnpause();
 }
 
 void LARCmaCS::on_checkBox_SimEnable_stateChanged(int state)
