@@ -1,4 +1,4 @@
-// Copyright 2019 Dmitrii Iarosh
+// Copyright 2019 Dmitrii Iarosh, Anastasiia Kornilova
 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,8 +23,14 @@ RobotReceiver::RobotReceiver(SharedRes * sharedRes)
 	connect(&mThread, SIGNAL(started()), mWorker, SLOT(start()));
 	connect(&mThread, SIGNAL(finished()), mWorker, SLOT(deleteLater()));
 
-	connect(mWorker, SIGNAL(setBallInsideData(const QString &, bool)),
-			this, SLOT(setBallInsideData(const QString &, bool)));
+	connect(&mWorker, SIGNAL(newBarrierState(const QVector<int> &))
+				, this, SIGNAL(newBarrierState(const QVector<int> &)));
+
+	connect(&mWorker, SIGNAL(newKickerChargeStatus(const QVector<int> &))
+				, this, SIGNAL(newKickerChargeStatus(const QVector<int> &)));
+
+	connect(&mWorker, SIGNAL(newConnectionState(const QVector<int> &))
+				, this, SIGNAL(newConnectionState(const QVector<int> &)));
 
 	mThread.start();
 }
@@ -33,9 +39,4 @@ RobotReceiver::~RobotReceiver()
 {
 	mThread.quit();
 	mThread.wait();
-}
-
-void RobotReceiver::setBallInsideData(const QString & ip, bool isBallInside)
-{
-	mSharedRes->setBallInsideData(ip, isBallInside);
 }

@@ -1,4 +1,4 @@
-// Copyright 2019 Dmitrii Iarosh
+// Copyright 2019 Dmitrii Iarosh, Anastasiia Kornilova
 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,8 +28,10 @@ public:
 	~RobotReceiver();
 	void start();
 
-private slots:
-	void setBallInsideData(const QString & ip, bool isBallInside);
+signals:
+	void newBarrierState(const QVector<int> & barrierState);
+	void newKickerChargeStatus(const QVector<int> & kickerChargeStatus);
+	void newConnectionState(const QVector<int> & connectionState);
 
 private:
 	QThread mThread;
