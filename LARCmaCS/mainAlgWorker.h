@@ -43,7 +43,7 @@ private:
 	char mMatlabOutputBuffer[Constants::matlabOutputBufferSize];
 	MlData fmldata;
 	bool fmtlab;
-	int mFrequency = 1;
+	int mFrequency = 100;
 	bool mShutdownFlag;
 	bool mIsPause;
 	int mTotalPacketsNum = 0;
