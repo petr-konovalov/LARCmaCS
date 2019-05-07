@@ -12,10 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#very strange thing
-include(../macsCommon/macsCommon.pri)
-INCLUDEPATH += $${SHARED_DIR}/vartypes
-
 win32 {
   #add libs
   LIBS += -lws2_32
