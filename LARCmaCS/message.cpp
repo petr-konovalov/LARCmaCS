@@ -60,7 +60,7 @@ void Message::setKickForward(int kickForward)
 
 void Message::setRobotNumber(int number)
 {
-	mRobotNumber = number;
+	mRobotNumber = number - 1;
 }
 
 QByteArray Message::generateByteArray()
