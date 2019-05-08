@@ -63,7 +63,6 @@ private slots:
 	void on_checkBox_SimEnable_stateChanged(int state);
 	void on_pushButton_RemoteControl_clicked();
 	void on_matlabOutputFrequencyLineEdit_textEdited(const QString & text);
-	void on_pushButton_SetupIP_clicked();
 	void on_but_reference_clicked();
 
 signals:
