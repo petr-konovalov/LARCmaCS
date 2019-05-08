@@ -105,12 +105,12 @@ void Connector::onPauseChanged(bool status)
 	if (mIsPause) { //TODO: add check of remote control
 		QByteArray command;
 		if (!mIsSim) {
-			for (int i = 1; i <= 12; i++) {
+			for (int i = 1; i <= Constants::maxNumOfRobots; i++) {
 				DefaultRobot::formControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
 				run(i, command);
 			}
 		} else {
-			for (int i = 0; i <= 12; i++) {
+			for (int i = 0; i <= Constants::maxRobotsInTeam; i++) {
 				GrSimRobot::formControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
 				runSim(command); //for more power of remote control
 			}
