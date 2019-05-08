@@ -193,13 +193,6 @@ void LARCmaCS::on_pushButton_RemoteControl_clicked()
 	remotecontol.TimerStart();
 }
 
-void LARCmaCS::on_pushButton_SetupIP_clicked()
-{
-	IpDialog * ipDialog = new IpDialog(&sharedRes, this);
-	ipDialog->setWindowModality(Qt::WindowModality::WindowModal);
-	ipDialog->open();
-}
-
 void LARCmaCS::on_but_reference_clicked()
 {
 	Reference * refWindow = new Reference();

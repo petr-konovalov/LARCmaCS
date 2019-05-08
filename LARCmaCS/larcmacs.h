@@ -8,7 +8,6 @@
 #include "sceneView.h"
 #include "connector.h"
 #include "remotecontrol.h"
-#include "ipdialog.h"
 #include "reference.h"
 #include "robotReceiver.h"
 
