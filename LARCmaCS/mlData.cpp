@@ -6,8 +6,8 @@ MlData::MlData(RCConfig conf)
 	config = conf;
 
 	Ball         = mxCreateDoubleMatrix(1, 3, mxREAL);
-	Blue         = mxCreateDoubleMatrix(12, 4, mxREAL);
-	Yellow       = mxCreateDoubleMatrix(12, 4, mxREAL);
+	Blue         = mxCreateDoubleMatrix(Constants::maxRobotsInTeam, 4, mxREAL);
+	Yellow       = mxCreateDoubleMatrix(Constants::maxRobotsInTeam, 4, mxREAL);
 	Rule         = mxCreateDoubleMatrix(Constants::ruleLength, Constants::ruleAmount, mxREAL);
 	Back_Params  = mxCreateDoubleMatrix(config.BACK_LENGTH, config.BACK_AMOUNT, mxREAL);
 	Back_Amount  = mxCreateDoubleMatrix(1, 1, mxREAL);
@@ -23,10 +23,10 @@ MlData::MlData(const MlData &dat)
 	Ball         = mxCreateDoubleMatrix(1, 3, mxREAL);
 	memcpy(Ball, &dat.Ball, sizeof(Ball));
 
-	Blue         = mxCreateDoubleMatrix(12, 4, mxREAL);
+	Blue         = mxCreateDoubleMatrix(Constants::maxRobotsInTeam, 4, mxREAL);
 	memcpy(Blue, &dat.Blue, sizeof(Blue));
 
-	Yellow       = mxCreateDoubleMatrix(12, 4, mxREAL);
+	Yellow       = mxCreateDoubleMatrix(Constants::maxRobotsInTeam, 4, mxREAL);
 	memcpy(Yellow, &dat.Yellow, sizeof(Yellow));
 
 	Rule         = mxCreateDoubleMatrix(config.RULE_LENGTH, config.RULE_AMOUNT, mxREAL);
