@@ -28,8 +28,10 @@ public:
 	~RobotReceiver();
 	void start();
 
+public slots:
+	void changeBarrierState(const QVector<bool> & barrierState);
+
 signals:
-	void newBarrierState(const QVector<int> & barrierState);
 	void newKickerChargeStatus(const QVector<int> & kickerChargeStatus);
 	void newConnectionState(const QVector<int> & connectionState);
 

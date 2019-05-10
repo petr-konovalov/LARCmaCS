@@ -197,8 +197,14 @@ void MainAlgWorker::processPacket(const QSharedPointer<PacketSSL> & packetssl)
 	memcpy(mxGetPr(fmldata.Ball), packetssl->balls, Constants::ballAlgoPacketSize * sizeof(double));
 	memcpy(mxGetPr(fmldata.Blue), packetssl->robots_blue, Constants::robotAlgoPacketSize * sizeof(double));
 	memcpy(mxGetPr(fmldata.Yellow), packetssl->robots_yellow, Constants::robotAlgoPacketSize * sizeof(double));
-	memcpy(mxGetPr(fmldata.ballInside), &mIsBallInside, sizeof(double));
 
+	QVector<bool> barrierState = mSharedRes->getBarrierState();
+	double barrierStatesDouble[Constants::maxRobotsInTeam];
+	memset(barrierStatesDouble, 0, Constants::maxRobotsInTeam * sizeof(double));
+	for (int i = 0; i < barrierState.size(); i++) {
+		barrierStatesDouble[i] = barrierState[i];
+	}
+	memcpy(mxGetPr(fmldata.ballInside), barrierStatesDouble, Constants::maxRobotsInTeam * sizeof(double));
 
 	engPutVariable(fmldata.ep, "Balls", fmldata.Ball);
 	engPutVariable(fmldata.ep, "Blues", fmldata.Blue);

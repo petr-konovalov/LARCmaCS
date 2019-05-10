@@ -15,7 +15,7 @@
 #include "sharedRes.h"
 #include "settings.h"
 
-SharedRes::SharedRes() : mIPMutex()
+SharedRes::SharedRes()
 {
 	qRegisterMetaType<QSharedPointer<SSL_WrapperPacket> >("QSharedPointer<SSL_WrapperPacket>");
 	mDetection = QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > >
@@ -23,33 +23,24 @@ SharedRes::SharedRes() : mIPMutex()
 	for (auto i = 0; i < Constants::numOfCameras; i++) {
 		mDetection->replace(i, QSharedPointer<SSL_WrapperPacket>());
 	}
-	mGeometry = QSharedPointer<SSL_WrapperPacket>();
-	mBallInsideData = QSharedPointer<QVector<bool> >(new QVector<bool>(Constants::maxNumOfRobots));
-	for (auto i = 0; i < Constants::maxNumOfRobots; i++)
-	{
-		mBallInsideData->replace(i, false);
-	}
-	Settings settings;
-	for (auto i = 1; i <= Constants::maxNumOfRobots; i++) {
-		mIPRobotList[i] = settings.value(Settings::configKeyForRobotNum(i), "").toString();
-	}
 }
 
-const QSharedPointer<QVector<bool> > & SharedRes::getBallInsideData()
+QVector<bool> SharedRes::getBarrierState()
 {
-	return mBallInsideData;
+	QReadLocker locker(&mBarrierStateLock);
+	return mBarrierState;
 }
 
 QSharedPointer<SSL_WrapperPacket> SharedRes::getGeometry()
 {
+	QReadLocker locker(&mGeometryLock);
 	return mGeometry;
 }
 
 QSharedPointer<SSL_WrapperPacket> SharedRes::getDetection(int camID)
 {
 	QReadLocker locker(&mDetectionLock);
-	QSharedPointer<SSL_WrapperPacket> res = mDetection->at(camID);
-	return res;
+	return mDetection->at(camID);
 }
 
 QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > SharedRes::getDetection()
@@ -57,40 +48,10 @@ QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > SharedRes::getDetec
 	return mDetection;
 }
 
-QString SharedRes::getRobotIP(int id)
+void SharedRes::setBarrierState(const QVector<bool> &barrierState)
 {
-	QString tmp;
-	//mIPMutex.lock();
-//	if (id >= 0 && id < mIPRobotList.size()) {
-//		tmp = mIPRobotList[id];
-//	}
-	//mIPMutex.unlock();
-	return tmp;
-}
-
-void SharedRes::setRobotIP(int id, const QString & ip)
-{
-	//mIPMutex.lock();
-	if (ip.contains(".")) {
-		mIPRobotList[id] = ip;
-	} else {
-		mIPRobotList[id] = "";
-	}
-	Settings settings;
-	settings.setValue(Settings::configKeyForRobotNum(id), ip);
-	//mIPMutex.unlock();
-}
-
-void SharedRes::setBallInsideData(const QString & ip, bool isBallInside)
-{
-	//mIPMutex.lock();
-//	for (auto i = 0; i < mIPRobotList.size(); i++) {
-//		if (mIPRobotList[i] == ip) {
-//			mBallInsideData->replace(i, isBallInside);
-//			break;
-//		}
-//	}
-	//mIPMutex.unlock();
+	QWriteLocker locker(&mBarrierStateLock);
+	mBarrierState = barrierState;
 }
 
 void SharedRes::setDetection(const QSharedPointer<SSL_WrapperPacket> & detection, int camID)
@@ -101,5 +62,6 @@ void SharedRes::setDetection(const QSharedPointer<SSL_WrapperPacket> & detection
 
 void SharedRes::setGeometry(const QSharedPointer<SSL_WrapperPacket> & geometry)
 {
+	QWriteLocker locker(&mGeometryLock);
 	mGeometry = geometry;
 }

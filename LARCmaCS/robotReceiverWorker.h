@@ -29,7 +29,7 @@ public slots:
 	void start();
 
 signals:
-	void newBarrierState(const QVector<int> & barrierState);
+	void newBarrierState(const QVector<bool> & barrierState);
 	void newKickerChargeStatus(const QVector<int> & kickerChargeStatus);
 	void newConnectionState(const QVector<int> & connectionState);
 
@@ -45,7 +45,7 @@ private:
 
 	QUdpSocket mUdpSocket;
 
-	QVector<int> mBarrierState;
+	QVector<bool> mBarrierState;
 	QVector<int> mKickerChargeStatus;
 	QVector<int> mConnectionState;
 };

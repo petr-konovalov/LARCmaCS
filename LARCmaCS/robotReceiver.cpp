@@ -18,6 +18,7 @@ RobotReceiver::RobotReceiver(SharedRes * sharedRes)
 	: mSharedRes(sharedRes)
 {
 	qRegisterMetaType<QVector<int> >("QVector<int>");
+	qRegisterMetaType<QVector<bool> >("QVector<bool>");
 
 	mWorker = new RobotReceiverWorker();
 	mWorker->moveToThread(&mThread);
@@ -25,8 +26,8 @@ RobotReceiver::RobotReceiver(SharedRes * sharedRes)
 	connect(&mThread, SIGNAL(started()), mWorker, SLOT(start()));
 	connect(&mThread, SIGNAL(finished()), mWorker, SLOT(deleteLater()));
 
-	connect(mWorker, SIGNAL(newBarrierState(const QVector<int> &))
-				, this, SIGNAL(newBarrierState(const QVector<int> &)));
+	connect(mWorker, SIGNAL(newBarrierState(const QVector<bool> &))
+				, this, SLOT(changeBarrierState(const QVector<bool> &)));
 
 	connect(mWorker, SIGNAL(newKickerChargeStatus(const QVector<int> &))
 				, this, SIGNAL(newKickerChargeStatus(const QVector<int> &)));
@@ -41,4 +42,9 @@ RobotReceiver::~RobotReceiver()
 {
 	mThread.quit();
 	mThread.wait();
+}
+
+void RobotReceiver::changeBarrierState(const QVector<bool> &barrierState)
+{
+	mSharedRes->setBarrierState(barrierState);
 }
