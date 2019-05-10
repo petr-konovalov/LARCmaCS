@@ -54,6 +54,8 @@ private slots:
 	void matlabConsoleMenuRequested(const QPoint & point);
 	void updateView();
 	void scaleView(int);
+	void updateConnectionState(const QVector<int> & connectionState);
+	void updateChargeLevel(const QVector<int> & chargeLevel);
 
 private slots:
 	//void on_pushButton_Pause_clicked();

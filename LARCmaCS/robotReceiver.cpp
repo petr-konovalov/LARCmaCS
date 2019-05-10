@@ -1,4 +1,4 @@
-// Copyright 2019 Dmitrii Iarosh
+// Copyright 2019 Dmitrii Iarosh, Anastasiia Kornilova
 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,14 +17,26 @@
 RobotReceiver::RobotReceiver(SharedRes * sharedRes)
 	: mSharedRes(sharedRes)
 {
+	qRegisterMetaType<QVector<int> >("QVector<int>");
+	qRegisterMetaType<QVector<bool> >("QVector<bool>");
+
 	mWorker = new RobotReceiverWorker();
 	mWorker->moveToThread(&mThread);
 
 	connect(&mThread, SIGNAL(started()), mWorker, SLOT(start()));
 	connect(&mThread, SIGNAL(finished()), mWorker, SLOT(deleteLater()));
 
-	connect(mWorker, SIGNAL(setBallInsideData(const QString &, bool)),
-			this, SLOT(setBallInsideData(const QString &, bool)));
+	connect(mWorker, SIGNAL(newBarrierState(const QVector<bool> &))
+				, this, SLOT(changeBarrierState(const QVector<bool> &)));
+
+	connect(mWorker, SIGNAL(newKickerChargeStatus(const QVector<int> &))
+				, this, SIGNAL(newKickerChargeStatus(const QVector<int> &)));
+
+	connect(mWorker, SIGNAL(newConnectionState(const QVector<int> &))
+				, this, SIGNAL(newConnectionState(const QVector<int> &)));
+
+	connect(mWorker, SIGNAL(newChargeLevel(const QVector<int> &))
+				, this, SIGNAL(newChargeLevel(const QVector<int> &)));
 
 	mThread.start();
 }
@@ -35,7 +47,7 @@ RobotReceiver::~RobotReceiver()
 	mThread.wait();
 }
 
-void RobotReceiver::setBallInsideData(const QString & ip, bool isBallInside)
+void RobotReceiver::changeBarrierState(const QVector<bool> &barrierState)
 {
-	mSharedRes->setBallInsideData(ip, isBallInside);
+	mSharedRes->setBarrierState(barrierState);
 }
