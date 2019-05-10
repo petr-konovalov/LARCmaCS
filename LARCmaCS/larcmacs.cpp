@@ -69,6 +69,13 @@ LARCmaCS::LARCmaCS(QWidget *parent)
 	connect(&mainalg, SIGNAL(pause(bool))
 				, &connector, SLOT(onPauseChanged(bool)));
 
+	connect(&robotReceiver, SIGNAL(newConnectionState(const QVector<int> &))
+				, this, SLOT(updateConnectionState(const QVector<int> &)));
+
+
+	connect(&robotReceiver, SIGNAL(newChargeLevel(const QVector<int> &))
+				, this, SLOT(updateChargeLevel(const QVector<int> &)));
+
 	sceneview.start();
 	UpdateStatusBar("Waiting SSL connection...");
 	UpdateSSLFPS("FPS = 0");
@@ -130,6 +137,26 @@ void LARCmaCS::scaleView(int _sizescene)
 	drawscale = pow(0.9, _sizescene - sizescene);
 	sizescene = _sizescene;
 	scalingRequested = true;
+}
+
+void LARCmaCS::updateConnectionState(const QVector<int> & connectionState)
+{
+	ui->connection1->setText(connectionState[0] == 0 ? "No" : "Yes");
+	ui->connection2->setText(connectionState[1] == 0 ? "No" : "Yes");
+	ui->connection3->setText(connectionState[2] == 0 ? "No" : "Yes");
+	ui->connection4->setText(connectionState[3] == 0 ? "No" : "Yes");
+	ui->connection5->setText(connectionState[4] == 0 ? "No" : "Yes");
+	ui->connection6->setText(connectionState[5] == 0 ? "No" : "Yes");
+}
+
+void LARCmaCS::updateChargeLevel(const QVector<int> &chargeLevel)
+{
+	ui->battery1->setNum(chargeLevel[0]);
+	ui->battery2->setNum(chargeLevel[1]);
+	ui->battery3->setNum(chargeLevel[2]);
+	ui->battery4->setNum(chargeLevel[3]);
+	ui->battery5->setNum(chargeLevel[4]);
+	ui->battery6->setNum(chargeLevel[5]);
 }
 
 void LARCmaCS::toMatlabConsole(const QString & str)

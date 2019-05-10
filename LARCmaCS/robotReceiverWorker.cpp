@@ -25,6 +25,7 @@ RobotReceiverWorker::RobotReceiverWorker()
 	mBarrierState.resize(mRobotsInPacket);
 	mKickerChargeStatus.resize(mRobotsInPacket);
 	mConnectionState.resize(mRobotsInPacket);
+	mChargeLevel.resize(mRobotsInPacket);
 }
 
 RobotReceiverWorker::~RobotReceiverWorker()
@@ -52,6 +53,7 @@ void RobotReceiverWorker::processPendingDatagrams()
 		}
 
 		for (int i = 0; i < mRobotsInPacket; i++) {
+			mChargeLevel[i] = datagram[1 + i * mOnePacketLength];
 			mBarrierState[i] = datagram[17 + i * mOnePacketLength];
 			mKickerChargeStatus[i] = datagram[18 + i * mOnePacketLength];
 			mConnectionState[i] = datagram[19 + i * mOnePacketLength];
@@ -60,5 +62,6 @@ void RobotReceiverWorker::processPendingDatagrams()
 		emit newBarrierState(mBarrierState);
 		emit newKickerChargeStatus(mKickerChargeStatus);
 		emit newConnectionState(mConnectionState);
+		emit newChargeLevel(mChargeLevel);
 	}
 }

@@ -34,6 +34,7 @@ public slots:
 signals:
 	void newKickerChargeStatus(const QVector<int> & kickerChargeStatus);
 	void newConnectionState(const QVector<int> & connectionState);
+	void newChargeLevel(const QVector<int> & connectionState);
 
 private:
 	QThread mThread;

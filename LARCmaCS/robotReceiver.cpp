@@ -35,6 +35,9 @@ RobotReceiver::RobotReceiver(SharedRes * sharedRes)
 	connect(mWorker, SIGNAL(newConnectionState(const QVector<int> &))
 				, this, SIGNAL(newConnectionState(const QVector<int> &)));
 
+	connect(mWorker, SIGNAL(newChargeLevel(const QVector<int> &))
+				, this, SIGNAL(newChargeLevel(const QVector<int> &)));
+
 	mThread.start();
 }
 
