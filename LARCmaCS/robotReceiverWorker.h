@@ -25,7 +25,7 @@ public:
 	RobotReceiverWorker();
 	~RobotReceiverWorker();
 
-public slot:
+public slots:
 	void start();
 
 signals:
@@ -45,7 +45,7 @@ private:
 
 	QUdpSocket mUdpSocket;
 
-	QVector<quint8> mBarrierState;
-	QVector<quint8> mKickerChargeStatus;
-	QVector<quint8> mConnectionState;
+	QVector<int> mBarrierState;
+	QVector<int> mKickerChargeStatus;
+	QVector<int> mConnectionState;
 };

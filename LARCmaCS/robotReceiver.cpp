@@ -17,19 +17,21 @@
 RobotReceiver::RobotReceiver(SharedRes * sharedRes)
 	: mSharedRes(sharedRes)
 {
+	qRegisterMetaType<QVector<int> >("QVector<int>");
+
 	mWorker = new RobotReceiverWorker();
 	mWorker->moveToThread(&mThread);
 
 	connect(&mThread, SIGNAL(started()), mWorker, SLOT(start()));
 	connect(&mThread, SIGNAL(finished()), mWorker, SLOT(deleteLater()));
 
-	connect(&mWorker, SIGNAL(newBarrierState(const QVector<int> &))
+	connect(mWorker, SIGNAL(newBarrierState(const QVector<int> &))
 				, this, SIGNAL(newBarrierState(const QVector<int> &)));
 
-	connect(&mWorker, SIGNAL(newKickerChargeStatus(const QVector<int> &))
+	connect(mWorker, SIGNAL(newKickerChargeStatus(const QVector<int> &))
 				, this, SIGNAL(newKickerChargeStatus(const QVector<int> &)));
 
-	connect(&mWorker, SIGNAL(newConnectionState(const QVector<int> &))
+	connect(mWorker, SIGNAL(newConnectionState(const QVector<int> &))
 				, this, SIGNAL(newConnectionState(const QVector<int> &)));
 
 	mThread.start();

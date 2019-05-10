@@ -17,7 +17,7 @@
 #include "robotReceiverWorker.h"
 #include "message.h"
 
-const QString RobotReceiverWorker::mSocketIp = QStringLiteral("192.168.0.2");
+const QString RobotReceiverWorker::mSocketIp = QStringLiteral("255.255.255.255");
 
 RobotReceiverWorker::RobotReceiverWorker()
 	: mUdpSocket(this)
@@ -35,7 +35,7 @@ RobotReceiverWorker::~RobotReceiverWorker()
 void RobotReceiverWorker::start()
 {
 	mUdpSocket.bind(QHostAddress::AnyIPv4, mPort, QUdpSocket::ShareAddress);
-	mUdpSocket.joinMulticastGroup(mSocketIp);
+	mUdpSocket.joinMulticastGroup(QHostAddress(mSocketIp));
 	connect(&mUdpSocket, SIGNAL(readyRead()), this, SLOT(processPendingDatagrams()));
 }
 
