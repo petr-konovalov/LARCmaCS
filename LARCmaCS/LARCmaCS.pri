@@ -12,10 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#very strange thing
-include(../macsCommon/macsCommon.pri)
-INCLUDEPATH += $${SHARED_DIR}/vartypes
-
 win32 {
   #add libs
   LIBS += -lws2_32
@@ -49,7 +45,6 @@ SOURCES +=  \
 	$$PWD/mlData.cpp \
 	$$PWD/remotecontrol.cpp \
 	$$PWD/message.cpp \
-	$$PWD/ipdialog.cpp \
 	$$PWD/reference.cpp \
 	$$PWD/sceneViewWorker.cpp \
 	$$PWD/robot.cpp \
@@ -77,7 +72,6 @@ HEADERS  += \
 	$$PWD/mlData.h \
 	$$PWD/remotecontrol.h \
 	$$PWD/message.h \
-	$$PWD/ipdialog.h \
 	$$PWD/reference.h \
 	$$PWD/sceneViewWorker.h \
 	$$PWD/receiverWorker.h \
@@ -97,5 +91,4 @@ HEADERS  += \
 FORMS += \
 	$$PWD/larcmacs.ui \
 	$$PWD/remotecontrol.ui \
-	$$PWD/ipdialog.ui \
 	$$PWD/reference.ui \

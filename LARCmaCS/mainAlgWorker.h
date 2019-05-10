@@ -37,7 +37,7 @@ public slots:
 
 private:
 	EngineInterface * mEngine;
-	int mFrequency = 1;
+	int mFrequency = 100;
 	bool mShutdownFlag;
 	int mTotalPacketsNum = 0;
 	int mPacketsPerSecond = 0;

@@ -30,22 +30,22 @@ class SharedRes : public QObject
 
 public:
 	SharedRes();
-	QString getRobotIP(int id);
 	int getDetectionSize();
-	void setRobotIP(int id, const QString & ip);
-	void setBallInsideData(const QString & ip, bool isBallInside);
+	void setBarrierState(const QVector<bool> & barrierState);
 	void setDetection(const QSharedPointer<SSL_WrapperPacket> & detection, int camID);
 	void setGeometry(const QSharedPointer<SSL_WrapperPacket> & geometry);
-	const QSharedPointer<QVector<bool> > & getBallInsideData();
+	QVector<bool> getBarrierState();
 	QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > getDetection();
 	QSharedPointer<SSL_WrapperPacket> getGeometry();
 	QSharedPointer<SSL_WrapperPacket> getDetection(int camID);
 
 private:
-	QMutex mIPMutex;
-	QMap<int, QString> mIPRobotList;
-	QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > mDetection;
-	QSharedPointer<SSL_WrapperPacket> mGeometry;
-	QSharedPointer<QVector<bool> > mBallInsideData;
 	QReadWriteLock mDetectionLock;
+	QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > mDetection;
+
+	QReadWriteLock mGeometryLock;
+	QSharedPointer<SSL_WrapperPacket> mGeometry;
+
+	QReadWriteLock mBarrierStateLock;
+	QVector<bool> mBarrierState;
 };

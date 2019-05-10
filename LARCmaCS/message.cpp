@@ -58,59 +58,37 @@ void Message::setKickForward(int kickForward)
 	mKickForward = kickForward;
 }
 
+void Message::setRobotNumber(int number)
+{
+	mRobotNumber = number - 1;
+}
+
 QByteArray Message::generateByteArray()
 {
 	QByteArray ba;
-	quint8 sync = 0xAA;
 	QDataStream ds(&ba, QIODevice::WriteOnly);
 	ds.setByteOrder(QDataStream::LittleEndian);
-	for (int i = 0; i < 4; i++) {
-		ds << sync;
-	}
 
-	ds << (quint32)mSpeedX;
-	ds << (quint32)mSpeedY;
-	ds << (quint32)mSpeedR;
+	quint8 opcode = 1;
+	ds << opcode;
+	ds << (quint8)mRobotNumber;
 
-	ds << (quint32)mSpeedDribbler;
-	ds << (quint8)mDribblerEnable;
+	ds << (qint8)mSpeedX;
+	ds << (qint8)mSpeedY;
+	ds << (qint8)mSpeedR;
 
-	ds << (quint32)mKickerVoltageLevel;
-	ds << (quint8)mKickerChargeEnable;
+	ds << (quint8)mSpeedDribbler;
+	ds << (quint8)mKickerVoltageLevel;
 	ds << (quint8)mKickUp;
 	ds << (quint8)mKickForward;
 
-	quint32 crc = calculateCRC(ba, 28);
-	ds << (quint32)crc;
+	quint8 beeperState = 0;
+	ds << beeperState;
+
+	ds << (quint8)mDribblerEnable;
+	ds << (quint8)mKickerChargeEnable;
+	quint8 bskickState = 0;
+	ds << bskickState;
+
 	return ba;
-}
-
-quint32 Message::calculateCRC(const QByteArray &buf, int len)
-{
-	quint32 crc_table[256];
-	quint32 crc;
-	quint32 i;
-
-	for (i = 0; i < 256; i++) {
-		quint32 j;
-		crc = i;
-
-		for (j = 0; j < 8; j++) {
-			if ((crc & 1) > 0) {
-				crc = (crc >> 1) ^ 0xEDB88320;
-			} else {
-				crc = crc >> 1;
-			}
-		}
-		crc_table[i] = crc;
-	}
-
-	crc = 0xFFFFFFFF;
-	quint32 vsp = 0;
-
-	while (len-- > 0) {
-		crc = crc_table[(crc ^ buf[vsp]) & 0xFF] ^ (crc >> 8);
-		vsp++;
-	}
-	return crc ^ 0xFFFFFFFF;
 }

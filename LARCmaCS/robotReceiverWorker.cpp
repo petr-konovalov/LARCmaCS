@@ -17,10 +17,16 @@
 #include "robotReceiverWorker.h"
 #include "message.h"
 
+const QString RobotReceiverWorker::mSocketIp = QStringLiteral("255.255.255.255");
+
 RobotReceiverWorker::RobotReceiverWorker()
 	: mUdpSocket(this)
-	, mGroupAddress(QStringLiteral("192.168.1.255"))
-{}
+{
+	mBarrierState.resize(mRobotsInPacket);
+	mKickerChargeStatus.resize(mRobotsInPacket);
+	mConnectionState.resize(mRobotsInPacket);
+	mChargeLevel.resize(mRobotsInPacket);
+}
 
 RobotReceiverWorker::~RobotReceiverWorker()
 {
@@ -29,8 +35,8 @@ RobotReceiverWorker::~RobotReceiverWorker()
 
 void RobotReceiverWorker::start()
 {
-	mUdpSocket.bind(QHostAddress::AnyIPv4, 57000, QUdpSocket::ShareAddress);
-	mUdpSocket.joinMulticastGroup(mGroupAddress);
+	mUdpSocket.bind(QHostAddress::AnyIPv4, mPort, QUdpSocket::ShareAddress);
+	mUdpSocket.joinMulticastGroup(QHostAddress(mSocketIp));
 	connect(&mUdpSocket, SIGNAL(readyRead()), this, SLOT(processPendingDatagrams()));
 }
 
@@ -41,18 +47,21 @@ void RobotReceiverWorker::processPendingDatagrams()
 	while (mUdpSocket.hasPendingDatagrams()) {
 		datagram.resize(static_cast<int>(mUdpSocket.pendingDatagramSize()));
 		mUdpSocket.readDatagram(datagram.data(), datagram.size());
-		if (datagram.size() != 50) {
+		if (datagram.size() != mDatagramSize) {
+			qDebug() << "Packet of incorrect length was received in RobotReceiver";
 			continue;
 		}
-		quint32 crc = Message::calculateCRC(datagram, 46);
-		if (crc != ((quint32)(datagram.at(47) << 24) + (quint32)(datagram.at(48) << 16)
-					+ (quint32)(datagram.at(49) << 8) + (quint32)datagram.at(50))) {
-			continue;
+
+		for (int i = 0; i < mRobotsInPacket; i++) {
+			mChargeLevel[i] = datagram[1 + i * mOnePacketLength];
+			mBarrierState[i] = datagram[17 + i * mOnePacketLength];
+			mKickerChargeStatus[i] = datagram[18 + i * mOnePacketLength];
+			mConnectionState[i] = datagram[19 + i * mOnePacketLength];
 		}
-		QString ip = QString::number((quint32)datagram.at(26)) + "."
-				+ QString::number((quint32)datagram.at(27)) + "." + QString::number((quint32)datagram.at(28))
-				+ "." + QString::number((quint32)datagram.at(29));
-		bool isBallInside = datagram.at(4) == 0 ? false : true;
-		emit setBallInsideData(ip, isBallInside);
+
+		emit newBarrierState(mBarrierState);
+		emit newKickerChargeStatus(mKickerChargeStatus);
+		emit newConnectionState(mConnectionState);
+		emit newChargeLevel(mChargeLevel);
 	}
 }

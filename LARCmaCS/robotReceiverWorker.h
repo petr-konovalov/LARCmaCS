@@ -25,15 +25,29 @@ public:
 	RobotReceiverWorker();
 	~RobotReceiverWorker();
 
+public slots:
+	void start();
+
 signals:
-	void setBallInsideData(const QString & ip, bool isBallInside);
+	void newBarrierState(const QVector<bool> & barrierState);
+	void newKickerChargeStatus(const QVector<int> & kickerChargeStatus);
+	void newConnectionState(const QVector<int> & connectionState);
+	void newChargeLevel(const QVector<int> & connectionState);
 
 private slots:
-	void start();
 	void processPendingDatagrams();
 
 private:
+	static const int mDatagramSize = 120;
+	static const int mPort = 57004;
+	static const int mRobotsInPacket = 6;
+	static const int mOnePacketLength = mDatagramSize / mRobotsInPacket;
+	static const QString mSocketIp;
+
 	QUdpSocket mUdpSocket;
-	QHostAddress mGroupAddress;
-	QHash<char, char> ballStatuses;
+
+	QVector<bool> mBarrierState;
+	QVector<int> mKickerChargeStatus;
+	QVector<int> mConnectionState;
+	QVector<int> mChargeLevel;
 };

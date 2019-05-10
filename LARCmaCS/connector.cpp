@@ -5,6 +5,8 @@
 #include "grSimRobot.h"
 #include "defaultRobot.h"
 
+const QString Connector::robotBoxIP = QStringLiteral("192.168.0.10");
+
 Connector::Connector(SharedRes * sharedRes)
 	: mSharedRes(sharedRes)
 	, mUdpSocket(this)
@@ -31,7 +33,7 @@ unsigned short Connector::getRobotPort()
 
 void Connector::run(int N, const QByteArray & command)
 {
-	mUdpSocket.writeDatagram(command, QHostAddress(mSharedRes->getRobotIP(N)), DefaultRobot::robotPort);
+	mUdpSocket.writeDatagram(command, QHostAddress(robotBoxIP), DefaultRobot::robotPort);
 }
 
 void Connector::runSim(const QByteArray & command)
@@ -102,12 +104,12 @@ void Connector::onPauseChanged(bool status)
 	if (mIsPause) { //TODO: add check of remote control
 		QByteArray command;
 		if (!mIsSim) {
-			for (int i = 1; i <= 12; i++) {
+			for (int i = 1; i <= Constants::maxNumOfRobots; i++) {
 				DefaultRobot::formControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
 				run(i, command);
 			}
 		} else {
-			for (int i = 0; i <= 12; i++) {
+			for (int i = 0; i <= Constants::maxRobotsInTeam; i++) {
 				GrSimRobot::formControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
 				runSim(command); //for more power of remote control
 			}
