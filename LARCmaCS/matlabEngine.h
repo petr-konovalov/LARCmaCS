@@ -13,19 +13,21 @@
 // limitations under the License.
 
 #pragma once
+
+#include <QSharedPointer>
+
 #include "engineInterface.h"
 #include "mlData.h"
-#include <QSharedPointer>
 #include "packetSSL.h"
 
 class MatlabEngine : public EngineInterface
 {
 public:
 	MatlabEngine(SharedRes * sharedRes);
-	~MatlabEngine();
-	void evaluate();
-	virtual void pauseUnpause();
-	virtual void setDirectory(const QString & path);
+	~MatlabEngine() override;
+	void evaluate() override;
+	void pauseUnpause() override;
+	void setDirectory(const QString & path) override;
 
 private:
 	void runMatlab();
@@ -36,4 +38,5 @@ private:
 
 	char mMatlabOutputBuffer[Constants::matlabOutputBufferSize];
 	MlData mMatlabData;
+	bool mIsPause {false};
 };
