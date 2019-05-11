@@ -51,48 +51,47 @@ void Connector::onConnectorChange(bool isSim, const QString &ip, int port)
 	}
 }
 
-void Connector::sendNewCommand(const QVector<double> & newmess)
+void Connector::sendNewCommand(const QVector<Rule> & rule)
 {
-	if (newmess[0] == 1) {
+	for (int k = 0; k < rule.size(); k++) {
 		QByteArray command;
-
-		int voltage = 12; //fixed while we don't have abilities to change it from algos
 		bool simFlag = mIsSim;
 		if (!simFlag) {
 			if (!mIsPause) {
-				DefaultRobot::formControlPacket(command, newmess[1], newmess[3], newmess[2], newmess[5],
-						newmess[6], newmess[4], voltage, 0);
+				DefaultRobot::formControlPacket(command, k, rule[k].mSpeedX, rule[k].mSpeedY, rule[k].mSpeedR,
+						rule[k].mKickUp, rule[k].mKickForward, rule[k].mKickerVoltageLevel,
+												rule[k].mDribblerEnable, rule[k].mSpeedDribbler);
 			} else {
-				DefaultRobot::formControlPacket(command, newmess[1], 0, 0, 0, 0, 0, voltage, 0);
+				DefaultRobot::formControlPacket(command, k, 0, 0, 0, 0, 0, 0, 0);
 			}
 		} else {
 			if (!mIsPause) {
-				GrSimRobot::formControlPacket(command, newmess[1], newmess[3], newmess[2], newmess[5],
-						newmess[6], newmess[4], voltage, 0);
+				GrSimRobot::formControlPacket(command, k, rule[k].mSpeedX, rule[k].mSpeedY, rule[k].mSpeedR,
+											  rule[k].mKickUp, rule[k].mKickForward, rule[k].mKickerVoltageLevel,
+											  rule[k].mDribblerEnable, rule[k].mSpeedDribbler);
 			} else {
-				GrSimRobot::formControlPacket(command, newmess[1], 0, 0, 0, 0, 0, voltage, 0);
+				GrSimRobot::formControlPacket(command, k, 0, 0, 0, 0, 0, 0, 0);
 			}
 		}
 
-		if (newmess[1] == 0) {
-			for (int i = 1; i <= Constants::maxNumOfRobots; i++) {
-				if (!simFlag) {
-					emit run(i, command);
-				} else {
-					QByteArray multiCommand;
-					GrSimRobot::formControlPacket(multiCommand, i, newmess[3], newmess[2], newmess[5],
-							newmess[6], newmess[4], voltage, 0);
-					emit runSim(multiCommand);
-				}
-			}
-		}
+		//TODO: sending to all should be implemented in future
+//		if (newmess[1] == 0) {
+//			for (int i = 1; i <= Constants::maxNumOfRobots; i++) {
+//				if (!simFlag) {
+//					emit run(i, command);
+//				} else {
+//					QByteArray multiCommand;
+//					GrSimRobot::formControlPacket(multiCommand, i, newmess[3], newmess[2], newmess[5],
+//							newmess[6], newmess[4], voltage, 0);
+//					emit runSim(multiCommand);
+//				}
+//			}
+//		}
 
-		if ((newmess[1] > 0) && (newmess[1] <= Constants::maxNumOfRobots)) {
-			if (!simFlag) {
-				emit run(newmess[1], command);
-			} else {
-				emit runSim(command);
-			}
+		if (!simFlag) {
+			emit run(k, command);
+		} else {
+			emit runSim(command);
 		}
 	}
 }

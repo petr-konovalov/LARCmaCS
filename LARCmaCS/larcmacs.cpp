@@ -23,7 +23,7 @@ LARCmaCS::LARCmaCS(QWidget *parent)
 	, connector(&sharedRes)
 	, mIsSim(false)
 {
-	qRegisterMetaType<QVector<double> >("QVector<double>");
+	qRegisterMetaType<QVector<Rule> >("QVector<Rule>");
 
 	ui->setupUi(this);
 	ui->fieldView->setScene(fieldscene);
@@ -33,9 +33,9 @@ LARCmaCS::LARCmaCS(QWidget *parent)
 	sceneview.init();
 
 	//algorithm connect
-	connect(this, SIGNAL(MLEvalString(const QString &)), &mainalg, SLOT(EvalString(const QString &)));
-	connect(this, SIGNAL(updateMatlabDebugFrequency(int)), &mainalg, SIGNAL(updateMatlabDebugFrequency(int)));
-	//connect(this, SIGNAL(MatlabPause()), &mainalg.worker, SLOT(Pause()));
+	connect(this, SIGNAL(setDirectory(const QString &)), &mainalg, SIGNAL(setDirectory(const QString &)));
+	connect(this, SIGNAL(updateDebugFrequency(int)), &mainalg, SIGNAL(updateDebugFrequency(int)));
+	connect(this, SIGNAL(pauseUnpause()), &mainalg, SIGNAL(pauseUnpause()));
 
 	connect(ui->matlabConsole, SIGNAL(customContextMenuRequested(const QPoint &)),
 			this, SLOT(matlabConsoleMenuRequested(const QPoint &)));
@@ -44,10 +44,10 @@ LARCmaCS::LARCmaCS(QWidget *parent)
 	connect(&sceneview.worker, SIGNAL(updateView()), this, SLOT(updateView()));
 	connect(ui->sceneslider, SIGNAL(valueChanged(int)), this, SLOT(scaleView(int)));
 
-	connect(&mainalg, SIGNAL(toMatlabConsole(const QString &)), this, SLOT(toMatlabConsole(const QString &)));
+	connect(&mainalg, SIGNAL(toConsole(const QString &)), this, SLOT(toConsole(const QString &)));
 
 	//info GUI
-	connect(&mainalg, SIGNAL(UpdatePauseState(const QString &)), this, SLOT(UpdatePauseState(const QString &)));
+	connect(&mainalg, SIGNAL(updatePauseState(const QString &)), this, SLOT(UpdatePauseState(const QString &)));
 	connect(&mainalg, SIGNAL(engineStatistics(const QString &)), this, SLOT(UpdateStatusBar(const QString &)));
 	connect(&receiver, SIGNAL(updateSSLFPS(const QString &)), this, SLOT(UpdateSSLFPS(const QString &)));
 
@@ -63,8 +63,8 @@ LARCmaCS::LARCmaCS(QWidget *parent)
 	connect(this, SIGNAL(connectorChanged(bool, const QString &, int))
 				, &connector, SLOT(onConnectorChange(bool, const QString &, int)));
 
-	connect(&mainalg, SIGNAL(newData(const QVector<double> &))
-				, &connector, SLOT(sendNewCommand(const QVector<double> &)));
+	connect(&mainalg, SIGNAL(newData(const QVector<Rule> &))
+				, &connector, SLOT(sendNewCommand(const QVector<Rule> &)));
 
 	connect(&mainalg, SIGNAL(pause(bool))
 				, &connector, SLOT(onPauseChanged(bool)));
@@ -159,7 +159,7 @@ void LARCmaCS::updateChargeLevel(const QVector<int> &chargeLevel)
 	ui->battery6->setNum(chargeLevel[5]);
 }
 
-void LARCmaCS::toMatlabConsole(const QString & str)
+void LARCmaCS::toConsole(const QString & str)
 {
 	ui->matlabConsole->appendPlainText(str);
 }
@@ -183,9 +183,7 @@ void LARCmaCS::on_pushButton_SetMLdir_clicked()
 	dir = QFileDialog::getExistingDirectory(Q_NULLPTR, QString(), dir);
 	if (!dir.isEmpty()) {
 		settings.setValue(key, dir);
-		QString s = "cd " + dir;
-		qDebug() << "New Matlab directory = " << s;
-		emit MLEvalString(s);
+		emit setDirectory(dir);
 	}
 }
 
@@ -203,8 +201,13 @@ void LARCmaCS::on_matlabOutputFrequencyLineEdit_textEdited(const QString & text)
 	bool isInt = false;
 	int frequency = text.split(" ")[0].toInt(&isInt);
 	if (isInt && frequency != 0) {
-		emit updateMatlabDebugFrequency(frequency);
+		emit updateDebugFrequency(frequency);
 	}
+}
+
+void LARCmaCS::on_pushButton_Pause_clicked()
+{
+	emit pauseUnpause();
 }
 
 void LARCmaCS::on_checkBox_SimEnable_stateChanged(int state)

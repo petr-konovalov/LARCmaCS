@@ -7,6 +7,7 @@
 #include "packetSSL.h"
 #include "mlData.h"
 #include "sharedRes.h"
+#include "engineInterface.h"
 
 class MainAlgWorker : public QObject
 {
@@ -15,41 +16,31 @@ class MainAlgWorker : public QObject
 public:
 	MainAlgWorker(SharedRes * sharedRes);
 	~MainAlgWorker();
+	void run();
 
 signals:
 	void newPauseState(const QString & state);
 	void sendStatistics(const QString & statistics);
-	void toMatlabConsole(const QString & str);
-	void newData(const QVector<double> & data);
+	void toConsole(const QString & str);
+	void newData(const QVector<Rule> & data);
 	void pause(bool status);
 
 public slots:
 	void start();
-	void setMatlabDebugFrequency(int frequency);
+	void setDirectory(const QString & path);
+	void setDebugFrequency(int frequency);
 	void formStatistics();
-	void updatePauseState();
+	void receiveMSGToConsole(const QString & str);
 	void stop();
-	void processPacket(const QSharedPointer<PacketSSL> & packetssl);
-	void Pause();
-	void runMatlab();
-	void stop_matlab();
-	void run();
-	void evalString(const QString & s);
+	void pauseUnpause();
+
 
 private:
-	void init();
-	QSharedPointer<PacketSSL> loadVisionData();
-	bool mIsSimEnabledFlag = false;
-	char mMatlabOutputBuffer[Constants::matlabOutputBufferSize];
-	MlData fmldata;
-	bool fmtlab;
+	EngineInterface * mEngine;
 	int mFrequency = 100;
 	bool mShutdownFlag;
-	bool mIsPause;
 	int mTotalPacketsNum = 0;
 	int mPacketsPerSecond = 0;
 	QTimer mStatisticsTimer;
-	QSharedPointer<PacketSSL> mPacketSSL;
-	double mIsBallInside;
 	SharedRes * mSharedRes;
 };

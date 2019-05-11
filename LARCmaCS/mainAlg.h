@@ -31,23 +31,19 @@ public:
 	explicit MainAlg(SharedRes * sharedRes);
 	~MainAlg();
 
-public slots:
-	void EvalString(const QString & s);
-	void receivePauseState(const QString & state);
-	void changeBallStatus(bool status);
-
 signals:
 	void updateBallStatus(bool status);
-	void updateMatlabDebugFrequency(int frequency);
-	void MLEvalString(const QString & s);
+	void updateDebugFrequency(int frequency);
+	void pauseUnpause();
+	void setDirectory(const QString & s);
 	void sendToConnector(int N, const QByteArray & command);
 	void sendToSimConnector(const QByteArray & command);
 	void updateEnableSimFlag(bool flag);
 	void engineStatistics(const QString & status);
-	void UpdatePauseState(const QString & state);
-	void toMatlabConsole(const QString & str);
+	void updatePauseState(const QString & state);
+	void toConsole(const QString & str);
 	void connectorChanged(bool, const QString &, int);
-	void newData(const QVector<double> & data);
+	void newData(const QVector<Rule> & data);
 	void pause(bool status);
 	void stopped();
 

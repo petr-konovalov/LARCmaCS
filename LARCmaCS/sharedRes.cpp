@@ -40,12 +40,21 @@ QSharedPointer<SSL_WrapperPacket> SharedRes::getGeometry()
 QSharedPointer<SSL_WrapperPacket> SharedRes::getDetection(int camID)
 {
 	QReadLocker locker(&mDetectionLock);
-	return mDetection->at(camID);
+	if (camID >= 0 && camID < mDetection->size()) {
+		return mDetection->at(camID);
+	} else {
+		return QSharedPointer<SSL_WrapperPacket>();
+	}
 }
 
 QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > SharedRes::getDetection()
 {
 	return mDetection;
+}
+
+int SharedRes::getDetectionSize()
+{
+	return mDetection->size();
 }
 
 void SharedRes::setBarrierState(const QVector<bool> &barrierState)

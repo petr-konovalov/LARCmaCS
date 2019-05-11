@@ -8,6 +8,7 @@
 #include "sharedRes.h"
 #include "settings.h"
 #include "defaultRobot.h"
+#include "engineInterface.h"
 
 using std::map;
 
@@ -24,7 +25,7 @@ public:
 
 public slots:
 	void onConnectorChange(bool isSim, const QString & ip, int port);
-	void sendNewCommand(const QVector<double> & newmess);
+	void sendNewCommand(const QVector<Rule> & rule);
 	void onPauseChanged(bool status);
 
 private:

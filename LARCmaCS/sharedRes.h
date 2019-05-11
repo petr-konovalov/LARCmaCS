@@ -30,6 +30,7 @@ class SharedRes : public QObject
 
 public:
 	SharedRes();
+	int getDetectionSize();
 	void setBarrierState(const QVector<bool> & barrierState);
 	void setDetection(const QSharedPointer<SSL_WrapperPacket> & detection, int camID);
 	void setGeometry(const QSharedPointer<SSL_WrapperPacket> & geometry);
