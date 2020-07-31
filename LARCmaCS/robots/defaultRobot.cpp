@@ -14,24 +14,25 @@
 
 
 #include "defaultRobot.h"
-
+#include <QDebug>
 DefaultRobot::DefaultRobot(){}
 
 void DefaultRobot::formControlPacket(QByteArray & command, int numOfRobot, int speedX, int speedY, int speedR,
 									 bool kickUp, bool kickForward, int kickVoltage,
-									 bool enableSpinner, int spinnerSpeed)
+									 bool enableSpinner, int spinnerSpeed, int autoKick, bool kickerCharge, bool beep)
 {
-	Message msg;
+    Message msg;
 	msg.setRobotNumber(numOfRobot);
 	msg.setKickVoltageLevel(kickVoltage);
-	msg.setKickerChargeEnable(1);
+	msg.setKickerChargeEnable(kickerCharge);
 	msg.setSpeedX(speedX);
 	msg.setSpeedY(speedY);
 	msg.setSpeedR(speedR);
 	msg.setKickForward(kickForward);
 	msg.setKickUp(kickUp);
 	msg.setDribblerEnable(enableSpinner);
-	msg.setSpeedDribbler(spinnerSpeed); //fixed for the first time
-
+	msg.setSpeedDribbler(spinnerSpeed);
+	msg.setAutoKick(autoKick);
+    msg.setBeep(beep);
 	command = msg.generateByteArray();
 }

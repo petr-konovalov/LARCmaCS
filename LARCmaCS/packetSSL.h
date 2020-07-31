@@ -9,4 +9,5 @@ struct PacketSSL
 	double robots_blue[Constants::robotAlgoPacketSize];
 	double robots_yellow[Constants::robotAlgoPacketSize];
 	double balls[Constants::ballAlgoPacketSize];
+	double fieldInfo[Constants::fieldInfoSize];
 };

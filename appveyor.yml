@@ -48,6 +48,7 @@ after_test:
   - cd C:\build_mingw_%platform%\bin
   - windeployqt --release LARCmaCS.exe
   - cp %MSYS_DIR%/mingw%bit%/bin/libprotobuf.dll .
+  - cp %MSYS_DIR%/mingw%bit%/bin/libssp-0.dll .
 # TODO copy dll
   - set ZIP_NAME=larcmacs_%APPVEYOR_REPO_COMMIT:~0,7%_%platform%.zip
   - 7z a %APPVEYOR_BUILD_FOLDER%\%ZIP_NAME% .

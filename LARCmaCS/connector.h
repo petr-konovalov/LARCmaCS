@@ -27,11 +27,10 @@ public slots:
 	void onConnectorChange(bool isSim, const QString & ip, int port);
 	void sendNewCommand(const QVector<Rule> & rule);
 	void onPauseChanged(bool status);
-
-private:
 	void run(int N, const QByteArray & command);
 	void runSim(const QByteArray & command);
 
+private:
 	QString mGrSimIP;
 	unsigned short mGrSimPort;
 	SharedRes * mSharedRes;

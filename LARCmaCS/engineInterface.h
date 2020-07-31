@@ -19,7 +19,7 @@ typedef struct Rule
 	int mKickForward = 0;
 
 	int mBeep = 0;
-	int bs_kick_state = 0;
+	int mAutoKick = 0;
 } Rule;
 
 

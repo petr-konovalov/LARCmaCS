@@ -23,6 +23,7 @@ SharedRes::SharedRes()
 	for (auto i = 0; i < Constants::numOfCameras; i++) {
 		mDetection->replace(i, QSharedPointer<SSL_WrapperPacket>());
 	}
+	mBarrierState.resize(Constants::maxRobotsInTeam);
 }
 
 QVector<bool> SharedRes::getBarrierState()
@@ -47,6 +48,24 @@ QSharedPointer<SSL_WrapperPacket> SharedRes::getDetection(int camID)
 	}
 }
 
+int SharedRes::getRefereeState()
+{
+	QReadLocker locker(&mRefereeLock);
+	return mRefereeState;
+}
+
+int SharedRes::getRefereeTeam()
+{
+	QReadLocker locker(&mRefereeLock);
+	return  mRefereeTeam;
+}
+
+bool SharedRes::getRefereePartOfFieldLeft()
+{
+	QReadLocker locker(&mRefereeLock);
+	return mRefereePartOfFieldLeft;
+}
+
 QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > SharedRes::getDetection()
 {
 	return mDetection;
@@ -57,7 +76,7 @@ int SharedRes::getDetectionSize()
 	return mDetection->size();
 }
 
-void SharedRes::setBarrierState(const QVector<bool> &barrierState)
+void SharedRes::setBarrierState(const QVector<bool> & barrierState)
 {
 	QWriteLocker locker(&mBarrierStateLock);
 	mBarrierState = barrierState;
@@ -73,4 +92,12 @@ void SharedRes::setGeometry(const QSharedPointer<SSL_WrapperPacket> & geometry)
 {
 	QWriteLocker locker(&mGeometryLock);
 	mGeometry = geometry;
+}
+
+void SharedRes::setRefereeData(int state, int team, bool partOfField)
+{
+	QWriteLocker locker(&mRefereeLock);
+	mRefereeState = state;
+	mRefereeTeam = team;
+	mRefereePartOfFieldLeft = partOfField;
 }

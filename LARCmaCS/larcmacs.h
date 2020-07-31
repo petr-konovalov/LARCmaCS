@@ -10,6 +10,7 @@
 #include "remotecontrol.h"
 #include "reference.h"
 #include "robotReceiver.h"
+#include "referee/refereeClient.h"
 
 #define NUM_CONTROL_ROBOTS 12
 
@@ -46,6 +47,7 @@ private:
 	QUdpSocket socket;
 	RobotReceiver robotReceiver;
 	bool mIsSim;
+	RefereeClient referee;
 
 private slots:
 	void UpdateSSLFPS(const QString & message);
@@ -74,4 +76,6 @@ signals:
 	void setDirectory(const QString & s);
 	void updateRobots();
 	void connectorChanged(bool isSim, const QString & ip, int port);
+	void run(int N, const QByteArray & command);
+	void runSim(const QByteArray & command);
 };

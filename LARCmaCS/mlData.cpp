@@ -7,13 +7,16 @@ MlData::MlData(RCConfig conf)
 	config = conf;
 
 	Ball         = mxCreateDoubleMatrix(1, 3, mxREAL);
-	Blue         = mxCreateDoubleMatrix(Constants::maxRobotsInTeam, 4, mxREAL);
-	Yellow       = mxCreateDoubleMatrix(Constants::maxRobotsInTeam, 4, mxREAL);
+	Blue         = mxCreateDoubleMatrix(Constants::maxRobotsInTeam, 5, mxREAL);
+	Yellow       = mxCreateDoubleMatrix(Constants::maxRobotsInTeam, 5, mxREAL);
 	Rule         = mxCreateDoubleMatrix(Constants::ruleLength, Constants::ruleAmount, mxREAL);
 	Back_Params  = mxCreateDoubleMatrix(config.BACK_LENGTH, config.BACK_AMOUNT, mxREAL);
 	Back_Amount  = mxCreateDoubleMatrix(1, 1, mxREAL);
 	Back_Length  = mxCreateDoubleMatrix(1, 1, mxREAL);
-	ballInside   = mxCreateDoubleMatrix(Constants::maxRobotsInTeam, 1, mxREAL);
+	state        = mxCreateDoubleScalar(0);
+	team         = mxCreateDoubleScalar(0);
+	partOfFieldLeft = mxCreateDoubleScalar(0);
+	fieldInfo    = mxCreateDoubleMatrix(1, Constants::fieldInfoSize, mxREAL);
 }
 
 MlData::MlData(const MlData &dat)
@@ -24,13 +27,13 @@ MlData::MlData(const MlData &dat)
 	Ball         = mxCreateDoubleMatrix(1, 3, mxREAL);
 	memcpy(Ball, &dat.Ball, sizeof(Ball));
 
-	Blue         = mxCreateDoubleMatrix(Constants::maxRobotsInTeam, 4, mxREAL);
+	Blue         = mxCreateDoubleMatrix(Constants::maxRobotsInTeam, 5, mxREAL);
 	memcpy(Blue, &dat.Blue, sizeof(Blue));
 
-	Yellow       = mxCreateDoubleMatrix(Constants::maxRobotsInTeam, 4, mxREAL);
+	Yellow       = mxCreateDoubleMatrix(Constants::maxRobotsInTeam, 5, mxREAL);
 	memcpy(Yellow, &dat.Yellow, sizeof(Yellow));
 
-	Rule         = mxCreateDoubleMatrix(config.RULE_LENGTH, config.RULE_AMOUNT, mxREAL);
+	Rule         = mxCreateDoubleMatrix(Constants::ruleLength, Constants::ruleAmount, mxREAL);
 	memcpy(Rule, &dat.Rule, sizeof(Rule));
 
 	Back_Params  = mxCreateDoubleMatrix(config.BACK_LENGTH, config.BACK_AMOUNT, mxREAL);
@@ -42,6 +45,15 @@ MlData::MlData(const MlData &dat)
 	Back_Length  = mxCreateDoubleMatrix(1, 1, mxREAL);
 	memcpy(Back_Length, &dat.Back_Length, sizeof(Back_Length));
 
-	ballInside   = mxCreateDoubleMatrix(Constants::maxRobotsInTeam, 1, mxREAL);
-	memcpy(ballInside, &dat.ballInside, sizeof(ballInside));
+	state      = mxCreateDoubleScalar(0);
+	memcpy(state, &dat.state, sizeof(state));
+
+	team       = mxCreateDoubleScalar(0);
+	memcpy(team, &dat.team, sizeof(team));
+
+	partOfFieldLeft = mxCreateDoubleScalar(0);
+	memcpy(partOfFieldLeft, &dat.partOfFieldLeft, sizeof(partOfFieldLeft));
+	
+	fieldInfo    = mxCreateDoubleMatrix(1, Constants::fieldInfoSize, mxREAL);
+	memcpy(fieldInfo, &dat.fieldInfo, sizeof(fieldInfo));
 }

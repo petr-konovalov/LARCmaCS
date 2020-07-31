@@ -37,3 +37,4 @@ INCLUDEPATH += $$PROTO_GENERATED_DIR
 old_ssl: PROTOS = $$files($$PWD/ssl-2009/*.proto)
 !old_ssl: PROTOS = $$files($$PWD/ssl-2018/*.proto)
 !old_ssl: PROTOS += $$files($$PWD/simulator/*.proto)
+PROTOS += $$files($$PWD/referee/*.proto)

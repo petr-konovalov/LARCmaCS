@@ -16,16 +16,17 @@
 
 #include "robotReceiverWorker.h"
 #include "message.h"
+#include "constants.h"
 
 const QString RobotReceiverWorker::mSocketIp = QStringLiteral("255.255.255.255");
 
 RobotReceiverWorker::RobotReceiverWorker()
 	: mUdpSocket(this)
 {
-	mBarrierState.resize(mRobotsInPacket);
-	mKickerChargeStatus.resize(mRobotsInPacket);
-	mConnectionState.resize(mRobotsInPacket);
-	mChargeLevel.resize(mRobotsInPacket);
+	mBarrierState.resize(Constants::maxRobotsInTeam);
+	mKickerChargeStatus.resize(Constants::maxRobotsInTeam);
+	mConnectionState.resize(Constants::maxRobotsInTeam);
+	mChargeLevel.resize(Constants::maxRobotsInTeam);
 }
 
 RobotReceiverWorker::~RobotReceiverWorker()
