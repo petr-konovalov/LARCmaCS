@@ -42,7 +42,7 @@ void MatlabEngine::runMatlab()
 		return;
 	}
 
-	mMatlabOutputBuffer[Constants::matlabOutputBufferSize - 1] = '\0';
+    mMatlabOutputBuffer[Constants::matlabOutputBufferSize - 1] = '\0';
 	engOutputBuffer(mMatlabData.ep, mMatlabOutputBuffer, Constants::matlabOutputBufferSize - 1);
 	qDebug() << "Matlab Engine is opened\n" << endl;
 
@@ -98,12 +98,20 @@ QSharedPointer<PacketSSL> MatlabEngine::loadVisionData()
 			balls_n = mDetection.balls_size();
 
 			// [Start] Ball info
-			if (balls_n != 0) {
-				packetSSL->balls[0] = idCam;
-				SSL_DetectionBall ball = mDetection.balls(0);
-				packetSSL->balls[1] = ball.x();
-				packetSSL->balls[2] = ball.y();
-			}
+            //qDebug() << balls_n << ' ';
+            for (int j = 0; j < Constants::ballAlgoPacketSize; ++j)
+            {
+                for (int k = 0; k < Constants::maxBallsInCamera; ++k) {
+                    packetSSL->balls[j*Constants::maxBallsInField+(idCam - 1) * Constants::maxBallsInCamera + k] = 0;
+                }
+            }
+            for (int ball_id = 0; ball_id < balls_n; ++ball_id)
+            {
+                SSL_DetectionBall ball = mDetection.balls(ball_id);
+                packetSSL->balls[ball_id+(idCam - 1) * Constants::maxBallsInCamera] = idCam;
+                packetSSL->balls[ball_id+Constants::maxBallsInField+(idCam - 1) * Constants::maxBallsInCamera] = ball.x();
+                packetSSL->balls[ball_id+2*Constants::maxBallsInField+(idCam - 1) * Constants::maxBallsInCamera] = ball.y();
+            }
 			// [End] Ball info
 
 			// [Start] Robot info
@@ -165,7 +173,7 @@ void MatlabEngine::processPacket(const QSharedPointer<PacketSSL> & packetssl)
 		}
 	}
 
-	memcpy(mxGetPr(mMatlabData.Ball), packetssl->balls, Constants::ballAlgoPacketSize * sizeof(double));
+    memcpy(mxGetPr(mMatlabData.Ball), packetssl->balls, Constants::maxBallsInField * Constants::ballAlgoPacketSize * sizeof(double));
 	memcpy(mxGetPr(mMatlabData.Blue), packetssl->robots_blue, Constants::robotAlgoPacketSize * sizeof(double));
 	memcpy(mxGetPr(mMatlabData.Yellow), packetssl->robots_yellow, Constants::robotAlgoPacketSize * sizeof(double));
 	memcpy(mxGetPr(mMatlabData.fieldInfo), packetssl->fieldInfo, Constants::fieldInfoSize * sizeof(double));
@@ -178,6 +186,13 @@ void MatlabEngine::processPacket(const QSharedPointer<PacketSSL> & packetssl)
 
 	double partOfField = (double)mSharedRes->getRefereePartOfFieldLeft();
 	memcpy(mxGetPr(mMatlabData.partOfFieldLeft), &partOfField, sizeof(double));
+
+//    qDebug() << packetssl->balls[0] << ' '
+//             << packetssl->balls[  Constants::maxBallsInField] << ' '
+//             << packetssl->balls[2*Constants::maxBallsInField] << ' '
+//             << packetssl->balls[1] << ' '
+//             << packetssl->balls[1+Constants::maxBallsInField] << ' '
+//             << packetssl->balls[1+2*Constants::maxBallsInField] << ' ';
 
 	engPutVariable(mMatlabData.ep, "Balls", mMatlabData.Ball);
 	engPutVariable(mMatlabData.ep, "Blues", mMatlabData.Blue);

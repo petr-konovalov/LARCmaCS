@@ -38,9 +38,9 @@ private slots:
 	void processPendingDatagrams();
 
 private:
-	static const int mDatagramSize = 120;
-	static const int mPort = 57004;
-	static const int mRobotsInPacket = 6;
+    static const int mDatagramSize = 120;
+    static const int mPort = 57004;
+    static const int mRobotsInPacket = 6;
 	static const int mOnePacketLength = mDatagramSize / mRobotsInPacket;
 	static const QString mSocketIp;
 

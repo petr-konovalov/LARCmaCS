@@ -39,6 +39,8 @@ private:
 	static const QString robotBoxIP;
 
 	bool mIsSim { false };
-	static const unsigned short mRobotPort = 10000;
+    static const unsigned short mRobotPort = 10000;
 	bool mIsPause { false };
+
+    QVector<Rule> oldRule {*new QVector<Rule>(Constants::ruleAmount)};
 };

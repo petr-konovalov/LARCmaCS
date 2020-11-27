@@ -23,10 +23,10 @@ environment:
 
 init:
   - set PATH=%MSYS_DIR%\usr\bin;%PATH%
-  - git clone https://github.com/IKhonakhbeeva/MCR_for_LARCmaCS C:\MCR
+#  - git clone https://github.com/IKhonakhbeeva/MCR_for_LARCmaCS C:\MCR
 #  - pacman --noconfirm -Su mingw%bit%/mingw-w64-%platform_name%-gcc
-  - pacman --noconfirm -Su mingw%bit%/mingw-w64-%platform_name%-make
-  - pacman --noconfirm -Su mingw%bit%/mingw-w64-%platform_name%-qt5
+#  - pacman --noconfirm -Su mingw%bit%/mingw-w64-%platform_name%-make
+#  - pacman --noconfirm -Su mingw%bit%/mingw-w64-%platform_name%-qt5
   - pacman --noconfirm -Su mingw%bit%/mingw-w64-%platform_name%-protobuf
   - pacman --noconfirm -Su unzip
 install:
