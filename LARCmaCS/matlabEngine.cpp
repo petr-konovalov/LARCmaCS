@@ -105,6 +105,7 @@ QSharedPointer<PacketSSL> MatlabEngine::loadVisionData()
                     packetSSL->balls[j*Constants::maxBallsInField+(idCam - 1) * Constants::maxBallsInCamera + k] = 0;
                 }
             }
+            //qDebug() << balls_n << '\n';
             for (int ball_id = 0; ball_id < balls_n; ++ball_id)
             {
                 SSL_DetectionBall ball = mDetection.balls(ball_id);
@@ -175,7 +176,8 @@ void MatlabEngine::processPacket(const QSharedPointer<PacketSSL> & packetssl)
 
     memcpy(mxGetPr(mMatlabData.Ball), packetssl->balls, Constants::maxBallsInField * Constants::ballAlgoPacketSize * sizeof(double));
 	memcpy(mxGetPr(mMatlabData.Blue), packetssl->robots_blue, Constants::robotAlgoPacketSize * sizeof(double));
-	memcpy(mxGetPr(mMatlabData.Yellow), packetssl->robots_yellow, Constants::robotAlgoPacketSize * sizeof(double));
+    memcpy(mxGetPr(mMatlabData.BlueHeap), packetssl->robot_blue_heap, Constants::maxRobotsInField*Constants::robotAlgoPacketSize * sizeof(double));
+    memcpy(mxGetPr(mMatlabData.Yellow), packetssl->robots_yellow, Constants::robotAlgoPacketSize * sizeof(double));
 	memcpy(mxGetPr(mMatlabData.fieldInfo), packetssl->fieldInfo, Constants::fieldInfoSize * sizeof(double));
 
 	double state = mSharedRes->getRefereeState();
@@ -196,6 +198,7 @@ void MatlabEngine::processPacket(const QSharedPointer<PacketSSL> & packetssl)
 
 	engPutVariable(mMatlabData.ep, "Balls", mMatlabData.Ball);
 	engPutVariable(mMatlabData.ep, "Blues", mMatlabData.Blue);
+    engPutVariable(mMatlabData.ep, "BlueHeap", mMatlabData.BlueHeap);
 	engPutVariable(mMatlabData.ep, "Yellows", mMatlabData.Yellow);
 	engPutVariable(mMatlabData.ep, "FieldInfo", mMatlabData.fieldInfo);
 	engPutVariable(mMatlabData.ep, "RefState", mMatlabData.state);

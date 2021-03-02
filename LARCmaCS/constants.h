@@ -30,5 +30,7 @@ public:
 	static const int ruleAmount = 16;
     static const int matlabOutputBufferSize = 2048;
     static const int maxBallsInCamera = 64;
+    static const int maxRobotsInCamera = 4;
     static const int maxBallsInField = maxBallsInCamera * numOfCameras;
+    static const int maxRobotsInField = maxRobotsInCamera * numOfCameras;
 };

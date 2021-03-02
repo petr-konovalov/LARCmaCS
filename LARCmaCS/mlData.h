@@ -28,6 +28,7 @@ public:
 	mxArray *Rule;
 	mxArray *Ball;
 	mxArray *Blue;
+    mxArray *BlueHeap;
 	mxArray *Yellow;
 	mxArray *Back_Params;
 	mxArray *Back_Amount;
