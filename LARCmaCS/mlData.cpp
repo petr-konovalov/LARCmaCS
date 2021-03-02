@@ -8,6 +8,7 @@ MlData::MlData(RCConfig conf)
 
     Ball         = mxCreateDoubleMatrix(Constants::maxBallsInField, Constants::ballAlgoPacketSize, mxREAL);
 	Blue         = mxCreateDoubleMatrix(Constants::maxRobotsInTeam, 5, mxREAL);
+    BlueHeap     = mxCreateDoubleMatrix(Constants::maxRobotsInField*Constants::maxNumOfRobots, 5, mxREAL);
 	Yellow       = mxCreateDoubleMatrix(Constants::maxRobotsInTeam, 5, mxREAL);
 	Rule         = mxCreateDoubleMatrix(Constants::ruleLength, Constants::ruleAmount, mxREAL);
 	Back_Params  = mxCreateDoubleMatrix(config.BACK_LENGTH, config.BACK_AMOUNT, mxREAL);

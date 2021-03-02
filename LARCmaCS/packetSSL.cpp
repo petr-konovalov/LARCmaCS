@@ -2,6 +2,7 @@
 
 PacketSSL::PacketSSL()
 {
+    memset(robot_blue_heap, 0, Constants::maxRobotsInField*Constants::robotAlgoPacketSize * sizeof(double));
 	memset(robots_blue, 0, Constants::robotAlgoPacketSize * sizeof(double));
 	memset(robots_yellow, 0, Constants::robotAlgoPacketSize * sizeof(double));
     memset(balls, 0, Constants::maxBallsInField*Constants::ballAlgoPacketSize * sizeof(double));
@@ -10,6 +11,7 @@ PacketSSL::PacketSSL()
 
 PacketSSL::PacketSSL(const PacketSSL & ps)
 {
+    memcpy(robot_blue_heap, ps.robots_blue, Constants::maxRobotsInField*Constants::robotAlgoPacketSize * sizeof(double));
 	memcpy(robots_blue, ps.robots_blue, Constants::robotAlgoPacketSize * sizeof(double));
 	memcpy(robots_yellow, ps.robots_yellow, Constants::robotAlgoPacketSize * sizeof(double));
     memcpy(balls, ps.balls, Constants::maxBallsInField*Constants::ballAlgoPacketSize * sizeof(double));

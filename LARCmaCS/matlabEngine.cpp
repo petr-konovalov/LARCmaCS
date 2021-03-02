@@ -126,6 +126,12 @@ QSharedPointer<PacketSSL> MatlabEngine::loadVisionData()
 					packetSSL->robots_blue[robot.robot_id() + Constants::maxRobotsInTeam] = robot.x();
 					packetSSL->robots_blue[robot.robot_id() + Constants::maxRobotsInTeam * 2] = robot.y();
 					packetSSL->robots_blue[robot.robot_id() + Constants::maxRobotsInTeam * 3] = robot.orientation();
+
+                    packetSSL->robot_blue_heap[i + (idCam - 1) * Constants::maxRobotsInCamera * Constants::maxNumOfRobots] = idCam;
+                    packetSSL->robot_blue_heap[i + (idCam - 1) * Constants::maxRobotsInCamera * Constants::maxNumOfRobots + Constants::maxRobotsInField*Constants::maxNumOfRobots] = robot.x();
+                    packetSSL->robot_blue_heap[i + (idCam - 1) * Constants::maxRobotsInCamera * Constants::maxNumOfRobots + Constants::maxRobotsInField*Constants::maxNumOfRobots * 2] = robot.y();
+                    packetSSL->robot_blue_heap[i + (idCam - 1) * Constants::maxRobotsInCamera * Constants::maxNumOfRobots + Constants::maxRobotsInField*Constants::maxNumOfRobots * 3] = robot.orientation();
+                    packetSSL->robot_blue_heap[i + (idCam - 1) * Constants::maxRobotsInCamera * Constants::maxNumOfRobots + Constants::maxRobotsInField*Constants::maxNumOfRobots * 4] = robot.robot_id() + 1;
 				} else {
 					if (robot.has_robot_id()) {
 						qDebug() << "Error: incorrect blue robot id" << robot.robot_id();
