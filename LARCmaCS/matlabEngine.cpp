@@ -105,10 +105,6 @@ QSharedPointer<PacketSSL> MatlabEngine::loadVisionData()
                     packetSSL->balls[j*Constants::maxBallsInField+(idCam - 1) * Constants::maxBallsInCamera + k] = 0;
                 }
             }
-<<<<<<< HEAD
-            //qDebug() << balls_n << '\n';
-=======
->>>>>>> df2f115a9f02832016b2e3c20dacadfe858d3ff7
             for (int ball_id = 0; ball_id < balls_n; ++ball_id)
             {
                 SSL_DetectionBall ball = mDetection.balls(ball_id);
