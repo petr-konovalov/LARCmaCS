@@ -9,20 +9,20 @@ RemoteControl::RemoteControl(QWidget *parent) :
 	ui(new Ui::RemoteControl)
 {
 	ui->setupUi(this);
-	qDebug()<<"START REMOTE CONTROL";
-	connect(&timer,SIGNAL(timeout()),this,SLOT(RC_send()));
-	connect(this,SIGNAL(destroyed()),this,SLOT(TimerStop()));
-	//    connect(this,SIGNAL()
-	for(int i=0; i<256; i++)
-		keys[i]=0;
-	key_shift=0;
+	qDebug() << "START REMOTE CONTROL";
+	connect(&timer, SIGNAL(timeout()), this, SLOT(RC_send()));
+	connect(this, SIGNAL(destroyed()), this, SLOT(TimerStop()));
+	for(int i = 0; i < 256; i++) {
+		keys[i] = 0;
+	}
+	key_shift = 0;
 	effort = 1;
 }
 
 void RemoteControl::TimerStart()
 {
 	if (!timer.isActive()) {
-		qDebug()<<"<RemContril>: Start";
+		qDebug() << "<RemContril>: Start";
 		timer.start(RC_TIMER_CD);
 	}
 }
@@ -30,7 +30,7 @@ void RemoteControl::TimerStop()
 {
 	if (timer.isActive()) {
 		emit RC_control(0, 0, 0, 0, 0);
-		qDebug()<<"<RemContril>: Stop";
+		qDebug() << "<RemContril>: Stop";
 		timer.stop();
 	}
 }
@@ -45,26 +45,24 @@ RemoteControl::~RemoteControl()
 
 void RemoteControl::keyPressEvent(QKeyEvent * key)
 {
-	quint32 nkey=key->nativeVirtualKey();
-	//qDebug()<<key<<" "<<key->key()<<" "<<key->nativeVirtualKey();
-	if (nkey<256)
-		keys[nkey]=1;
-	if (nkey==QT_KEY_ESCAPE_NATIVE) {
+	quint32 nkey = key->nativeVirtualKey();
+	if (nkey < 256)
+		keys[nkey] = 1;
+	if (nkey == QT_KEY_ESCAPE_NATIVE) {
 		this->close();
 	}
-	if (nkey==QT_KEY_SHIFT_NATIVE) {
-		key_shift=1;
+	if (nkey == QT_KEY_SHIFT_NATIVE) {
+		key_shift = 1;
 	}
 }
 
 void RemoteControl::keyReleaseEvent(QKeyEvent * key)
 {
-	quint32 nkey=key->nativeVirtualKey();
-	//qDebug()<<key<<" "<<key->key()<<" "<<key->nativeVirtualKey();
-	if (nkey<256)
-		keys[nkey]=0;
-	if (nkey==QT_KEY_SHIFT_NATIVE) {
-		key_shift=0;
+	quint32 nkey = key->nativeVirtualKey();
+	if (nkey < 256)
+		keys[nkey] = 0;
+	if (nkey == QT_KEY_SHIFT_NATIVE) {
+		key_shift = 0;
 	}
 	if(nkey == ' ') {
 		qDebug() << "Space release";
@@ -73,7 +71,7 @@ void RemoteControl::keyReleaseEvent(QKeyEvent * key)
 
 void RemoteControl::RC_send(void)
 {
-	int L=0,R=0,S=0,K=0,B=0;
+	int L = 0, R = 0, S = 0, K = 0, B = 0;
 
 	int xVel = 0, yVel = 0, r = 0;
 	bool kickUp = false;
@@ -82,78 +80,40 @@ void RemoteControl::RC_send(void)
 		kickUp = true;
 	}
 
-	if(keys[38]&&key_shift) {
+	if(keys[38] && key_shift) {
 		effort++;
 		qDebug() << "Effort: " << effort;
 		return;
 	}
-	if(keys[40]&&key_shift) {
-		if(effort>1)
-		effort--;
+	if(keys[40] && key_shift) {
+		if (effort > 1) {
+			effort--;
+		}
 		qDebug() << "Effort: " << effort;
 		return;
 	}
 
 	if (keys['W'] || keys[38] ) {
-		yVel = 10*effort;
+		yVel = 10 * effort;
 	}
 	if (keys['S'] || keys[40]) {
-		yVel = -10*effort;
+		yVel = -10 * effort;
 	}
 	if (keys['A'] || keys[37]) {
-		xVel = -20*effort;
+		xVel = 20 * effort;
 	}
 	if (keys['D'] || keys[39]) {
-		xVel = 20*effort;
+		xVel = -20 * effort;
 	}
 	if (keys['R']) {
-		r = 10*effort;
+		r = 10 * effort;
 	}
 	if (keys['F']) {
-		r = -10*effort;
+		r = -10 * effort;
 	}
 
-
-	qDebug() << "emit " << xVel << " " << yVel;
+	qDebug() << "emit " << xVel << " " << yVel << " " << r;
 	emit RC_control(xVel, yVel, r, 0, kickUp);
-
-	return;
-
-	if (keys['W'] ) {
-		L+=50;
-		R+=50;
-	}
-	if (keys['S']) {
-		L-=50;
-		R-=50;
-	}
-	if (keys['A']) {
-		L-=25;
-		R+=25;
-	}
-	if (keys['D']) {
-		L+=25;
-		R-=25;
-	}
-	if (keys[' ']||keys['Q'])
-		K=1;
-	if (keys['E'])
-		K=-1;
-	if (keys['Z']||keys['B'])
-		B=1;
-	if (key_shift) {
-		L=L*2;
-		R=R*2;
-		if (abs(L)>100)
-			L=L/abs(L)*100;
-		if (abs(R)>100)
-			R=R/abs(R)*100;
-	}
-	ui->label_state->setText(" L=" +QString::number(L)+
-							 " R=" +QString::number(R)+
-							 " K=" +QString::number(K)+
-							 " B=" +QString::number(B));
-	emit RC_control(L,R,K,B, kickUp);
 }
 
 void RemoteControl::closeEvent(QCloseEvent *)

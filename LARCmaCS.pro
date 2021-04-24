@@ -1,18 +1,21 @@
 include(config.pri)
 include(personal.pri)
 #check personal info
+
 msvc {
   isEmpty(VCPKG_DIR): error("To use MSVC you need to specify the path to VCPKG_DIR!")
 }
 mingw {
   isEmpty(MSYS_DIR): error("To use MINGW you need to specify the path to MSYS_DIR!")
 }
+
 isEmpty(MATLAB_DIR): error("You need to specify the path to MATLAB_DIR!")
 include(proto/proto.pri)
 
 SHARED_DIR = $$PWD/macsCommon
 
 include (LARCmaCS/LARCmaCS.pri)
+
 
 #Need this???
 #where to place built objects

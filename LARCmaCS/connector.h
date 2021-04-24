@@ -27,11 +27,10 @@ public slots:
 	void onConnectorChange(bool isSim, const QString & ip, int port);
 	void sendNewCommand(const QVector<Rule> & rule);
 	void onPauseChanged(bool status);
-
-private:
 	void run(int N, const QByteArray & command);
 	void runSim(const QByteArray & command);
 
+private:
 	QString mGrSimIP;
 	unsigned short mGrSimPort;
 	SharedRes * mSharedRes;
@@ -40,6 +39,8 @@ private:
 	static const QString robotBoxIP;
 
 	bool mIsSim { false };
-	static const unsigned short mRobotPort = 10000;
+    static const unsigned short mRobotPort = 10000;
 	bool mIsPause { false };
+
+    QVector<Rule> oldRule {*new QVector<Rule>(Constants::ruleAmount)};
 };
