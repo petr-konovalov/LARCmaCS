@@ -27,7 +27,7 @@ public:
 	static const unsigned  refereePort = 10003;
 	static const int numOfCameras = 4;
 	static const int ruleLength = 13;
-	static const int ruleAmount = 16;
+    static const int ruleAmount = maxNumOfRobots * 2;
     static const int matlabOutputBufferSize = 2048;
     static const int maxBallsInCamera = 64;
     static const int maxBallsInField = maxBallsInCamera * numOfCameras;

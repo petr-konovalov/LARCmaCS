@@ -136,9 +136,9 @@ QSharedPointer<PacketSSL> MatlabEngine::loadVisionData()
 				SSL_DetectionRobot robot = mDetection.robots_yellow(i);
 				if (robot.has_robot_id() && robot.robot_id() >= 0 && robot.robot_id() <= Constants::maxRobotsInTeam) {
 					packetSSL->robots_yellow[robot.robot_id()] = idCam;
-					packetSSL->robots_yellow[robot.robot_id() + 12] = robot.x();
-					packetSSL->robots_yellow[robot.robot_id() + 24] = robot.y();
-					packetSSL->robots_yellow[robot.robot_id() + 36] = robot.orientation();
+                    packetSSL->robots_yellow[robot.robot_id() + Constants::maxRobotsInTeam] = robot.x();
+                    packetSSL->robots_yellow[robot.robot_id() + Constants::maxRobotsInTeam * 2] = robot.y();
+                    packetSSL->robots_yellow[robot.robot_id() + Constants::maxRobotsInTeam * 3] = robot.orientation();
 				} else {
 					if (robot.has_robot_id()) {
 						qDebug() << "Error: incorrect yellow robot id" << robot.robot_id();

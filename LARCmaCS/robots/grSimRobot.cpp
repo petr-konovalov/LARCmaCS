@@ -32,7 +32,7 @@ void GrSimRobot::formControlPacket(QByteArray & command, int numOfRobot, int spe
 								   bool kickerCharge, bool beep)
 {
 	grSim_Packet packet;
-	bool yellow = false;
+    bool yellow = false;
 	if (numOfRobot >= Constants::maxRobotsInTeam) { //TODO use field TEAM from rule
 		yellow = true;
 	}
