@@ -73,16 +73,17 @@ LIBS += -lprotobuf
 #INCLUDEPATH += "/data/workspace/robocup/iakov/LARCmaCS/docker/tmp/R2018a/extern/include/"
 INCLUDEPATH += "/usr/local/MATLAB/R2018b/extern/include"
 
-#LIBS += -L/usr/local/MATLAB/R2018b/bin/glnxa64 -leng \
-#        -L/usr/local/MATLAB/R2018b/bin/glnxa64 -lmat \
-#        -L/usr/local/MATLAB/R2018b/bin/glnxa64 -lmx
+LIBS += -L/usr/local/MATLAB/R2018b/bin/glnxa64 -leng \
+        -L/usr/local/MATLAB/R2018b/bin/glnxa64 -lmat \
+        -L/usr/local/MATLAB/R2018b/bin/glnxa64 -lmx \
+        -L/usr/local/MATLAB/R2018b/bin/glnxa64 -licudata
 
 
-LIBS += -L/data/workspace/robocup/iakov/LARCmaCS/docker/tmp/R2018a/bin/glnxa64/ -leng
-LIBS += -L/data/workspace/robocup/iakov/LARCmaCS/docker/tmp/R2018a/bin/glnxa64/ -lmat
-LIBS += -L/data/workspace/robocup/iakov/LARCmaCS/docker/tmp/R2018a/bin/glnxa64/ -lmx
-LIBS += -L/data/workspace/robocup/iakov/LARCmaCS/docker/tmp/R2018a/bin/glnxa64/ -lmwresource_core
-
+#LIBS += -L/data/workspace/robocup/iakov/LARCmaCS/docker/tmp/R2018a/bin/glnxa64/ -leng
+#LIBS += -L/data/workspace/robocup/iakov/LARCmaCS/docker/tmp/R2018a/bin/glnxa64/ -lmat
+#LIBS += -L/data/workspace/robocup/iakov/LARCmaCS/docker/tmp/R2018a/bin/glnxa64/ -lmx
+##LIBS += -L/data/workspace/robocup/iakov/LARCmaCS/docker/tmp/R2018a/bin/glnxa64/ -lmwresource_core
+#LIBS += -L/data/workspace/robocup/iakov/LARCmaCS/docker/tmp/R2018a/bin/glnxa64/ -licudata
 
 #LIBS += -L/data/workspace/robocup/iakov/LARCmaCS/docker/tmp/R2018a/bin/glnxa64/ -lmwboost_locale
 #LIBS += -L/data/workspace/robocup/iakov/LARCmaCS/docker/tmp/R2018a/bin/glnxa64/ -lmwboost_date_time
