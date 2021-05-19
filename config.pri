@@ -8,17 +8,19 @@ CONFIG += console
 #PROTOC_VER=$$system($${PROTOC_BIN_DIR}protoc --version)
 #message("Compiler:$$QMAKE_CXX from $$(PATH) with protoc $$PROTOC_VER")
 !contains(QT_ARCH, i386):CONFIG += amd64
-#mingw {
-#  amd64 { message(MINGW64) }
-#  else  { message(MINGW32) }
-#} else: msvc {
-#  amd64 { message(MSVC64) }
-#  else  { message(MSVC32) }
-#} else  {
-#  message("I'm here")
-#  message(OTHER)
-#  error($$CONFIG)
-#}
+
+mingw {
+  amd64 { message(MINGW64) }
+  else  { message(MINGW32) }
+} else: msvc {
+  amd64 { message(MSVC64) }
+  else  { message(MSVC32) }
+} else: unix {
+   message("Building on unix")
+} else  {
+  error("Unsupported platform. Check config.pri file")
+  error($$CONFIG)
+}
 
 DEBUG_SUFFIX =
 RELEASE_SUFFIX =
