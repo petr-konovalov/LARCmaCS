@@ -20,6 +20,16 @@ win32 {
                   -L$${MATLAB_DIR}/lib/win$${BIT}/microsoft/ -llibmx
 }
 
+unix {
+  LIBS += -lprotobuf
+  LIBS += -L/usr/local/MATLAB/R2018b/bin/glnxa64 -leng \
+          -L/usr/local/MATLAB/R2018b/bin/glnxa64 -lmat \
+          -L/usr/local/MATLAB/R2018b/bin/glnxa64 -lmx \
+          -L/usr/local/MATLAB/R2018b/bin/glnxa64 -lmwresource_core \
+          -L/usr/local/MATLAB/R2018b/bin/glnxa64 -licudata
+#sudo ln -s libicudata.so.59 libicudata.so
+}
+
 QT += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
