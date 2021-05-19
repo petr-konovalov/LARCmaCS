@@ -27,7 +27,6 @@ unix {
           -L/usr/local/MATLAB/R2018b/bin/glnxa64 -lmx \
           -L/usr/local/MATLAB/R2018b/bin/glnxa64 -lmwresource_core \
           -L/usr/local/MATLAB/R2018b/bin/glnxa64 -licudata
-#sudo ln -s libicudata.so.59 libicudata.so
 }
 
 QT += core gui network
