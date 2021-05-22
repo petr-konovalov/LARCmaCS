@@ -21,12 +21,11 @@ win32 {
 }
 
 unix {
-  LIBS += -lprotobuf
-  LIBS += -L/usr/local/MATLAB/R2018b/bin/glnxa64 -leng \
-          -L/usr/local/MATLAB/R2018b/bin/glnxa64 -lmat \
-          -L/usr/local/MATLAB/R2018b/bin/glnxa64 -lmx \
-          -L/usr/local/MATLAB/R2018b/bin/glnxa64 -lmwresource_core \
-          -L/usr/local/MATLAB/R2018b/bin/glnxa64 -licudata
+  LIBS += -L$${MATLAB_DIR}/../bin/glnxa64 -leng \
+          -L$${MATLAB_DIR}/../bin/glnxa64 -lmat \
+          -L$${MATLAB_DIR}/../bin/glnxa64 -lmx \
+          -L$${MATLAB_DIR}/../bin/glnxa64 -lmwresource_core \
+          -L$${MATLAB_DIR}/../bin/glnxa64 -licudata
 }
 
 QT += core gui network
@@ -64,6 +63,7 @@ SOURCES +=  \
 	$$PWD/settings.cpp \
 	$$PWD/robots/grSimRobot.cpp \
 	$$PWD/robots/defaultRobot.cpp \
+        $$PWD/robots/erForceRobot.cpp \
 	$$PWD/sharedRes.cpp \
 	$$PWD/robotReceiverWorker.cpp \
 	$$PWD/robotReceiver.cpp \
@@ -96,6 +96,7 @@ HEADERS  += \
 	$$PWD/constants.h \
 	$$PWD/robots/grSimRobot.h \
 	$$PWD/robots/defaultRobot.h \
+        $$PWD/robots/erForceRobot.h \
 	$$PWD/sharedRes.h \
 	$$PWD/robotReceiverWorker.h \
         $$PWD/robotReceiver.h \
