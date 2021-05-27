@@ -30,8 +30,8 @@ USER default
 RUN git clone https://github.com/petr-konovalov/MLscripts.git && \
     cd MLscripts && git checkout new_algo
 
-RUN git clone https://github.com/mlipkovich/LARCmaCS && \
-    cd LARCmaCS && git checkout linux && \
+RUN git clone https://github.com/petr-konovalov/LARCmaCS && \
+    cd LARCmaCS && git checkout RoboCup2021 && \
     mkdir build && cd build && \
     qmake ../LARCmaCS.pro -spec linux-g++ && \
     make
