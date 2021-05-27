@@ -20,6 +20,14 @@ win32 {
                   -L$${MATLAB_DIR}/lib/win$${BIT}/microsoft/ -llibmx
 }
 
+unix {
+  LIBS += -L$${MATLAB_DIR}/../bin/glnxa64 -leng \
+          -L$${MATLAB_DIR}/../bin/glnxa64 -lmat \
+          -L$${MATLAB_DIR}/../bin/glnxa64 -lmx \
+          -L$${MATLAB_DIR}/../bin/glnxa64 -lmwresource_core \
+          -L$${MATLAB_DIR}/../bin/glnxa64 -licudata
+}
+
 QT += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -55,6 +63,7 @@ SOURCES +=  \
 	$$PWD/settings.cpp \
 	$$PWD/robots/grSimRobot.cpp \
 	$$PWD/robots/defaultRobot.cpp \
+        $$PWD/robots/erForceRobot.cpp \
 	$$PWD/sharedRes.cpp \
 	$$PWD/robotReceiverWorker.cpp \
 	$$PWD/robotReceiver.cpp \
@@ -87,6 +96,7 @@ HEADERS  += \
 	$$PWD/constants.h \
 	$$PWD/robots/grSimRobot.h \
 	$$PWD/robots/defaultRobot.h \
+        $$PWD/robots/erForceRobot.h \
 	$$PWD/sharedRes.h \
 	$$PWD/robotReceiverWorker.h \
         $$PWD/robotReceiver.h \
