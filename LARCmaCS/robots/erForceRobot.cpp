@@ -13,9 +13,17 @@
 // limitations under the License.
 
 #include "erForceRobot.h"
+#include <cmath>
 
 ErForceRobot::ErForceRobot(){}
 
+ErForceRobot::Speed ErForceRobot::fromMLSpeed2ERSpeed(int MLSpeedX, int MLSpeedY)
+{
+    float oldNorma = sqrt(MLSpeedX*MLSpeedX+MLSpeedY*MLSpeedY);
+    float newNorma = std::min(oldNorma, 100.0f)*0.05f;
+    float multiplier = newNorma / std::max(oldNorma, 0.001f);
+    return Speed(MLSpeedX*multiplier, -MLSpeedY*multiplier);
+};
 
 void ErForceRobot::formControlPacket(QByteArray & command, int numOfRobot, int speedX, int speedY, int speedR,
 								   bool kickUp, bool kickForward, int kickVoltage,
@@ -38,9 +46,10 @@ void ErForceRobot::formControlPacket(QByteArray & command, int numOfRobot, int s
     robotCommand->set_dribbler_speed(0);
 
     MoveLocalVelocity* localVelocity = robotCommand->mutable_move_command()->mutable_local_velocity();
-    localVelocity->set_forward(speedX);
-    localVelocity->set_left(speedY);
-    localVelocity->set_angular(speedR);
+    Speed erSpeed = fromMLSpeed2ERSpeed(speedX, speedY);
+    localVelocity->set_forward(erSpeed.SpeedX);
+    localVelocity->set_left(erSpeed.SpeedY);
+    localVelocity->set_angular(std::max(std::min(speedR, 100), -100));
 
 	command.resize(packet.ByteSize());
 	packet.SerializeToArray(command.data(), command.size());

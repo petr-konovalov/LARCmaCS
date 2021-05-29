@@ -69,16 +69,16 @@ void Connector::sendNewCommand(const QVector<Rule> & rule)
 				}
 			} else {
 				if (!mIsPause) {
-//					GrSimRobot::formControlPacket(command, k, rule[k].mSpeedX, rule[k].mSpeedY, rule[k].mSpeedR,
-//												  rule[k].mKickUp, rule[k].mKickForward, rule[k].mKickerVoltageLevel,
-//												  rule[k].mDribblerEnable, rule[k].mSpeedDribbler, rule[k].mAutoKick,
-//												  rule[k].mKickerChargeEnable, rule[k].mBeep);
+//                    GrSimRobot::formControlPacket(command, k, rule[k].mSpeedX, rule[k].mSpeedY, rule[k].mSpeedR,
+//                                                  rule[k].mKickUp, rule[k].mKickForward, rule[k].mKickerVoltageLevel,
+//                                                  rule[k].mDribblerEnable, rule[k].mSpeedDribbler, rule[k].mAutoKick,
+//                                                  rule[k].mKickerChargeEnable, rule[k].mBeep);
                     ErForceRobot::formControlPacket(command, k, rule[k].mSpeedX, rule[k].mSpeedY, rule[k].mSpeedR,
                                                   rule[k].mKickUp, rule[k].mKickForward, rule[k].mKickerVoltageLevel,
                                                   rule[k].mDribblerEnable, rule[k].mSpeedDribbler, rule[k].mAutoKick,
                                                   rule[k].mKickerChargeEnable, rule[k].mBeep);
                 } else {
-//					GrSimRobot::formControlPacket(command, k, 0, 0, 0, 0, 0, 0, 0);
+//                    GrSimRobot::formControlPacket(command, k, 0, 0, 0, 0, 0, 0, 0);
                     ErForceRobot::formControlPacket(command, k, 0, 0, 0, 0, 0, 0, 0);
 				}
 			}
@@ -126,7 +126,7 @@ void Connector::onPauseChanged(bool status)
 			}
 		} else {
 			for (int i = 0; i <= Constants::maxRobotsInTeam; i++) {
-                //GrSimRobot::formControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
+//                GrSimRobot::formControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
                 ErForceRobot::formControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
 				runSim(command);
 			}
