@@ -33,5 +33,5 @@ private:
         Speed(float SpeedX, float SpeedY): SpeedX(SpeedX), SpeedY(SpeedY){};
     } Speed;
 
-    static Speed fromMLSpeed2ERSpeed(int MLSpeedX, int MLSpeedY);
+    static Speed fromMLSpeed2ERSpeed(const int MLSpeedX, const int MLSpeedY);
 };

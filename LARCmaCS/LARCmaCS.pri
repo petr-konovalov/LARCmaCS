@@ -47,8 +47,7 @@ INCLUDEPATH += \
 SOURCES +=  \
 	$$PWD/main.cpp \
 	$$PWD/larcmacs.cpp \
-	$$PWD/fieldScene.cpp \
-    $$PWD/robots/erForceRobot.cpp \
+        $$PWD/fieldScene.cpp \
 	$$PWD/sceneView.cpp \
 	$$PWD/receiver.cpp \
 	$$PWD/mainAlg.cpp \
@@ -77,7 +76,6 @@ SOURCES +=  \
         $$PWD/referee/teamInfo.cpp \
 
 HEADERS  += \
-    $$PWD/robots/erForceRobot.h \
 	$${SHARED_DIR}/util/timer.h \
 	$${SHARED_DIR}/util/field_default_constants.h \
 	$$PWD/larcmacs.h \

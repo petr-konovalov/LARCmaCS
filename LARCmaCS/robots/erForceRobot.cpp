@@ -17,7 +17,7 @@
 
 ErForceRobot::ErForceRobot(){}
 
-ErForceRobot::Speed ErForceRobot::fromMLSpeed2ERSpeed(int MLSpeedX, int MLSpeedY)
+ErForceRobot::Speed ErForceRobot::fromMLSpeed2ERSpeed(const int MLSpeedX, const int MLSpeedY)
 {
     float oldNorma = sqrt(MLSpeedX*MLSpeedX+MLSpeedY*MLSpeedY);
     float newNorma = std::min(oldNorma, 100.0f)*0.05f;
@@ -40,8 +40,8 @@ void ErForceRobot::formControlPacket(QByteArray & command, int numOfRobot, int s
     // TODO: What about team? Perhaps deletion is not needed
     robotCommand->set_id(numOfRobot % Constants::maxRobotsInTeam);
     // TODO: Convert (kickVoltage, kickForward, kickUp to speed and angle)
-    robotCommand->set_kick_speed(kickVoltage);
-    robotCommand->set_kick_angle(0);
+    robotCommand->set_kick_speed(autoKick+kickUp+kickForward ? kickVoltage: 0);
+    robotCommand->set_kick_angle(autoKick == 2 || kickUp ? 45 : 0);
     // TODO: How dribbler and spenner are related?
     robotCommand->set_dribbler_speed(0);
 
