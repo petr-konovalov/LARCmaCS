@@ -26,4 +26,12 @@ public:
 								  bool kickUp, bool kickForward, int kickVoltage,
 								  bool enableSpinner, int spinnerSpeed = 0, int autoKick = 0,
                                   bool kickerCharge = 1, bool beep = 0);
+private:
+    typedef struct Speed {
+        float SpeedX;
+        float SpeedY;
+        Speed(float SpeedX, float SpeedY): SpeedX(SpeedX), SpeedY(SpeedY){};
+    } Speed;
+
+    static Speed fromMLSpeed2ERSpeed(int MLSpeedX, int MLSpeedY);
 };
