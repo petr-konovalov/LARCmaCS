@@ -17,8 +17,8 @@
 class Constants
 {
 public:
-	static const int maxNumOfRobots = 16;
-	static const int maxRobotsInTeam = maxNumOfRobots; //maxNumOfRobots / 2;
+    static const int maxNumOfRobots = 32;
+    static const int maxRobotsInTeam = maxNumOfRobots / 2;
 	static const int robotAlgoPacketSize = 5 * maxRobotsInTeam;
     static const int ballAlgoPacketSize = 3;
 	static const int fieldInfoSize = 2;
@@ -27,7 +27,7 @@ public:
 	static const unsigned  refereePort = 10003;
 	static const int numOfCameras = 4;
 	static const int ruleLength = 13;
-    static const int ruleAmount = maxNumOfRobots * 2;
+    static const int ruleAmount = maxNumOfRobots;
     static const int matlabOutputBufferSize = 2048;
     static const int maxBallsInCamera = 64;
     static const int maxBallsInField = maxBallsInCamera * numOfCameras;

@@ -37,18 +37,19 @@ void Connector::run(int N, const QByteArray & command)
 	mUdpSocket.writeDatagram(command, QHostAddress(robotBoxIP), DefaultRobot::robotPort);
 }
 
-void Connector::runSim(const QByteArray & command)
+void Connector::runSim(const QByteArray & command, bool isYellow)
 {
-	mUdpSocket.writeDatagram(command, QHostAddress(mGrSimIP), mGrSimPort);
+    mUdpSocket.writeDatagram(command, QHostAddress(mGrSimIP), isYellow ? mGrSimPortYellow: mGrSimPort);
 }
 
-void Connector::onConnectorChange(bool isSim, const QString &ip, int port)
+void Connector::onConnectorChange(bool isSim, const QString &ip, int port, int portYellow)
 {
 	mIsSim = isSim;
 
 	if (mIsSim) {
 		mGrSimIP = ip;
 		mGrSimPort = port;
+        mGrSimPortYellow = portYellow;
 	}
 }
 
@@ -103,7 +104,7 @@ void Connector::sendNewCommand(const QVector<Rule> & rule)
                 if (!simFlag) {
                     emit run(k, command);
                 } else {
-                    emit runSim(command);
+                    emit runSim(command, k >= rule.size()/2);
                 }
                 oldRule[k] = rule[k];
             }
@@ -125,10 +126,10 @@ void Connector::onPauseChanged(bool status)
 				run(i, command);
 			}
 		} else {
-			for (int i = 0; i <= Constants::maxRobotsInTeam; i++) {
+            for (int i = 0; i <= Constants::maxNumOfRobots; i++) {
 //                GrSimRobot::formControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
                 ErForceRobot::formControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
-				runSim(command);
+                runSim(command, i >= Constants::maxRobotsInTeam);
 			}
 		}
 	}

@@ -21,7 +21,7 @@ LARCmaCS::LARCmaCS(QWidget *parent)
 	, fieldscene(new FieldScene(&sharedRes))
 	, mainalg(&sharedRes)
 	, connector(&sharedRes)
-	, mIsSim(false)
+    , mIsSim(false)
 	, referee(&sharedRes)
 {
 	qRegisterMetaType<QVector<Rule> >("QVector<Rule>");
@@ -55,16 +55,16 @@ LARCmaCS::LARCmaCS(QWidget *parent)
 	//remotecontrol
 	connect(&remotecontol, SIGNAL(RC_control(int, int, int, int, bool)),
 			this, SLOT(remcontrolsender(int, int, int, int, bool)));
-	connect(this, SIGNAL(run(int, const QByteArray &)), &connector, SLOT(run(int, const QByteArray &)));
-	connect(this, SIGNAL(runSim(const QByteArray &)), &connector, SLOT(runSim(const QByteArray &)));
+    connect(this, SIGNAL(run(int, const QByteArray &)), &connector, SLOT(run(int, const QByteArray &)));
+    connect(this, SIGNAL(runSim(const QByteArray &, bool)), &connector, SLOT(runSim(const QByteArray &, bool)));
 
 	//simulator Enable
-	connect(this, SIGNAL(connectorChanged(bool, const QString &, int))
-				, &receiver, SLOT(changeSimulatorMode(bool, const QString &, int)));
+    connect(this, SIGNAL(connectorChanged(bool, const QString &, int, int))
+                , &receiver, SLOT(changeSimulatorMode(bool, const QString &, int, int)));
 	connect(&receiver, SIGNAL(clearField()), fieldscene, SLOT(ClearField()));
 
-	connect(this, SIGNAL(connectorChanged(bool, const QString &, int))
-				, &connector, SLOT(onConnectorChange(bool, const QString &, int)));
+    connect(this, SIGNAL(connectorChanged(bool, const QString &, int, int))
+                , &connector, SLOT(onConnectorChange(bool, const QString &, int, int)));
 
 	connect(&mainalg, SIGNAL(newData(const QVector<Rule> &))
 				, &connector, SLOT(sendNewCommand(const QVector<Rule> &)));
@@ -108,7 +108,7 @@ void LARCmaCS::remcontrolsender(int l, int r,int k, int b, bool kickUp)
 	if (!mIsSim) {
 		emit run(k, byteData);
 	} else {
-		emit runSim(byteData);
+        emit runSim(byteData, false);
 	}
 }
 
@@ -213,7 +213,7 @@ void LARCmaCS::on_pushButton_Pause_clicked()
 void LARCmaCS::on_checkBox_SimEnable_stateChanged(int state)
 {
 	mIsSim = state > 0;
-	emit connectorChanged(mIsSim, ui->lineEditSimIP->text(), ui->lineEditSimPort->text().toInt());
+    emit connectorChanged(mIsSim, ui->lineEditSimIP->text(), ui->lineEditSimPort->text().toInt(), ui->lineEditSimPortYellow->text().toInt());
 }
 
 void LARCmaCS::on_pushButton_RemoteControl_clicked()

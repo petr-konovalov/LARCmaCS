@@ -55,7 +55,7 @@ void Receiver::setDisplayFlag()
 	mDisplayFlag = true;
 }
 
-void Receiver::changeSimulatorMode(bool isSim, const QString &, int)
+void Receiver::changeSimulatorMode(bool isSim, const QString &, int, int)
 {
 	emit updateSimulatorMode(isSim);
 }
