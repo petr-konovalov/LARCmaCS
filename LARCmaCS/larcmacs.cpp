@@ -59,15 +59,15 @@ LARCmaCS::LARCmaCS(QWidget *parent)
 	connect(this, SIGNAL(runSim(const QByteArray &)), &connector, SLOT(runSim(const QByteArray &)));
 
 	//simulator Enable
-    connect(this, SIGNAL(connectorChanged(bool, const QString &, int, QString &))
-                , &receiver, SLOT(changeSimulatorMode(bool, const QString &, int, QString &)));
+    connect(this, SIGNAL(connectorChanged(bool, const QString &, int, const QString &))
+                , &receiver, SLOT(changeSimulatorMode(bool, const QString &, int, const QString &)));
 	connect(&receiver, SIGNAL(clearField()), fieldscene, SLOT(ClearField()));
 
-    connect(this, SIGNAL(connectorChanged(bool, const QString &, int, QString &))
-                , &connector, SLOT(onConnectorChange(bool, const QString &, int, QString &)));
+    connect(this, SIGNAL(connectorChanged(bool, const QString &, int, const QString &))
+                , &connector, SLOT(onConnectorChange(bool, const QString &, int, const QString &)));
 
-    connect(this, SIGNAL(connectorChanged(bool, const QString &, int, QString &))
-                , &referee, SLOT(changeSimulatorMode(bool, const QString &, int, QString &)));
+    connect(this, SIGNAL(connectorChanged(bool, const QString &, int, const QString &))
+                , &referee, SLOT(changeSimulatorMode(bool, const QString &, int, const QString &)));
 
 	connect(&mainalg, SIGNAL(newData(const QVector<Rule> &))
 				, &connector, SLOT(sendNewCommand(const QVector<Rule> &)));
