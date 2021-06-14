@@ -16,6 +16,7 @@
 
 #include <QTimer>
 #include <QUdpSocket>
+#include <QNetworkInterface>
 
 #include "messages_robocup_ssl_wrapper.pb.h"
 

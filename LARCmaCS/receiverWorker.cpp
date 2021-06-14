@@ -16,7 +16,6 @@
 
 #include <QApplication>
 #include <QMutex>
-#include <QNetworkInterface>
 
 #include "constants.h"
 #include "packetSSL.h"
