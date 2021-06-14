@@ -24,7 +24,7 @@ public:
     ErForceRobot();
 	static void formControlPacket(QByteArray & command, int numOfRobot, int speedX, int speedY, int speedR,
 								  bool kickUp, bool kickForward, int kickVoltage,
-								  bool enableSpinner, int spinnerSpeed = 0, int autoKick = 0,
+                                  bool enableSpinner, float spinnerSpeed = 0, int autoKick = 0,
                                   bool kickerCharge = 1, bool beep = 0);
 private:
     typedef struct Speed {

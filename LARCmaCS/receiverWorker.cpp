@@ -23,7 +23,8 @@
 const QString ReceiverWorker::visionIP = QStringLiteral("224.5.23.2");
 
 ReceiverWorker::ReceiverWorker()
-	: mSocket(this)
+    : mSocket(this)
+    , mSocketFeedback(this)
 	, mStatisticsTimer(this)
 	, mGroupAddress(visionIP)
 {
@@ -112,8 +113,10 @@ void ReceiverWorker::changeSimulatorMode(bool isSim)
 	if (isSim != mIsSimEnabledFlag) {
 		mIsSimEnabledFlag = isSim;
 		if (mIsSimEnabledFlag) {
-			close();
-			open(Constants::SimVisionPort);
+			close();            
+            open(Constants::SimVisionPort);
+            //mSocketFeedback.bind(QHostAddress::AnyIPv4, 10302, QUdpSocket::ShareAddress);
+            //mSocketFeedback.joinMulticastGroup(mGroupAddress);
 		} else {
 			close();
 			open(Constants::SSLVisionPort);

@@ -47,6 +47,7 @@ private:
 
 	static const QString visionIP;
 	QUdpSocket mSocket;
+    QUdpSocket mSocketFeedback;
 	QTimer mStatisticsTimer;
 	QHostAddress mGroupAddress;
 	int mTotalPacketsNum = 0;
