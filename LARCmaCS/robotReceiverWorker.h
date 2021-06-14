@@ -16,6 +16,8 @@
 
 #include <QHostAddress>
 #include <QUdpSocket>
+#include <QSharedPointer>
+#include "ssl_simulation_robot_feedback.pb.h"
 
 class RobotReceiverWorker : public QObject
 {
@@ -33,6 +35,8 @@ signals:
 	void newKickerChargeStatus(const QVector<int> & kickerChargeStatus);
 	void newConnectionState(const QVector<int> & connectionState);
 	void newChargeLevel(const QVector<int> & connectionState);
+
+    void newRobotFeedback(const QSharedPointer<sslsim::RobotFeedback> &robotFeedback);
 
 private slots:
 	void processPendingDatagrams();

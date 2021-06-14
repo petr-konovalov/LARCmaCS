@@ -30,6 +30,7 @@ public:
 
 public slots:
 	void changeBarrierState(const QVector<bool> & barrierState);
+    void newRobotFeedback(const QSharedPointer<sslsim::RobotFeedback> & robotFeedback);
 
 signals:
 	void newKickerChargeStatus(const QVector<int> & kickerChargeStatus);

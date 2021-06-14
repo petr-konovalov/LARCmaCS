@@ -50,6 +50,7 @@ private:
 	static const QString visionIP;
     static const QString defaultInterface;
 	QUdpSocket mSocket;
+    QUdpSocket mSocketFeedback;
 	QTimer mStatisticsTimer;
 	QHostAddress mGroupAddress;
 	int mTotalPacketsNum = 0;

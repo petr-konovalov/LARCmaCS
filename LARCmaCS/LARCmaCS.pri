@@ -47,7 +47,7 @@ INCLUDEPATH += \
 SOURCES +=  \
 	$$PWD/main.cpp \
 	$$PWD/larcmacs.cpp \
-	$$PWD/fieldScene.cpp \
+        $$PWD/fieldScene.cpp \
 	$$PWD/sceneView.cpp \
 	$$PWD/receiver.cpp \
 	$$PWD/mainAlg.cpp \
