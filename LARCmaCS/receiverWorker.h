@@ -28,7 +28,7 @@ public:
 
 public slots:
 	void start();
-	void changeSimulatorMode(bool isSim);
+    void changeSimulatorMode(bool isSim, const QString &netInterface);
 
 private slots:
 	void formStatistics();
@@ -41,11 +41,13 @@ signals:
 	void updateGeometry(const QSharedPointer<SSL_WrapperPacket> & geometry);
 	void updateSSLFPS(const QString & message);
 
-private:
-	bool open(unsigned short port);
+private:    
+    bool open(unsigned short port, const QString &netInterface);
 	void close();
+    QNetworkInterface getInterfaceByName(const QString &netInterface);
 
 	static const QString visionIP;
+    static const QString defaultInterface;
 	QUdpSocket mSocket;
 	QTimer mStatisticsTimer;
 	QHostAddress mGroupAddress;

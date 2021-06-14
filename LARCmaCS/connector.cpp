@@ -39,10 +39,11 @@ void Connector::run(int N, const QByteArray & command)
 
 void Connector::runSim(const QByteArray & command)
 {
+    qInfo() << "Writing to sim" << mGrSimIP << mGrSimPort;
 	mUdpSocket.writeDatagram(command, QHostAddress(mGrSimIP), mGrSimPort);
 }
 
-void Connector::onConnectorChange(bool isSim, const QString &ip, int port)
+void Connector::onConnectorChange(bool isSim, const QString &ip, int port, const QString &)
 {
 	mIsSim = isSim;
 
