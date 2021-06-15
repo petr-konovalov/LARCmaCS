@@ -42,7 +42,7 @@ void Connector::runSim(const QByteArray & command, bool isYellow)
     mUdpSocket.writeDatagram(command, QHostAddress(mGrSimIP), isYellow ? mGrSimPortYellow: mGrSimPort);
 }
 
-void Connector::onConnectorChange(bool isSim, const QString &ip, int port, int portYellow)
+void Connector::onConnectorChange(bool isSim, const QString &ip, int port, int portYellow, const QString &)
 {
 	mIsSim = isSim;
 

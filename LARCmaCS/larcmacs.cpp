@@ -59,12 +59,15 @@ LARCmaCS::LARCmaCS(QWidget *parent)
     connect(this, SIGNAL(runSim(const QByteArray &, bool)), &connector, SLOT(runSim(const QByteArray &, bool)));
 
 	//simulator Enable
-    connect(this, SIGNAL(connectorChanged(bool, const QString &, int, int))
-                , &receiver, SLOT(changeSimulatorMode(bool, const QString &, int, int)));
-	connect(&receiver, SIGNAL(clearField()), fieldscene, SLOT(ClearField()));
+  connect(this, SIGNAL(connectorChanged(bool, const QString &, int, int, const QString &))
+       , &receiver, SLOT(changeSimulatorMode(bool, const QString &, int, int, const QString &)));
+ 	connect(&receiver, SIGNAL(clearField()), fieldscene, SLOT(ClearField()));
 
-    connect(this, SIGNAL(connectorChanged(bool, const QString &, int, int))
-                , &connector, SLOT(onConnectorChange(bool, const QString &, int, int)));
+  connect(this, SIGNAL(connectorChanged(bool, const QString &, int, int, const QString &))
+       , &connector, SLOT(onConnectorChange(bool, const QString &, int, int, const QString &)));
+
+  connect(this, SIGNAL(connectorChanged(bool, const QString &, int, int, const QString &))
+       , &referee, SLOT(changeSimulatorMode(bool, const QString &, int, int, const QString &)));
 
 	connect(&mainalg, SIGNAL(newData(const QVector<Rule> &))
 				, &connector, SLOT(sendNewCommand(const QVector<Rule> &)));
@@ -213,7 +216,7 @@ void LARCmaCS::on_pushButton_Pause_clicked()
 void LARCmaCS::on_checkBox_SimEnable_stateChanged(int state)
 {
 	mIsSim = state > 0;
-    emit connectorChanged(mIsSim, ui->lineEditSimIP->text(), ui->lineEditSimPort->text().toInt(), ui->lineEditSimPortYellow->text().toInt());
+  emit connectorChanged(mIsSim, ui->lineEditSimIP->text(), ui->lineEditSimPort->text().toInt(), ui->lineEditSimPortYellow->text().toInt(), ui->lineEditNetInterface->text());
 }
 
 void LARCmaCS::on_pushButton_RemoteControl_clicked()
