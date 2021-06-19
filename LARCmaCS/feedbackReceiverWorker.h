@@ -19,37 +19,33 @@
 #include <QSharedPointer>
 #include "ssl_simulation_robot_feedback.pb.h"
 
-class RobotReceiverWorker : public QObject
+class FeedbackReceiverWorker : public QObject
 {
 	Q_OBJECT
 
 public:
-	RobotReceiverWorker();
-	~RobotReceiverWorker();
+    FeedbackReceiverWorker();
+    ~FeedbackReceiverWorker();
 
 public slots:
 	void start();
+    void changeNetAddress(const QString & ip, int port, int portYellow, const QString & netInterface);
 
 signals:
-	void newBarrierState(const QVector<bool> & barrierState);
-	void newKickerChargeStatus(const QVector<int> & kickerChargeStatus);
-	void newConnectionState(const QVector<int> & connectionState);
-	void newChargeLevel(const QVector<int> & connectionState);
+    void newRobotFeedback(const QSharedPointer<RobotFeedback> &robotFeedback);
 
 private slots:
 	void processPendingDatagrams();
 
 private:
-    static const int mDatagramSize = 120;
-    static const int mPort = 57004;
-    static const int mRobotsInPacket = 6;
-	static const int mOnePacketLength = mDatagramSize / mRobotsInPacket;
-	static const QString mSocketIp;
+    static const QString defaultIp;
+    static const QString defaultInterface;
+    static const int defaultPort;
+
+    bool open(const QHostAddress ip, unsigned short port, const QString &netInterface);
+    void close();
+
+    QNetworkInterface getInterfaceByName(const QString &netInterface);
 
 	QUdpSocket mUdpSocket;
-
-	QVector<bool> mBarrierState;
-	QVector<int> mKickerChargeStatus;
-	QVector<int> mConnectionState;
-	QVector<int> mChargeLevel;
 };

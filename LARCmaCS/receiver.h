@@ -24,27 +24,27 @@
 
 struct Receiver : public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	Receiver(SharedRes * sharedRes);
-	~Receiver();
+    Receiver(SharedRes * sharedRes);
+    ~Receiver();
 
 public slots:
-	void updateDetection(const QSharedPointer<SSL_WrapperPacket> & detection, int camID);
-	void updateGeometry(const QSharedPointer<SSL_WrapperPacket> & geometry);
-	void setDisplayFlag();
-  void changeSimulatorMode(bool isSim, const QString &, int, int, const QString &);
+    void updateDetection(const QSharedPointer<SSL_WrapperPacket> & detection, int camID);
+    void updateGeometry(const QSharedPointer<SSL_WrapperPacket> & geometry);
+    void setDisplayFlag();
+    void changeSimulatorMode(bool isSim, const QString &, int, int, const QString &);
 
 signals:
     void updateSimulatorMode(bool mode, const QString &netInterface);
-	void clearField();
-	void updateSSLFPS(const QString & status);
+    void clearField();
+    void updateSSLFPS(const QString & status);
 
 private:
-	QTimer mDisplayTimer;
-	ReceiverWorker * mWorker;
-	QThread mThread;
-	SharedRes * mSharedRes;
-	bool mDisplayFlag = false;
+    QTimer mDisplayTimer;
+    ReceiverWorker * mWorker;
+    QThread mThread;
+    SharedRes * mSharedRes;
+    bool mDisplayFlag = false;
 };

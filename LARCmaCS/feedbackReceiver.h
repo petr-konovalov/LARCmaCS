@@ -17,27 +17,26 @@
 #include <QThread>
 
 #include "sharedRes.h"
-#include "robotReceiverWorker.h"
+#include "feedbackReceiverWorker.h"
 
-class RobotReceiver : public QObject
+class FeedbackReceiver : public QObject
 {
 	Q_OBJECT
 
 public:
-	RobotReceiver(SharedRes * sharedRes);
-	~RobotReceiver();
+    FeedbackReceiver(SharedRes * sharedRes);
+    ~FeedbackReceiver();
 	void start();
 
 public slots:
-	void changeBarrierState(const QVector<bool> & barrierState);
+    void changeRobotFeedback(const QSharedPointer<RobotFeedback> & robotFeedback);
+    void changeSimulatorMode(bool, const QString & ip, int port, int portYellow, const QString & netInterface);
 
 signals:
-	void newKickerChargeStatus(const QVector<int> & kickerChargeStatus);
-	void newConnectionState(const QVector<int> & connectionState);
-	void newChargeLevel(const QVector<int> & connectionState);
+    void changeNetAddress(const QString & ip, int port, int portYellow, const QString & netInterface);
 
 private:
 	QThread mThread;
-	RobotReceiverWorker * mWorker;
+    FeedbackReceiverWorker * mWorker;
 	SharedRes * mSharedRes;
 };

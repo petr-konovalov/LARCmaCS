@@ -1,7 +1,5 @@
 syntax = "proto2";
 
-package sslsim;
-
 // Errors in the simulator
 message SimulatorError {
     // Unique code of the error for automatic handling on client side

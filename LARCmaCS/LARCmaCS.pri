@@ -74,6 +74,8 @@ SOURCES +=  \
         $$PWD/referee/refereeClientWorker.cpp \
         $$PWD/referee/refereeMessage.cpp \
         $$PWD/referee/teamInfo.cpp \
+        $$PWD/feedbackReceiver.cpp \
+        $$PWD/feedbackReceiverWorker.cpp
 
 HEADERS  += \
 	$${SHARED_DIR}/util/timer.h \
@@ -109,7 +111,9 @@ HEADERS  += \
         $$PWD/referee/refereeInfo.h \
         $$PWD/referee/refereeMessage.h \
         $$PWD/referee/refereeUtils.h \
-        $$PWD/referee/teamInfo.h
+        $$PWD/referee/teamInfo.h \
+        $$PWD/feedbackReceiver.h \
+        $$PWD/feedbackReceiverWorker.h
 
 FORMS += \
 	$$PWD/larcmacs.ui \
