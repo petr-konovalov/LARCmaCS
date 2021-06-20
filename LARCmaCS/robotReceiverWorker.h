@@ -36,8 +36,6 @@ signals:
 	void newConnectionState(const QVector<int> & connectionState);
 	void newChargeLevel(const QVector<int> & connectionState);
 
-    void newRobotFeedback(const QSharedPointer<sslsim::RobotFeedback> &robotFeedback);
-
 private slots:
 	void processPendingDatagrams();
 

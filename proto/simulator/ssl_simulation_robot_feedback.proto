@@ -3,8 +3,6 @@ syntax = "proto2";
 import "ssl_simulation_error.proto";
 import "google/protobuf/any.proto";
 
-package sslsim;
-
 // Feedback from a robot
 message RobotFeedback {
     // Id of the robot

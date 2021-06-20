@@ -12,32 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#pragma once
+#include "feedbackReceiver.h"
 
-#include <QThread>
+#include <QDebug>
 
-#include "sharedRes.h"
-#include "robotReceiverWorker.h"
-
-class RobotReceiver : public QObject
+FeedbackReceiver::FeedbackReceiver(SharedRes * sharedRes)
+	: mSharedRes(sharedRes)
 {
-	Q_OBJECT
+}
 
-public:
-	RobotReceiver(SharedRes * sharedRes);
-	~RobotReceiver();
-	void start();
+FeedbackReceiver::~FeedbackReceiver()
+{
+}
 
-public slots:
-	void changeBarrierState(const QVector<bool> & barrierState);
-
-signals:
-	void newKickerChargeStatus(const QVector<int> & kickerChargeStatus);
-	void newConnectionState(const QVector<int> & connectionState);
-	void newChargeLevel(const QVector<int> & connectionState);
-
-private:
-	QThread mThread;
-	RobotReceiverWorker * mWorker;
-	SharedRes * mSharedRes;
-};
+void FeedbackReceiver::changeRobotFeedback(const QSharedPointer<RobotControlResponse> & robotFeedback)
+{
+    mSharedRes -> setRobotFeedback(robotFeedback);
+}
