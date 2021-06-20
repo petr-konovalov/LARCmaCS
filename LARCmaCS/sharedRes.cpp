@@ -94,6 +94,12 @@ void SharedRes::setGeometry(const QSharedPointer<SSL_WrapperPacket> & geometry)
 	mGeometry = geometry;
 }
 
+void SharedRes::setRobotFeedback(const QSharedPointer<RobotControlResponse> & robotFeedback)
+{
+    QWriteLocker locker(&mRobotFeedbackLock);
+    mRobotFeedback = robotFeedback;
+}
+
 void SharedRes::setRefereeData(int state, int team, bool partOfField)
 {
 	QWriteLocker locker(&mRefereeLock);

@@ -70,8 +70,8 @@ LARCmaCS::LARCmaCS(QWidget *parent)
     connect(this, SIGNAL(connectorChanged(bool, const QString &, int, int, const QString &))
             , &referee, SLOT(changeSimulatorMode(bool, const QString &, int, int, const QString &)));
 
-    connect(this, SIGNAL(connectorChanged(bool, const QString &, int, int, const QString &))
-         , &feedbackReceiver, SLOT(changeSimulatorMode(bool, const QString &, int, int, const QString &)));
+    connect(&connector, SIGNAL(newRobotFeedback(const QSharedPointer<RobotControlResponse> &))
+                , &feedbackReceiver, SLOT(changeRobotFeedback(const QSharedPointer<RobotControlResponse> &)));
 
     connect(&mainalg, SIGNAL(newData(const QVector<Rule> &))
             , &connector, SLOT(sendNewCommand(const QVector<Rule> &)));

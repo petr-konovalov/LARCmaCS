@@ -9,6 +9,7 @@
 #include "settings.h"
 #include "defaultRobot.h"
 #include "engineInterface.h"
+#include "ssl_simulation_robot_feedback.pb.h"
 
 using std::map;
 
@@ -29,6 +30,10 @@ public slots:
     void onPauseChanged(bool status);
     void run(int N, const QByteArray & command);
     void runSim(const QByteArray & command, bool isYellow);
+    void readRobotFeedback(bool isYellow);
+
+signals:
+    void newRobotFeedback(const QSharedPointer<RobotControlResponse> & robotFeedback);
 
 private:
     QString mGrSimIP;

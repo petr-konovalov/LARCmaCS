@@ -17,7 +17,6 @@
 #include <QThread>
 
 #include "sharedRes.h"
-#include "feedbackReceiverWorker.h"
 
 class FeedbackReceiver : public QObject
 {
@@ -29,14 +28,8 @@ public:
 	void start();
 
 public slots:
-    void changeRobotFeedback(const QSharedPointer<RobotFeedback> & robotFeedback);
-    void changeSimulatorMode(bool, const QString & ip, int port, int portYellow, const QString & netInterface);
-
-signals:
-    void changeNetAddress(const QString & ip, int port, int portYellow, const QString & netInterface);
+    void changeRobotFeedback(const QSharedPointer<RobotControlResponse> & robotFeedback);
 
 private:
-	QThread mThread;
-    FeedbackReceiverWorker * mWorker;
 	SharedRes * mSharedRes;
 };

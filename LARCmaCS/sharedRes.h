@@ -15,6 +15,7 @@
 #pragma once
 
 #include "messages_robocup_ssl_wrapper.pb.h"
+#include "ssl_simulation_robot_feedback.pb.h"
 
 #include <QVector>
 #include <QSharedPointer>
@@ -34,6 +35,7 @@ public:
 	void setBarrierState(const QVector<bool> & barrierState);
 	void setDetection(const QSharedPointer<SSL_WrapperPacket> & detection, int camID);
 	void setGeometry(const QSharedPointer<SSL_WrapperPacket> & geometry);
+    void setRobotFeedback(const QSharedPointer<RobotControlResponse> & robotFeedback);
 	void setRefereeData(int state, int team, bool partOfField);
 	QVector<bool> getBarrierState();
 
@@ -50,6 +52,9 @@ private:
 
 	QReadWriteLock mGeometryLock;
 	QSharedPointer<SSL_WrapperPacket> mGeometry;
+
+    QReadWriteLock mRobotFeedbackLock;
+    QSharedPointer<RobotControlResponse> mRobotFeedback;
 
 	QReadWriteLock mBarrierStateLock;
 	QVector<bool> mBarrierState;
