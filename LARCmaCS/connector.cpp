@@ -45,8 +45,8 @@ void Connector::runSim(const QByteArray & command, bool isYellow)
 
 void Connector::readRobotFeedback(bool isYellow)
 {
+    // TODO: Code duplication
     while (mUdpSocket.hasPendingDatagrams()) {
-        qInfo() << "Read robot feedback" << endl;
         int datagramSize = static_cast<int>(mUdpSocket.pendingDatagramSize());
         QByteArray datagram;
         datagram.resize(datagramSize);
@@ -64,7 +64,6 @@ void Connector::readRobotFeedback(bool isYellow)
             qInfo() << "ERROR: Packet is uninitialized; skipping";
             continue;
         }
-        qInfo() << "Sending robot feedback" << endl;
         emit newRobotFeedback(packet);
     }
 }

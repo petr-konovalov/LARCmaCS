@@ -27,6 +27,5 @@ FeedbackReceiver::~FeedbackReceiver()
 
 void FeedbackReceiver::changeRobotFeedback(const QSharedPointer<RobotControlResponse> & robotFeedback)
 {
-    qDebug() << "Received robot feedbach" << robotFeedback << endl;
-    //qDebug() << robotFeedback->has_dribbler_ball_contact() << endl;
+    mSharedRes -> setRobotFeedback(robotFeedback);
 }
