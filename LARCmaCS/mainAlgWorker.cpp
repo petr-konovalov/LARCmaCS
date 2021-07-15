@@ -1,6 +1,6 @@
 #include "mainAlgWorker.h"
 
-#include <QDebug>
+//#include <QDebug>
 #include <QApplication>
 
 #include "message.h"

@@ -49,7 +49,7 @@ void RobotReceiverWorker::processPendingDatagrams()
 		datagram.resize(static_cast<int>(mUdpSocket.pendingDatagramSize()));
 		mUdpSocket.readDatagram(datagram.data(), datagram.size());
 		if (datagram.size() != mDatagramSize) {
-            qDebug() << "Packet of incorrect length was received in RobotReceiver";
+            //qDebug() << "Packet of incorrect length was received in RobotReceiver";
 			continue;
 		}
 

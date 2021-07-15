@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include "matlabEngine.h"
-#include <QDebug>
+//#include <QDebug>
 #include <QApplication>
 
 MatlabEngine::MatlabEngine(SharedRes * sharedRes)
@@ -38,13 +38,13 @@ void MatlabEngine::evaluate()
 void MatlabEngine::runMatlab()
 {
 	if (!(mMatlabData.ep = engOpen(NULL))) {
-		qDebug() << "Can't open Matlab Engine" << endl;
+        //qDebug() << "Can't open Matlab Engine" << endl;
 		return;
 	}
 
     mMatlabOutputBuffer[Constants::matlabOutputBufferSize - 1] = '\0';
 	engOutputBuffer(mMatlabData.ep, mMatlabOutputBuffer, Constants::matlabOutputBufferSize - 1);
-	qDebug() << "Matlab Engine is opened\n" << endl;
+    //qDebug() << "Matlab Engine is opened\n" << endl;
 
 	//-----create Rules-----
 	char sendString[256];
@@ -71,7 +71,7 @@ QSharedPointer<PacketSSL> MatlabEngine::loadVisionData()
 	QSharedPointer<SSL_WrapperPacket> geometryPacket = mSharedRes->getGeometry();
 	if (!geometryPacket || !geometryPacket->IsInitialized()) {
 		if (geometryPacket) {
-			qDebug() << "Packet is uninitialized!";
+            //qDebug() << "Packet is uninitialized!";
 		}
 	} else {
 		if (geometryPacket->has_geometry()) {
@@ -86,7 +86,7 @@ QSharedPointer<PacketSSL> MatlabEngine::loadVisionData()
 		QSharedPointer<SSL_WrapperPacket> packet = mSharedRes->getDetection(i);
 		if (!packet || !packet->IsInitialized()) {
 			if (packet) {
-				qDebug() << "Packet is uninitialized!";
+                //qDebug() << "Packet is uninitialized!";
 			}
 			continue;
 		}
@@ -127,7 +127,7 @@ QSharedPointer<PacketSSL> MatlabEngine::loadVisionData()
 					packetSSL->robots_blue[robot.robot_id() + Constants::maxRobotsInTeam * 3] = robot.orientation();
 				} else {
 					if (robot.has_robot_id()) {
-						qDebug() << "Error: incorrect blue robot id" << robot.robot_id();
+                        //qDebug() << "Error: incorrect blue robot id" << robot.robot_id();
 					}
 				}
 			}
@@ -141,7 +141,7 @@ QSharedPointer<PacketSSL> MatlabEngine::loadVisionData()
                     packetSSL->robots_yellow[robot.robot_id() + Constants::maxRobotsInTeam * 3] = robot.orientation();
 				} else {
 					if (robot.has_robot_id()) {
-						qDebug() << "Error: incorrect yellow robot id" << robot.robot_id();
+                        //qDebug() << "Error: incorrect yellow robot id" << robot.robot_id();
 					}
 				}
 			}
@@ -294,6 +294,6 @@ void MatlabEngine::pauseUnpause()
 void MatlabEngine::setDirectory(const QString & path)
 {
 	QString command = "cd " + path;
-	qDebug() << "New Matlab directory = " << path;
+    //qDebug() << "New Matlab directory = " << path;
 	evalString(command);
 }

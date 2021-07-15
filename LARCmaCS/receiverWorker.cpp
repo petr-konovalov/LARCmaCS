@@ -82,12 +82,12 @@ void ReceiverWorker::processPendingDatagrams()
 		QSharedPointer<SSL_WrapperPacket> packet(new SSL_WrapperPacket());
 		auto parseResult = packet->ParseFromArray(datagram.data(), datagramSize);
 		if (!parseResult) {
-			qDebug() << "ERROR: Failed to parse packet from datagram; skipping";
+            //qDebug() << "ERROR: Failed to parse packet from datagram; skipping";
 			continue;
 		}
 
 		if (!packet->IsInitialized()) {
-			qDebug() << "ERROR: Packet is uninitialized; skipping";
+            //qDebug() << "ERROR: Packet is uninitialized; skipping";
 			continue;
 		}
 

@@ -18,7 +18,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <QTextStream>
-#include <QDebug>
+//#include <QDebug>
 
 FieldScene::FieldScene(SharedRes * sharedRes, QObject *parent)
 	: QGraphicsScene(parent)

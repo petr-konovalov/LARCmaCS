@@ -9,7 +9,7 @@ RemoteControl::RemoteControl(QWidget *parent) :
 	ui(new Ui::RemoteControl)
 {
 	ui->setupUi(this);
-	qDebug() << "START REMOTE CONTROL";
+    //qDebug() << "START REMOTE CONTROL";
 	connect(&timer, SIGNAL(timeout()), this, SLOT(RC_send()));
 	connect(this, SIGNAL(destroyed()), this, SLOT(TimerStop()));
 	for(int i = 0; i < 256; i++) {
@@ -22,7 +22,7 @@ RemoteControl::RemoteControl(QWidget *parent) :
 void RemoteControl::TimerStart()
 {
 	if (!timer.isActive()) {
-		qDebug() << "<RemContril>: Start";
+        //qDebug() << "<RemContril>: Start";
 		timer.start(RC_TIMER_CD);
 	}
 }
@@ -30,7 +30,7 @@ void RemoteControl::TimerStop()
 {
 	if (timer.isActive()) {
 		emit RC_control(0, 0, 0, 0, 0);
-		qDebug() << "<RemContril>: Stop";
+        //qDebug() << "<RemContril>: Stop";
 		timer.stop();
 	}
 }
@@ -65,7 +65,7 @@ void RemoteControl::keyReleaseEvent(QKeyEvent * key)
 		key_shift = 0;
 	}
 	if(nkey == ' ') {
-		qDebug() << "Space release";
+        //qDebug() << "Space release";
 	}
 }
 
@@ -82,14 +82,14 @@ void RemoteControl::RC_send(void)
 
 	if(keys[38] && key_shift) {
 		effort++;
-		qDebug() << "Effort: " << effort;
+        //qDebug() << "Effort: " << effort;
 		return;
 	}
 	if(keys[40] && key_shift) {
 		if (effort > 1) {
 			effort--;
 		}
-		qDebug() << "Effort: " << effort;
+        //qDebug() << "Effort: " << effort;
 		return;
 	}
 
@@ -112,7 +112,7 @@ void RemoteControl::RC_send(void)
 		r = -10 * effort;
 	}
 
-	qDebug() << "emit " << xVel << " " << yVel << " " << r;
+    //qDebug() << "emit " << xVel << " " << yVel << " " << r;
 	emit RC_control(xVel, yVel, r, 0, kickUp);
 }
 

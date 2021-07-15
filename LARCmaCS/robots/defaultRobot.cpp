@@ -14,7 +14,7 @@
 
 
 #include "defaultRobot.h"
-#include <QDebug>
+//#include <QDebug>
 DefaultRobot::DefaultRobot(){}
 
 void DefaultRobot::formControlPacket(QByteArray & command, int numOfRobot, int speedX, int speedY, int speedR,
@@ -27,7 +27,7 @@ void DefaultRobot::formControlPacket(QByteArray & command, int numOfRobot, int s
 	msg.setKickerChargeEnable(kickerCharge);
 	msg.setSpeedX(speedX);
 	msg.setSpeedY(speedY);
-	msg.setSpeedR(speedR);
+    msg.setSpeedR(-speedR);
 	msg.setKickForward(kickForward);
 	msg.setKickUp(kickUp);
 	msg.setDribblerEnable(enableSpinner);
