@@ -165,6 +165,20 @@
            </property>
           </widget>
          </item>
+         <item>
+          <widget class="QLabel" name="label_2_1">
+           <property name="text">
+            <string>Network interface</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEditNetInterface">
+           <property name="text">
+            <string>eth0</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
        <item>

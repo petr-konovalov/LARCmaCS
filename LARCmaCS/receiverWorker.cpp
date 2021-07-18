@@ -21,6 +21,7 @@
 #include "packetSSL.h"
 
 const QString ReceiverWorker::visionIP = QStringLiteral("224.5.23.2");
+const QString ReceiverWorker::defaultInterface = QStringLiteral("eth1");
 
 ReceiverWorker::ReceiverWorker()
     : mSocket(this)
@@ -62,11 +63,25 @@ void ReceiverWorker::close()
 	emit updateGeometry(QSharedPointer<SSL_WrapperPacket>());
 }
 
-bool ReceiverWorker::open(unsigned short port)
+QNetworkInterface ReceiverWorker::getInterfaceByName(const QString &netInterface)
+{
+    QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
+    for (int i = 0; i < interfaces.length(); ++i) {
+        if (interfaces.at(i).name() == netInterface) {
+            qInfo() << "Found interface " << netInterface;
+            return interfaces.at(i);
+        };
+    }
+    qInfo() << "ERROR: No interface found for " << netInterface << ". Using first interface";
+    return interfaces.at(0);
+}
+
+bool ReceiverWorker::open(unsigned short port, const QString &netInterface)
 {
 	close();
+    QNetworkInterface interface = getInterfaceByName(netInterface);
 	if (mSocket.bind(QHostAddress::AnyIPv4, port, QUdpSocket::ShareAddress)
-			&& mSocket.joinMulticastGroup(mGroupAddress)) {
+            && mSocket.joinMulticastGroup(mGroupAddress, interface)) {
 		mStatisticsTimer.start();
 		return true;
 	}
@@ -75,7 +90,7 @@ bool ReceiverWorker::open(unsigned short port)
 
 void ReceiverWorker::processPendingDatagrams()
 {
-	while (mSocket.hasPendingDatagrams()) {
+    while (mSocket.hasPendingDatagrams()) {
 		int datagramSize = static_cast<int>(mSocket.pendingDatagramSize());
 		QByteArray datagram;
 		datagram.resize(datagramSize);
@@ -83,12 +98,12 @@ void ReceiverWorker::processPendingDatagrams()
 		QSharedPointer<SSL_WrapperPacket> packet(new SSL_WrapperPacket());
 		auto parseResult = packet->ParseFromArray(datagram.data(), datagramSize);
 		if (!parseResult) {
-			qDebug() << "ERROR: Failed to parse packet from datagram; skipping";
+            qInfo() << "ERROR: Failed to parse packet from datagram; skipping";
 			continue;
 		}
 
 		if (!packet->IsInitialized()) {
-			qDebug() << "ERROR: Packet is uninitialized; skipping";
+            qInfo() << "ERROR: Packet is uninitialized; skipping";
 			continue;
 		}
 
@@ -105,21 +120,21 @@ void ReceiverWorker::processPendingDatagrams()
 
 void ReceiverWorker::start()
 {
-	open(Constants::SSLVisionPort);
+    open(Constants::SSLVisionPort, defaultInterface);
 }
 
-void ReceiverWorker::changeSimulatorMode(bool isSim)
+void ReceiverWorker::changeSimulatorMode(bool isSim, const QString &netInterface)
 {
 	if (isSim != mIsSimEnabledFlag) {
 		mIsSimEnabledFlag = isSim;
 		if (mIsSimEnabledFlag) {
-			close();            
-            open(Constants::SimVisionPort);
-            //mSocketFeedback.bind(QHostAddress::AnyIPv4, 10302, QUdpSocket::ShareAddress);
-            //mSocketFeedback.joinMulticastGroup(mGroupAddress);
+			close();
+      open(Constants::SimVisionPort, netInterface);
+      //mSocketFeedback.bind(QHostAddress::AnyIPv4, 10302, QUdpSocket::ShareAddress);
+      //mSocketFeedback.joinMulticastGroup(mGroupAddress);
 		} else {
 			close();
-			open(Constants::SSLVisionPort);
+            open(Constants::SSLVisionPort, netInterface);
 		}
 	}
 }
