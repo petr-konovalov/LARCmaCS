@@ -71,49 +71,49 @@ void RemoteControl::keyReleaseEvent(QKeyEvent * key)
 
 void RemoteControl::RC_send(void)
 {
-	int L = 0, R = 0, S = 0, K = 0, B = 0;
+    int L = 0, R = 0, S = 0, K = 0, B = 0;
 
-	int xVel = 0, yVel = 0, r = 0;
-	bool kickUp = false;
+    int xVel = 0, yVel = 0, r = 0;
+    bool kickUp = false;
 
-	if(keys[' ']) {
-		kickUp = true;
-	}
+    if(keys[' ']) {
+        kickUp = true;
+    }
 
-	if(keys[38] && key_shift) {
-		effort++;
-        //qDebug() << "Effort: " << effort;
-		return;
-	}
-	if(keys[40] && key_shift) {
-		if (effort > 1) {
-			effort--;
-		}
-        //qDebug() << "Effort: " << effort;
-		return;
-	}
+    if(keys[38] && key_shift) {
+        effort++;
+        qDebug() << "Effort: " << effort;
+        return;
+    }
+    if(keys[40] && key_shift) {
+        if (effort > 1) {
+            effort--;
+        }
+        qDebug() << "Effort: " << effort;
+        return;
+    }
 
-	if (keys['W'] || keys[38] ) {
-		yVel = 10 * effort;
-	}
-	if (keys['S'] || keys[40]) {
-		yVel = -10 * effort;
-	}
-	if (keys['A'] || keys[37]) {
-		xVel = 20 * effort;
-	}
-	if (keys['D'] || keys[39]) {
-		xVel = -20 * effort;
-	}
-	if (keys['R']) {
-		r = 10 * effort;
-	}
-	if (keys['F']) {
-		r = -10 * effort;
-	}
+    if (keys['w'] || keys['W'] || keys[38] ) {
+        yVel = 10 * effort;
+    }
+    if (keys['s'] || keys['S'] || keys[40]) {
+        yVel = -10 * effort;
+    }
+    if (keys['a'] || keys['A'] || keys[37]) {
+        xVel = 20 * effort;
+    }
+    if (keys['d'] || keys['D'] || keys[39]) {
+        xVel = -20 * effort;
+    }
+    if (keys['r'] || keys['R']) {
+        r = 10 * effort;
+    }
+    if (keys['f'] || keys['F']) {
+        r = -10 * effort;
+    }
 
-    //qDebug() << "emit " << xVel << " " << yVel << " " << r;
-	emit RC_control(xVel, yVel, r, 0, kickUp);
+    qDebug() << "emit " << xVel << " " << yVel << " " << r;
+    emit RC_control(xVel, yVel, r, 0, kickUp);
 }
 
 void RemoteControl::closeEvent(QCloseEvent *)
