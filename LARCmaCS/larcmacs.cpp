@@ -86,27 +86,25 @@ LARCmaCS::LARCmaCS(QWidget *parent)
 
 void LARCmaCS::remcontrolsender(int l, int r,int k, int b, bool kickUp)
 {
-	QString ip = ui->lineEditRobotIp->text();
 	QByteArray byteData;
+    int rNum = ui->lineEditRobotIp->text().toInt();
 	if (!mIsSim) {
-		DefaultRobot::formControlPacket(byteData, 0, l, r, k, kickUp, 0, 4, 0);
+        //DefaultRobot::formControlPacket(byteData, 0, l, r, k, kickUp, 0, 4, 0);
+        DefaultRobot::formControlPacket(byteData, rNum, r, -l, k,
+                kickUp, 0, 15, false, 0, 0, true, false);
 	} else {
-		int numOfRobot = ip.toInt();
-		GrSimRobot::formControlPacket(byteData, numOfRobot, l, r, k, kickUp, 0, 4, 0);
+        GrSimRobot::formControlPacket(byteData, rNum, l, r, k, kickUp, 0, 4, 0);
 	}
 
 	unsigned short port;
-	QString IP;
 	if (!mIsSim) {
-		IP = ip;
 		port = connector.getRobotPort();
 	} else {
-		IP = connector.getGrSimIP();
 		port = connector.getGrSimPort();
 	}
 
 	if (!mIsSim) {
-		emit run(k, byteData);
+        emit run(rNum, byteData);
 	} else {
         emit runSim(byteData, false);
 	}

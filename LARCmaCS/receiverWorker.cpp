@@ -24,7 +24,6 @@ const QString ReceiverWorker::visionIP = QStringLiteral("224.5.23.2");
 
 ReceiverWorker::ReceiverWorker()
     : mSocket(this)
-    , mSocketFeedback(this)
 	, mStatisticsTimer(this)
 	, mGroupAddress(visionIP)
 {
@@ -52,6 +51,7 @@ void ReceiverWorker::formStatistics()
 
 void ReceiverWorker::close()
 {
+    mSocketFeedback.close();
 	mSocket.close();
 	mStatisticsTimer.stop();
 	mTotalPacketsNum = 0;

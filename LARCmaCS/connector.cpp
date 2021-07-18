@@ -5,17 +5,45 @@
 #include "grSimRobot.h"
 #include "erForceRobot.h"
 #include "defaultRobot.h"
+#include <QThread>
 
-const QString Connector::robotBoxIP = QStringLiteral("10.0.120.200");
+const QString Connector::robotBoxIP = QStringLiteral("10.0.120.210");
 
 Connector::Connector(SharedRes * sharedRes)
 	: mSharedRes(sharedRes)
 	, mUdpSocket(this)
 	, mStatisticsTimer(this)
-{}
+{
+    //connect(&mUdpSocket, SIGNAL(readyRead()), this, SLOT(newRobotFeedbackDatagram()));
+}
 
 Connector::~Connector()
 {}
+
+void Connector::newRobotFeedbackDatagram()
+{
+    while (mUdpSocket.hasPendingDatagrams()) {
+        //int datagramSize = static_cast<int>(mUdpSocket.pendingDatagramSize());
+        //QByteArray datagram;
+        //datagram.resize(datagramSize);
+        //mUdpSocket.readDatagram(datagram.data(), datagram.size());
+        /*
+        QSharedPointer<sslsim::RobotFeedback> packet(new sslsim::RobotFeedback());
+        auto parseResult = packet->ParseFromArray(datagram.data(), datagramSize);
+        if (!parseResult) {
+            qDebug() << "ERROR: Failed to parse feedback packet from datagram; skipping";
+            continue;
+        }
+
+        if (!packet->IsInitialized()) {
+            qDebug() << "ERROR: Feedback packet is uninitialized; skipping";
+            continue;
+        }
+        */
+
+        //qDebug() << "Kek" << endl;
+    }
+}
 
 const QString & Connector::getGrSimIP()
 {
@@ -47,9 +75,11 @@ void Connector::onConnectorChange(bool isSim, const QString &ip, int port, int p
 	mIsSim = isSim;
 
 	if (mIsSim) {
+        mUdpSocket.close();
 		mGrSimIP = ip;
 		mGrSimPort = port;
         mGrSimPortYellow = portYellow;
+        mUdpSocket.bind(QHostAddress(mGrSimIP), mGrSimPort, QUdpSocket::ShareAddress);
 	}
 }
 
@@ -61,12 +91,12 @@ void Connector::sendNewCommand(const QVector<Rule> & rule)
 			bool simFlag = mIsSim;
 			if (!simFlag) {
                 if (!mIsPause) {
-					DefaultRobot::formControlPacket(command, k, rule[k].mSpeedX, rule[k].mSpeedY, rule[k].mSpeedR,
+                    DefaultRobot::formControlPacket(command, k+1, rule[k].mSpeedX, rule[k].mSpeedY, rule[k].mSpeedR,
 							rule[k].mKickUp, rule[k].mKickForward, rule[k].mKickerVoltageLevel,
 													rule[k].mDribblerEnable, rule[k].mSpeedDribbler, rule[k].mAutoKick,
 													rule[k].mKickerChargeEnable, rule[k].mBeep);
 				} else {
-					DefaultRobot::formControlPacket(command, k, 0, 0, 0, 0, 0, 0, 0);
+                    DefaultRobot::formControlPacket(command, k+1, 0, 0, 0, 0, 0, 0, 0);
 				}
 			} else {
 				if (!mIsPause) {
@@ -115,22 +145,26 @@ void Connector::sendNewCommand(const QVector<Rule> & rule)
 
 void Connector::onPauseChanged(bool status)
 {
+    const int maxAttemptsCount = 5;
 	qDebug() << "onPauseChanged" << status;
 	mIsPause = status;
 
 	if (mIsPause) {
 		QByteArray command;
-		if (!mIsSim) {
-			for (int i = 1; i <= Constants::maxNumOfRobots; i++) {
-				DefaultRobot::formControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
-				run(i, command);
-			}
-		} else {
-            for (int i = 0; i <= Constants::maxNumOfRobots; i++) {
-//                GrSimRobot::formControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
-                ErForceRobot::formControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
-                runSim(command, i >= Constants::maxRobotsInTeam);
-			}
-		}
+        for (int attempt = 0; attempt < maxAttemptsCount; ++attempt) {
+            if (!mIsSim) {
+                for (int i = 1; i <= Constants::maxNumOfRobots; i++) {
+                    DefaultRobot::formControlPacket(command, i+1, 0, 0, 0, 0, 0, 0, 0);
+                    run(i, command);
+                }
+            } else {
+                for (int i = 0; i <= Constants::maxNumOfRobots; i++) {
+    //                GrSimRobot::formControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
+                    ErForceRobot::formControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
+                    runSim(command, i >= Constants::maxRobotsInTeam);
+                }
+            }
+            QThread::msleep(100);
+        }
 	}
 }

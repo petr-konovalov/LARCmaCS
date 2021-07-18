@@ -40,9 +40,6 @@ RobotReceiver::RobotReceiver(SharedRes * sharedRes)
 	connect(mWorker, SIGNAL(newChargeLevel(const QVector<int> &))
 				, this, SIGNAL(newChargeLevel(const QVector<int> &)));
 
-    connect(mWorker, SIGNAL(newRobotFeedback(const QSharedPointer<sslsim::RobotFeedback> &))
-                , this, SLOT(newRobotFeedback(const QSharedPointer<sslsim::RobotFeedback> &)));
-
 	mThread.start();
 }
 
@@ -57,8 +54,3 @@ void RobotReceiver::changeBarrierState(const QVector<bool> &barrierState)
 	mSharedRes->setBarrierState(barrierState);
 }
 
-void RobotReceiver::newRobotFeedback(const QSharedPointer<sslsim::RobotFeedback> &robotFeedback)
-{
-    qDebug() << "Hello" << endl;
-    //qDebug() << robotFeedback->has_dribbler_ball_contact() << endl;
-}
