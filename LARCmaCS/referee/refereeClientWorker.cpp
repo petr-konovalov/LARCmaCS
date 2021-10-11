@@ -1,6 +1,8 @@
 #include "refereeClientWorker.h"
 
 const QString RefereeClientWorker::hostName = QStringLiteral("224.5.23.1");
+const QString RefereeClientWorker::defaultInterface = QStringLiteral("eth1");
+
 
 RefereeClientWorker::RefereeClientWorker()
 	: mSocket(this)
@@ -14,14 +16,29 @@ RefereeClientWorker::~RefereeClientWorker()
 
 void RefereeClientWorker::start()
 {
-	open(Constants::refereePort);
+    open(Constants::refereePort, defaultInterface);
 }
 
-bool RefereeClientWorker::open(qint16 port)
+// TODO: Deduplicate
+QNetworkInterface RefereeClientWorker::getInterfaceByName(const QString &netInterface)
+{
+    QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
+    for (int i = 0; i < interfaces.length(); ++i) {
+        if (interfaces.at(i).name() == netInterface) {
+            qInfo() << "Found interface " << netInterface;
+            return interfaces.at(i);
+        };
+    }
+    qInfo() << "ERROR: No interface found for " << netInterface << ". Using first interface";
+    return interfaces.at(0);
+}
+
+bool RefereeClientWorker::open(qint16 port, const QString & netInterface)
 {
 	close();
+    QNetworkInterface interface = getInterfaceByName(netInterface);
 	return mSocket.bind(QHostAddress::AnyIPv4, port, QUdpSocket::ShareAddress)
-				&& mSocket.joinMulticastGroup(mGroupAddress);
+                && mSocket.joinMulticastGroup(mGroupAddress, interface);
 }
 
 void RefereeClientWorker::close()
@@ -66,4 +83,10 @@ void RefereeClientWorker::processPendingDatagrams()
 			emit refereeInfoUpdate(mRefInfo);
 		}
 	}
+}
+
+void RefereeClientWorker::changeNetInterface(const QString & netInterface)
+{
+    qInfo() << "Updating referee interface to" << netInterface;
+    open(Constants::refereePort, netInterface);
 }
