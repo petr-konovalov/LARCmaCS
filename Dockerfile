@@ -28,10 +28,10 @@ RUN ln -s /opt/matlab/R2020b/bin/glnxa64/libicudata.so.64 /opt/matlab/R2020b/bin
 USER default
 
 RUN git clone https://github.com/petr-konovalov/MLscripts.git && \
-    cd MLscripts && git checkout new_algo
+    cd MLscripts && git checkout BrazilOpen2021
 
 RUN git clone https://github.com/petr-konovalov/LARCmaCS && \
-    cd LARCmaCS && git checkout RoboCup2021 && \
+    cd LARCmaCS && git checkout BrazilOpen2021 && \
     mkdir build && cd build && \
     qmake ../LARCmaCS.pro -spec linux-g++ && \
     make
