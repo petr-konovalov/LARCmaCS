@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include "grSimRobot.h"
+#include <cmath>
 
 GrSimRobot::GrSimRobot(){}
 
@@ -49,8 +50,12 @@ void GrSimRobot::formControlPacket(QByteArray & command, int numOfRobot, int spe
 	controls->set_wheel3(0);
 	controls->set_wheel4(0);
 
-    controls->set_veltangent(fromPower2Speed(speedX)); //speed on X axis
-    controls->set_velnormal(-fromPower2Speed(speedY)); // speed on Y axis
+    float oldNorma = sqrt(speedX*speedX+speedY*speedY);
+    float newNorma = std::min(oldNorma, 100.0f)*0.05f;
+    float multiplier = newNorma / std::max(oldNorma, 0.001f);
+
+    controls->set_veltangent(speedX*multiplier); //speed on X axis
+    controls->set_velnormal(-speedY*multiplier); // speed on Y axis
 	controls->set_velangular(fromPower2Speed(speedR)); // rotation Speed
 	controls->set_kickspeedx(fromPower2Kick(kickForward, kickVoltage));
 	controls->set_kickspeedz(fromPower2Kick(kickUp, kickVoltage));
