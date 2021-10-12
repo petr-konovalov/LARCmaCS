@@ -49,8 +49,8 @@ void GrSimRobot::formControlPacket(QByteArray & command, int numOfRobot, int spe
 	controls->set_wheel3(0);
 	controls->set_wheel4(0);
 
-	controls->set_veltangent(fromPower2Speed(speedY)); //speed on X axis
-	controls->set_velnormal(fromPower2Speed(speedX)); // speed on Y axis
+    controls->set_veltangent(fromPower2Speed(speedX)); //speed on X axis
+    controls->set_velnormal(-fromPower2Speed(speedY)); // speed on Y axis
 	controls->set_velangular(fromPower2Speed(speedR)); // rotation Speed
 	controls->set_kickspeedx(fromPower2Kick(kickForward, kickVoltage));
 	controls->set_kickspeedz(fromPower2Kick(kickUp, kickVoltage));

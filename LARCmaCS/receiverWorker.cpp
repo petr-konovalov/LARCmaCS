@@ -21,7 +21,7 @@
 #include "packetSSL.h"
 
 const QString ReceiverWorker::visionIP = QStringLiteral("224.5.23.2");
-const QString ReceiverWorker::defaultInterface = QStringLiteral("eth1");
+const QString ReceiverWorker::defaultInterface = QStringLiteral("eth0");
 
 ReceiverWorker::ReceiverWorker()
     : mSocket(this)

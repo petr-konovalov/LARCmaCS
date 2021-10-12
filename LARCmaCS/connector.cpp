@@ -7,7 +7,7 @@
 #include "defaultRobot.h"
 #include <QThread>
 
-const QString Connector::robotBoxIP = QStringLiteral("10.0.120.210");
+const QString Connector::robotBoxIP = QStringLiteral("10.0.120.200");
 
 Connector::Connector(SharedRes * sharedRes)
 	: mSharedRes(sharedRes)
@@ -91,26 +91,26 @@ void Connector::sendNewCommand(const QVector<Rule> & rule)
 			bool simFlag = mIsSim;
 			if (!simFlag) {
                 if (!mIsPause) {
-                    DefaultRobot::formControlPacket(command, k+1, rule[k].mSpeedX, rule[k].mSpeedY, rule[k].mSpeedR,
+                    DefaultRobot::formControlPacket(command, k, rule[k].mSpeedX, rule[k].mSpeedY, rule[k].mSpeedR,
 							rule[k].mKickUp, rule[k].mKickForward, rule[k].mKickerVoltageLevel,
 													rule[k].mDribblerEnable, rule[k].mSpeedDribbler, rule[k].mAutoKick,
 													rule[k].mKickerChargeEnable, rule[k].mBeep);
 				} else {
-                    DefaultRobot::formControlPacket(command, k+1, 0, 0, 0, 0, 0, 0, 0);
+                    DefaultRobot::formControlPacket(command, k, 0, 0, 0, 0, 0, 0, 0);
 				}
 			} else {
 				if (!mIsPause) {
-//                    GrSimRobot::formControlPacket(command, k, rule[k].mSpeedX, rule[k].mSpeedY, rule[k].mSpeedR,
-//                                                  rule[k].mKickUp, rule[k].mKickForward, rule[k].mKickerVoltageLevel,
-//                                                  rule[k].mDribblerEnable, rule[k].mSpeedDribbler, rule[k].mAutoKick,
-//                                                  rule[k].mKickerChargeEnable, rule[k].mBeep);
-                    ErForceRobot::formControlPacket(command, k, rule[k].mSpeedX, rule[k].mSpeedY, rule[k].mSpeedR,
+                    GrSimRobot::formControlPacket(command, k, rule[k].mSpeedX, rule[k].mSpeedY, rule[k].mSpeedR,
                                                   rule[k].mKickUp, rule[k].mKickForward, rule[k].mKickerVoltageLevel,
                                                   rule[k].mDribblerEnable, rule[k].mSpeedDribbler, rule[k].mAutoKick,
                                                   rule[k].mKickerChargeEnable, rule[k].mBeep);
+//                    ErForceRobot::formControlPacket(command, k, rule[k].mSpeedX, rule[k].mSpeedY, rule[k].mSpeedR,
+//                                                  rule[k].mKickUp, rule[k].mKickForward, rule[k].mKickerVoltageLevel,
+//                                                  rule[k].mDribblerEnable, rule[k].mSpeedDribbler, rule[k].mAutoKick,
+//                                                  rule[k].mKickerChargeEnable, rule[k].mBeep);
                 } else {
-//                    GrSimRobot::formControlPacket(command, k, 0, 0, 0, 0, 0, 0, 0);
-                    ErForceRobot::formControlPacket(command, k, 0, 0, 0, 0, 0, 0, 0);
+                    GrSimRobot::formControlPacket(command, k, 0, 0, 0, 0, 0, 0, 0);
+//                    ErForceRobot::formControlPacket(command, k, 0, 0, 0, 0, 0, 0, 0);
 				}
 			}
             if (rule[k].mSpeedX != 0 ||
@@ -159,8 +159,8 @@ void Connector::onPauseChanged(bool status)
                 }
             } else {
                 for (int i = 0; i <= Constants::maxNumOfRobots; i++) {
-    //                GrSimRobot::formControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
-                    ErForceRobot::formControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
+                    GrSimRobot::formControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
+//                    ErForceRobot::formControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
                     runSim(command, i >= Constants::maxRobotsInTeam);
                 }
             }
