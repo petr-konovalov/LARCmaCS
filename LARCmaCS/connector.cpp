@@ -1,6 +1,9 @@
 #include "connector.h"
 
 #include <QMap>
+#include <QNetworkAddressEntry>
+#include <QNetworkInterface>
+
 
 #include "grSimRobot.h"
 #include "erForceRobot.h"
@@ -39,6 +42,13 @@ void Connector::run(int N, const QByteArray & command)
 
 void Connector::runSim(const QByteArray & command, bool isYellow)
 {
+//    qDebug() << "before eno" << '\n';
+//    const QNetworkInterface iface = QNetworkInterface::interfaceFromName("wlo1");
+//    qDebug() << "after eno" << '\n';
+//    const QNetworkAddressEntry addrEntry = iface.addressEntries().constFirst();
+//    qDebug() << "after addrEntry" << '\n';
+//    mUdpSocket.writeDatagram(command, addrEntry.broadcast(), isYellow ? mGrSimPortYellow: mGrSimPort);
+//    qDebug() << addrEntry.broadcast() << '\n';
     mUdpSocket.writeDatagram(command, QHostAddress(mGrSimIP), isYellow ? mGrSimPortYellow: mGrSimPort);
 }
 
@@ -83,6 +93,7 @@ void Connector::sendNewCommand(const QVector<Rule> & rule)
                     ErForceRobot::formControlPacket(command, k, 0, 0, 0, 0, 0, 0, 0);
 				}
 			}
+            /*
             if (rule[k].mSpeedX != 0 ||
                 rule[k].mSpeedY != 0 ||
                 rule[k].mSpeedR != 0 ||
@@ -100,14 +111,14 @@ void Connector::sendNewCommand(const QVector<Rule> & rule)
                 rule[k].mSpeedDribbler != oldRule[k].mSpeedDribbler ||
                 rule[k].mAutoKick != oldRule[k].mAutoKick ||
                 rule[k].mKickerChargeEnable != oldRule[k].mKickerChargeEnable ||
-                rule[k].mBeep != oldRule[k].mBeep) {
+                rule[k].mBeep != oldRule[k].mBeep) {*/
                 if (!simFlag) {
                     emit run(k, command);
                 } else {
                     emit runSim(command, k >= rule.size()/2);
                 }
                 oldRule[k] = rule[k];
-            }
+            //}
 		}
 
 	}
