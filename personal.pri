@@ -15,7 +15,7 @@
 
 #!amd64: MATLAB_DIR = 'C:/Program Files (x86)/MATLAB/R2015b/extern'
 !amd64: MATLAB_DIR = 'C:\Program Files (x86)\MATLAB\R2013b\extern'
-!UNIX: MATLAB_DIR = '/opt/matlab/R2020b' #'/usr/local/MATLAB/R2018b/extern'
+!UNIX: MATLAB_DIR = '/opt/matlab/R2020b/extern' #'/usr/local/MATLAB/R2018b/extern'
 #MATLAB_DIR = '/opt/matlab/R2020b'
 message("Path to matlab: $${MATLAB_DIR}")
 
