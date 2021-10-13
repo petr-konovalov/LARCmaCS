@@ -49,6 +49,17 @@ void GrSimRobot::formControlPacket(QByteArray & command, int numOfRobot, int spe
 	controls->set_wheel2(0);
 	controls->set_wheel3(0);
 	controls->set_wheel4(0);
+    int kickUpVoltage = 0;
+    int kickForwardVoltage = 0;
+    if (autoKick == 1) {
+        kickForward = 1;
+        kickForwardVoltage = kickVoltage;
+    } else if (autoKick == 2 || kickUp) {
+        kickUp = 1;
+        kickForward = 1;
+        kickForwardVoltage = kickVoltage;
+        kickUpVoltage = kickVoltage / 2;
+    }
 
     float oldNorma = sqrt(speedX*speedX+speedY*speedY);
     float newNorma = std::min(oldNorma, 100.0f)*0.05f;
@@ -57,8 +68,8 @@ void GrSimRobot::formControlPacket(QByteArray & command, int numOfRobot, int spe
     controls->set_veltangent(speedX*multiplier); //speed on X axis
     controls->set_velnormal(-speedY*multiplier); // speed on Y axis
 	controls->set_velangular(fromPower2Speed(speedR)); // rotation Speed
-	controls->set_kickspeedx(fromPower2Kick(kickForward, kickVoltage));
-	controls->set_kickspeedz(fromPower2Kick(kickUp, kickVoltage));
+    controls->set_kickspeedx(fromPower2Kick(kickForward, kickForwardVoltage));
+    controls->set_kickspeedz(fromPower2Kick(kickUp, kickUpVoltage));
 	controls->set_spinner(enableSpinner); //spinner isn't used now
 
 	command.resize(packet.ByteSize());
