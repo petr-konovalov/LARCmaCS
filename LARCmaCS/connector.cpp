@@ -72,7 +72,7 @@ void Connector::sendNewCommand(const QVector<Rule> & rule)
 			bool simFlag = mIsSim;
 			if (!simFlag) {
                 if (!mIsPause) {
-                    DefaultRobot::formControlPacket(command, k + 1, rule[k].mSpeedX, rule[k].mSpeedY, rule[k].mSpeedR,
+                    DefaultRobot::formControlPacket(command, k + 1, rule[k].mSpeedX, rule[k].mSpeedY, -rule[k].mSpeedR,
 							rule[k].mKickUp, rule[k].mKickForward, rule[k].mKickerVoltageLevel,
 													rule[k].mDribblerEnable, rule[k].mSpeedDribbler, rule[k].mAutoKick,
 													rule[k].mKickerChargeEnable, rule[k].mBeep);
@@ -139,7 +139,7 @@ void Connector::onPauseChanged(bool status)
                     DefaultRobot::formControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
                     run(i, command);
                 }
-                qDebug() << "Attempt\n";
+                //qDebug() << "Attempt\n";
                 QThread::msleep(100);
             }
 		} else {

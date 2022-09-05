@@ -1,7 +1,7 @@
 #include "refereeClientWorker.h"
 
 const QString RefereeClientWorker::hostName = QStringLiteral("224.5.23.1");
-const QString RefereeClientWorker::defaultInterface = QStringLiteral("eth1");
+const QString RefereeClientWorker::defaultInterface = QStringLiteral("eno1");
 
 
 RefereeClientWorker::RefereeClientWorker()
