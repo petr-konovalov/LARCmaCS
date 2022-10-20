@@ -58,6 +58,7 @@ SOURCES +=  \
 	$$PWD/sceneViewWorker.cpp \
 	$$PWD/robot.cpp \
 	$$PWD/receiverWorker.cpp \
+        $$PWD/connectorWorker.cpp \
 	$$PWD/mainAlgWorker.cpp \
 	$$PWD/packetSSL.cpp \
 	$$PWD/settings.cpp \
@@ -89,6 +90,7 @@ HEADERS  += \
 	$$PWD/message.h \
 	$$PWD/reference.h \
 	$$PWD/sceneViewWorker.h \
+        $$PWD/connectorWorker.h \
 	$$PWD/receiverWorker.h \
 	$$PWD/robot.h \
 	$$PWD/mainAlgWorker.h \

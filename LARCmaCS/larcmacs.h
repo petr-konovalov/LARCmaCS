@@ -63,7 +63,7 @@ private slots:
 	void on_pushButton_Pause_clicked();
 	void on_pushButton_SetMLdir_clicked();
 	void toConsole(const QString & str);
-	void remcontrolsender(int l, int r,int k, int b, bool kickUp);
+//	void remcontrolsender(int l, int r,int k, int b, bool kickUp);
 	void on_checkBox_SimEnable_stateChanged(int state);
 	void on_pushButton_RemoteControl_clicked();
 	void on_matlabOutputFrequencyLineEdit_textEdited(const QString & text);

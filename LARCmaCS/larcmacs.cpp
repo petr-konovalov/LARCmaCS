@@ -53,10 +53,10 @@ LARCmaCS::LARCmaCS(QWidget *parent)
 	connect(&receiver, SIGNAL(updateSSLFPS(const QString &)), this, SLOT(UpdateSSLFPS(const QString &)));
 
 	//remotecontrol
-	connect(&remotecontol, SIGNAL(RC_control(int, int, int, int, bool)),
-			this, SLOT(remcontrolsender(int, int, int, int, bool)));
-    connect(this, SIGNAL(run(int, const QByteArray &)), &connector, SLOT(run(int, const QByteArray &)));
-    connect(this, SIGNAL(runSim(const QByteArray &, bool)), &connector, SLOT(runSim(const QByteArray &, bool)));
+//	connect(&remotecontol, SIGNAL(RC_control(int, int, int, int, bool)),
+//			this, SLOT(remcontrolsender(int, int, int, int, bool)));
+//    connect(this, SIGNAL(run(int, const QByteArray &)), &connector, SLOT(run(int, const QByteArray &)));
+//    connect(this, SIGNAL(runSim(const QByteArray &, bool)), &connector, SLOT(runSim(const QByteArray &, bool)));
 
 	//simulator Enable
   connect(this, SIGNAL(connectorChanged(bool, const QString &, int, int, const QString &))
@@ -87,33 +87,33 @@ LARCmaCS::LARCmaCS(QWidget *parent)
 	UpdateSSLFPS("FPS = 0");
 }
 
-void LARCmaCS::remcontrolsender(int l, int r,int k, int b, bool kickUp)
-{
-	QString ip = ui->lineEditRobotIp->text();
-	QByteArray byteData;
-	if (!mIsSim) {
-		DefaultRobot::formControlPacket(byteData, 0, l, r, k, kickUp, 0, 4, 0);
-	} else {
-		int numOfRobot = ip.toInt();
-		GrSimRobot::formControlPacket(byteData, numOfRobot, l, r, k, kickUp, 0, 4, 0);
-	}
+//void LARCmaCS::remcontrolsender(int l, int r,int k, int b, bool kickUp)
+//{
+//	QString ip = ui->lineEditRobotIp->text();
+//	QByteArray byteData;
+//	if (!mIsSim) {
+//		DefaultRobot::formControlPacket(byteData, 0, l, r, k, kickUp, 0, 4, 0);
+//	} else {
+//		int numOfRobot = ip.toInt();
+//		GrSimRobot::formControlPacket(byteData, numOfRobot, l, r, k, kickUp, 0, 4, 0);
+//	}
 
-	unsigned short port;
-	QString IP;
-	if (!mIsSim) {
-		IP = ip;
-		port = connector.getRobotPort();
-	} else {
-		IP = connector.getGrSimIP();
-		port = connector.getGrSimPort();
-	}
+//	unsigned short port;
+//	QString IP;
+//	if (!mIsSim) {
+//		IP = ip;
+//		port = connector.getRobotPort();
+//	} else {
+//		IP = connector.getGrSimIP();
+//		port = connector.getGrSimPort();
+//	}
 
-	if (!mIsSim) {
-		emit run(k, byteData);
-	} else {
-        emit runSim(byteData, false);
-	}
-}
+//	if (!mIsSim) {
+//		emit run(k, byteData);
+//	} else {
+//        emit runSim(byteData, false);
+//	}
+//}
 
 LARCmaCS::~LARCmaCS()
 {

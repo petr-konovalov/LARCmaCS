@@ -123,7 +123,8 @@ void Connector::onPauseChanged(bool status)
 		QByteArray command;
 		if (!mIsSim) {
 //            for (int k = 0; k < attemptCount; ++k) {
-                for (int i = 1; i <= Constants::maxNumOfRobots; i++) {
+                for (int i = 0; i < Constants::maxNumOfRobots; i++) {
+//                    qDebug() << "Setting command for " << i << endl;
                     DefaultRobot::formControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
                     mSharedRes->setLastCommand(command, i);
 //                    run(i, command);
@@ -132,7 +133,7 @@ void Connector::onPauseChanged(bool status)
 //                QThread::msleep(100);
 //            }
 		} else {
-            for (int i = 0; i <= Constants::maxNumOfRobots; i++) {
+            for (int i = 0; i < Constants::maxNumOfRobots; i++) {
 //                GrSimRobot::formControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
                 ErForceRobot::formControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
                 mSharedRes->setLastCommand(command, i);
