@@ -84,6 +84,7 @@ void ConnectorWorker::start()
                 }
             }
         }
+        QThread::msleep(25);
     }
 }
 
