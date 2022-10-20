@@ -25,10 +25,11 @@ public:
 	unsigned short getRobotPort();
 
 public slots:
-    void onConnectorChange(bool isSim, const QString & ip, int port, int portYellow, const QString &netInterface);
+    void connectorChanged(bool isSim, const QString & ip, int port, int portYellow, const QString &netInterface);
 	void run(int N, const QByteArray & command);
     void runSim(const QByteArray & command, bool isYellow);
     void start();
+    void stop();
 
 private:
 	QString mGrSimIP;

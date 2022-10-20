@@ -15,32 +15,51 @@ Connector::Connector(SharedRes * sharedRes)
       mWorker(new ConnectorWorker(sharedRes))
 {
     mWorker->moveToThread(&mThread);
+    connect(&mThread, SIGNAL(started()), mWorker, SLOT(start()));
+    connect(&mThread, SIGNAL(finished()), mWorker, SLOT(deleteLater()));
+
+    // TODO: Signalling doesn't work for some reason
+//    connect(this,
+//            SIGNAL(connectorChange(bool, const QString &, int, int, const QString &)),
+//            mWorker,
+//            SLOT(connectorChanged(bool, const QString &, int, int, const QString &)));
+
+//    connect(this,
+//            SLOT(onConnectorChange(bool, const QString &, int, int, const QString &)),
+//            mWorker,
+//            SLOT(connectorChanged(bool, const QString &, int, int, const QString &)));
+
+    connect(this, SIGNAL(stopped()), mWorker, SLOT(stop()));
+
     mThread.start();
 }
 
 Connector::~Connector()
 {
+    qDebug() << "CONNECTOR Closing Connector" << endl;
+    emit stopped();
     mThread.quit();
     mThread.wait();
 }
 
 const QString & Connector::getGrSimIP()
 {
-    return mGrSimIP;
+    return mWorker->getGrSimIP();
 }
 
 unsigned short Connector::getGrSimPort()
 {
-    return mGrSimPort;
+    return mWorker->getGrSimPort();
 }
 
 unsigned short Connector::getRobotPort()
 {
-    return mRobotPort;
+    return mWorker->getRobotPort();
 }
 
 void Connector::sendNewCommand(const QVector<Rule> & rule)
 {
+//    qDebug() << "CONNECTOR Sending new command" << endl;
     if (!mIsPause) {
         for (int k = 0; k < rule.size(); k++) {
             QByteArray command;
@@ -89,43 +108,42 @@ void Connector::sendNewCommand(const QVector<Rule> & rule)
                 rule[k].mKickerChargeEnable != oldRule[k].mKickerChargeEnable ||
                 rule[k].mBeep != oldRule[k].mBeep) {*/
                 if (!simFlag) {
+//                    qDebug() << "CONNECTOR set last command" << endl;
                     mSharedRes->setLastCommand(command, k);
 //                    emit run(k, command);
                 } else {
+//                    qDebug() << "CONNECTOR set last command sim" << endl;
                     mSharedRes->setLastCommand(command, k);
 //                    emit runSim(command, k >= rule.size()/2);
                 }
-                oldRule[k] = rule[k];
+//                oldRule[k] = rule[k];
             //}
         }
 
     }
 }
 
-void Connector::onConnectorChange(bool isSim, const QString &ip, int port, int portYellow, const QString &)
+void Connector::onConnectorChange(bool isSim, const QString &ip, int port, int portYellow, const QString & address)
 {
+//    qDebug() << "CONNECTOR onConnectorChange" << endl;
     mIsSim = isSim;
-
-    if (mIsSim) {
-        mGrSimIP = ip;
-        mGrSimPort = port;
-        mGrSimPortYellow = portYellow;
-    }
+    // TODO: Signaling doesn't work for some reason
+//    emit connectorChange(isSim, ip, port, portYellow, address);
+    mWorker->connectorChanged(isSim, ip, port, portYellow, address);
 }
 
 void Connector::onPauseChanged(bool status)
 {
-	qDebug() << "onPauseChanged" << status;
+    qDebug() << "onPauseChanged" << status;
 	mIsPause = status;
-    int attemptCount = 10;
+//    int attemptCount = 10;
 
 	if (mIsPause) {
 		QByteArray command;
 		if (!mIsSim) {
 //            for (int k = 0; k < attemptCount; ++k) {
                 for (int i = 0; i < Constants::maxNumOfRobots; i++) {
-//                    qDebug() << "Setting command for " << i << endl;
-                    DefaultRobot::formControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
+                    DefaultRobot::formControlPacket(command, i+1, 0, 0, 0, 0, 0, 0, 0);
                     mSharedRes->setLastCommand(command, i);
 //                    run(i, command);
                 }

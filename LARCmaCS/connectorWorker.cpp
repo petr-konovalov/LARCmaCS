@@ -38,11 +38,14 @@ unsigned short ConnectorWorker::getRobotPort()
 
 void ConnectorWorker::run(int N, const QByteArray & command)
 {
+//    qDebug() << "CONNECTOR-WORKER write datagram" << endl;
     mUdpSocket.writeDatagram(command, QHostAddress(robotBoxIP), DefaultRobot::robotPort);
 }
 
 void ConnectorWorker::runSim(const QByteArray & command, bool isYellow)
 {
+//    qDebug() << "CONNECTOR-WORKER write SIM datagram" << endl;
+
 //    qDebug() << "before eno" << '\n';
 //    const QNetworkInterface iface = QNetworkInterface::interfaceFromName("wlo1");
 //    qDebug() << "after eno" << '\n';
@@ -53,8 +56,9 @@ void ConnectorWorker::runSim(const QByteArray & command, bool isYellow)
     mUdpSocket.writeDatagram(command, QHostAddress(mGrSimIP), isYellow ? mGrSimPortYellow: mGrSimPort);
 }
 
-void ConnectorWorker::onConnectorChange(bool isSim, const QString &ip, int port, int portYellow, const QString &)
+void ConnectorWorker::connectorChanged(bool isSim, const QString &ip, int port, int portYellow, const QString & tmp)
 {
+    qDebug() << "CONNECTOR-WORKER on connector change" << endl;
     mIsSim = isSim;
 
     if (mIsSim) {
@@ -67,18 +71,25 @@ void ConnectorWorker::onConnectorChange(bool isSim, const QString &ip, int port,
 
 void ConnectorWorker::start()
 {
+    qDebug() << "CONNECTOR-WORKER start loop" << endl;
     while (!mShutdownFlag) {
-        if (mIsSim) {
-            for (int k = 0; k < Constants::maxNumOfRobots; k++) {
-                QByteArray command = mSharedRes->getLastCommand(k);
-                if (command.size() > 0) {
-                    if (mIsSim) {
-                        run(k, command);
-                    } else{
-                        runSim(command, k >= Constants::maxRobotsInTeam);
-                    }
+        for (int k = 0; k < Constants::maxNumOfRobots; k++) {
+            QByteArray command = mSharedRes->getLastCommand(k);
+//            qDebug() << "CONNECTOR-WORKER sending command " << command << " " << command.size() << endl;
+            if (command.size() > 0) {
+                if (mIsSim) {
+                    runSim(command, k >= Constants::maxRobotsInTeam);
+                } else{
+                    run(k, command);
                 }
             }
         }
     }
+}
+
+
+void ConnectorWorker::stop()
+{
+    mStatisticsTimer.stop();
+    mShutdownFlag = true;
 }

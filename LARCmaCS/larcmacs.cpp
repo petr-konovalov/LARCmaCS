@@ -66,6 +66,9 @@ LARCmaCS::LARCmaCS(QWidget *parent)
   connect(this, SIGNAL(connectorChanged(bool, const QString &, int, int, const QString &))
        , &connector, SLOT(onConnectorChange(bool, const QString &, int, int, const QString &)));
 
+//  connect(this, SIGNAL(connectorChanged(bool, const QString &, int, int, const QString &))
+//       , connector.mWorker, SLOT(connectorChanged(bool, const QString &, int, int, const QString &)));
+
   connect(this, SIGNAL(connectorChanged(bool, const QString &, int, int, const QString &))
        , &referee, SLOT(changeSimulatorMode(bool, const QString &, int, int, const QString &)));
 
