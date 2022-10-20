@@ -4,6 +4,9 @@
 #include <QNetworkAddressEntry>
 #include <QNetworkInterface>
 #include <QThread>
+#include <QDateTime>
+#include <QFile>
+#include <QTextStream>
 
 
 #include "grSimRobot.h"
@@ -15,8 +18,12 @@ const QString Connector::robotBoxIP = QStringLiteral("10.0.120.210");
 Connector::Connector(SharedRes * sharedRes)
 	: mSharedRes(sharedRes)
 	, mUdpSocket(this)
-	, mStatisticsTimer(this)
-{}
+    , mStatisticsTimer(this)
+{
+    file.setFileName("/home/robotssl/LARCmaCS/sent_commands.log");
+    file.open(QIODevice::WriteOnly | QIODevice::Text);
+    out.setDevice(&file);
+}
 
 Connector::~Connector()
 {}
@@ -38,7 +45,11 @@ unsigned short Connector::getRobotPort()
 
 void Connector::run(int N, const QByteArray & command)
 {
-	mUdpSocket.writeDatagram(command, QHostAddress(robotBoxIP), DefaultRobot::robotPort);
+//    qint64 timestamp = QDateTime::currentMSecsSinceEpoch();
+
+//    out << "sending commands to  at " << timestamp << endl;
+
+    mUdpSocket.writeDatagram(command, QHostAddress(robotBoxIP), DefaultRobot::robotPort);
 }
 
 void Connector::runSim(const QByteArray & command, bool isYellow)
@@ -66,17 +77,32 @@ void Connector::onConnectorChange(bool isSim, const QString &ip, int port, int p
 
 void Connector::sendNewCommand(const QVector<Rule> & rule)
 {
+//    qDebug() << "sending new command start" << '\n';
 	if (!mIsPause) {
-		for (int k = 0; k < rule.size(); k++) {
+//        qDebug() << "sending new command not PAUSE" << '\n';
+        for (int k = 0; k < 32; k++) {
 			QByteArray command;
 			bool simFlag = mIsSim;
 			if (!simFlag) {
                 if (!mIsPause) {
+//                    if (k >= 2 && k <= 4) {
+
+//                    qint64 timestamp = QDateTime::currentMSecsSinceEpoch();
+
+//                    qDebug() << "sending commands to " << k + 1 << " at " << timestamp << " " << rule[k].mSpeedX << " " << rule[k].mSpeedY << " " << rule[k].mSpeedR <<   '\n';
+//                    out << "sending commands to " << k + 1 << " at " << timestamp << " " << rule[k].mSpeedX << " " << rule[k].mSpeedY << " " << rule[k].mSpeedR <<   endl;
+//                    }
                     DefaultRobot::formControlPacket(command, k + 1, rule[k].mSpeedX, rule[k].mSpeedY, -rule[k].mSpeedR,
 							rule[k].mKickUp, rule[k].mKickForward, rule[k].mKickerVoltageLevel,
 													rule[k].mDribblerEnable, rule[k].mSpeedDribbler, rule[k].mAutoKick,
 													rule[k].mKickerChargeEnable, rule[k].mBeep);
 				} else {
+//                    qDebug() << "sending zeros to" << k + 1 << '\n';
+//                    qint64 timestamp = QDateTime::currentMSecsSinceEpoch();
+
+//                    qDebug() << "sending commands to " << k + 1 << " at " << timestamp << " " << rule[k].mSpeedX << " " << rule[k].mSpeedY << " " << rule[k].mSpeedR <<   '\n';
+//                    out << "sending zeos to " << k + 1 << " at " << timestamp <<   endl;
+
                     DefaultRobot::formControlPacket(command, k + 1, 0, 0, 0, 0, 0, 0, 0);
 				}
 			} else {
@@ -114,6 +140,7 @@ void Connector::sendNewCommand(const QVector<Rule> & rule)
                 rule[k].mKickerChargeEnable != oldRule[k].mKickerChargeEnable ||
                 rule[k].mBeep != oldRule[k].mBeep) {*/
                 if (!simFlag) {
+//                    qDebug() << "Emitting new command" << endl;
                     emit run(k, command);
                 } else {
                     emit runSim(command, k >= rule.size()/2);

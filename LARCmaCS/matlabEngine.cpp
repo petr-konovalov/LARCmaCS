@@ -15,10 +15,18 @@
 #include "matlabEngine.h"
 #include <QDebug>
 #include <QApplication>
+#include <QDateTime>
+#include <QFile>
+#include <QTextStream>
+
 
 MatlabEngine::MatlabEngine(SharedRes * sharedRes)
 	: EngineInterface(sharedRes)
 {
+    file.setFileName("/home/robotssl/LARCmaCS/matlab_commands.log");
+    file.open(QIODevice::WriteOnly | QIODevice::Text);
+    out.setDevice(&file);
+
 	RCConfig rcconfig;
 	MlData mtl(rcconfig);
 	mMatlabData = mtl;
@@ -51,7 +59,7 @@ void MatlabEngine::runMatlab()
 	sprintf (sendString, "Rules=zeros(%d, %d)", Constants::ruleAmount, Constants::ruleLength);
 	evalString(sendString);
 
-	QString dirPath = "cd " + QCoreApplication::applicationDirPath() + "/MLscripts";
+    QString dirPath = "cd " + QCoreApplication::applicationDirPath() + "/../../../MLscripts";
 	evalString(dirPath);
 }
 
@@ -156,8 +164,18 @@ QSharedPointer<PacketSSL> MatlabEngine::loadVisionData()
 void MatlabEngine::processPacket(const QSharedPointer<PacketSSL> & packetssl)
 {
 	if (packetssl.isNull()) {
+//        qDebug() << "Empty package" << endl;
 		return;
-	}
+    } else {
+//        qDebug() << "NOT Empty package" << endl;
+    }
+
+//    qint64 timestamp = QDateTime::currentMSecsSinceEpoch();
+//    qDebug() << "sending package at " << timestamp << '\n';
+//    out << "sending package at " << timestamp << endl;
+//    if (2 *2 == 4) {
+//        return;
+//    }
 // Заполнение массивов Balls Blues и Yellows и запуск main-функции
 
 	bool isCurrentTeamBlue = true;
@@ -237,6 +255,7 @@ void MatlabEngine::processPacket(const QSharedPointer<PacketSSL> & packetssl)
 
 		}
 	}
+//    qDebug() << "Sending rule" << endl;
 	emit newData(rule);
 
 	free(ruleArray);

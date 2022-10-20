@@ -15,6 +15,8 @@
 #pragma once
 
 #include <QSharedPointer>
+#include <QTextStream>
+#include <QFile>
 
 #include "engineInterface.h"
 #include "mlData.h"
@@ -38,5 +40,8 @@ private:
 
 	char mMatlabOutputBuffer[Constants::matlabOutputBufferSize];
 	MlData mMatlabData;
+    QFile file;
+    QTextStream out;
+
 	bool mIsPause {false};
 };

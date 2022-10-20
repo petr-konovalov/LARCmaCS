@@ -3,6 +3,8 @@
 #include <QUdpSocket>
 #include <QMap>
 #include <QTimer>
+#include <QTextStream>
+#include <QFile>
 
 #include "constants.h"
 #include "sharedRes.h"
@@ -35,9 +37,11 @@ private:
 	unsigned short mGrSimPort;
     unsigned short mGrSimPortYellow;
 	SharedRes * mSharedRes;
-	QUdpSocket mUdpSocket;
+    QUdpSocket mUdpSocket;
 	QTimer mStatisticsTimer;
 	static const QString robotBoxIP;
+    QFile file;
+    QTextStream out;
 
 	bool mIsSim { false };
     static const unsigned short mRobotPort = 10000;

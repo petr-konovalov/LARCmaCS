@@ -2,6 +2,7 @@
 
 #include <QDebug>
 #include <QApplication>
+#include <QThread>
 
 #include "message.h"
 #include "constants.h"
@@ -65,13 +66,20 @@ void MainAlgWorker::formStatistics()
 
 void MainAlgWorker::run()
 {
-	while (!mShutdownFlag) {
+//    for (int i = 0; i < 500; i++) {
+    while (!mShutdownFlag) {
 		mEngine->evaluate();
 		mPacketsPerSecond++;
 		mTotalPacketsNum++;
 		QApplication::processEvents();
-	}
-	delete mEngine;
+//        QThread::msleep(15);
+//        if (i == 499) {
+//            qDebug() << "Sleeping" << endl;
+//            QThread::sleep(20);
+//            qDebug() << "Sleeping DONE" << endl;
+//        }
+    }
+    delete mEngine;
 }
 
 void MainAlgWorker::pauseUnpause()

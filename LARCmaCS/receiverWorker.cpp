@@ -16,12 +16,13 @@
 
 #include <QApplication>
 #include <QMutex>
+#include <QThread>
 
 #include "constants.h"
 #include "packetSSL.h"
 
 const QString ReceiverWorker::visionIP = QStringLiteral("224.5.23.2");
-const QString ReceiverWorker::defaultInterface = QStringLiteral("eth1");
+const QString ReceiverWorker::defaultInterface = QStringLiteral("eno1");
 
 ReceiverWorker::ReceiverWorker()
     : mSocket(this)
@@ -115,6 +116,7 @@ void ReceiverWorker::processPendingDatagrams()
 
 		mTotalPacketsNum++;
 		mPacketsPerSecond++;
+//        QThread::msleep(15);
 	}
 }
 

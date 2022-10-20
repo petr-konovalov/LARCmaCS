@@ -175,7 +175,7 @@
          <item>
           <widget class="QLineEdit" name="lineEditNetInterface">
            <property name="text">
-            <string>eth0</string>
+            <string>eno1</string>
            </property>
           </widget>
          </item>
