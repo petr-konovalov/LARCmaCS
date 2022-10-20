@@ -21,8 +21,29 @@
 #include <QMutex>
 #include <QMap>
 #include <QReadWriteLock>
+#include <QByteArray>
 
 #include "constants.h"
+
+
+typedef struct Rule
+{
+    int mSpeedX = 0;
+    int mSpeedY = 0;
+    int mSpeedR = 0;
+
+    float mSpeedDribbler = 0;
+    int mDribblerEnable = 0;
+
+    int mKickerVoltageLevel = 12;
+    int mKickerChargeEnable = 1;
+    int mKickUp = 0;
+    int mKickForward = 0;
+
+    int mBeep = 0;
+    int mAutoKick = 0;
+} Rule;
+
 
 class SharedRes : public QObject
 {
@@ -36,6 +57,9 @@ public:
 	void setGeometry(const QSharedPointer<SSL_WrapperPacket> & geometry);
 	void setRefereeData(int state, int team, bool partOfField);
 	QVector<bool> getBarrierState();
+
+    QByteArray getLastCommand(int k);
+    void setLastCommand(QByteArray command, int k);
 
 	QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > getDetection();
 	QSharedPointer<SSL_WrapperPacket> getGeometry();
@@ -53,6 +77,9 @@ private:
 
 	QReadWriteLock mBarrierStateLock;
 	QVector<bool> mBarrierState;
+
+    QReadWriteLock mCommandLock;
+    QSharedPointer<QVector<QByteArray>> mCommand;
 
 	QReadWriteLock mRefereeLock;
 	int mRefereeState = 0;

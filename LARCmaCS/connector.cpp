@@ -4,109 +4,58 @@
 #include <QNetworkAddressEntry>
 #include <QNetworkInterface>
 #include <QThread>
-#include <QDateTime>
-#include <QFile>
-#include <QTextStream>
-
+#include <QWriteLocker>
 
 #include "grSimRobot.h"
 #include "erForceRobot.h"
 #include "defaultRobot.h"
 
-const QString Connector::robotBoxIP = QStringLiteral("10.0.120.210");
-
 Connector::Connector(SharedRes * sharedRes)
-	: mSharedRes(sharedRes)
-	, mUdpSocket(this)
-    , mStatisticsTimer(this)
+    : mSharedRes(sharedRes),
+      mWorker(new ConnectorWorker(sharedRes))
 {
-    file.setFileName("/home/robotssl/LARCmaCS/sent_commands.log");
-    file.open(QIODevice::WriteOnly | QIODevice::Text);
-    out.setDevice(&file);
+    mWorker->moveToThread(&mThread);
+    mThread.start();
 }
 
 Connector::~Connector()
-{}
+{
+    mThread.quit();
+    mThread.wait();
+}
 
 const QString & Connector::getGrSimIP()
 {
-	return mGrSimIP;
+    return mGrSimIP;
 }
 
 unsigned short Connector::getGrSimPort()
 {
-	return mGrSimPort;
+    return mGrSimPort;
 }
 
 unsigned short Connector::getRobotPort()
 {
-	return mRobotPort;
-}
-
-void Connector::run(int N, const QByteArray & command)
-{
-//    qint64 timestamp = QDateTime::currentMSecsSinceEpoch();
-
-//    out << "sending commands to  at " << timestamp << endl;
-
-    mUdpSocket.writeDatagram(command, QHostAddress(robotBoxIP), DefaultRobot::robotPort);
-}
-
-void Connector::runSim(const QByteArray & command, bool isYellow)
-{
-//    qDebug() << "before eno" << '\n';
-//    const QNetworkInterface iface = QNetworkInterface::interfaceFromName("wlo1");
-//    qDebug() << "after eno" << '\n';
-//    const QNetworkAddressEntry addrEntry = iface.addressEntries().constFirst();
-//    qDebug() << "after addrEntry" << '\n';
-//    mUdpSocket.writeDatagram(command, addrEntry.broadcast(), isYellow ? mGrSimPortYellow: mGrSimPort);
-//    qDebug() << addrEntry.broadcast() << '\n';
-    mUdpSocket.writeDatagram(command, QHostAddress(mGrSimIP), isYellow ? mGrSimPortYellow: mGrSimPort);
-}
-
-void Connector::onConnectorChange(bool isSim, const QString &ip, int port, int portYellow, const QString &)
-{
-	mIsSim = isSim;
-
-	if (mIsSim) {
-		mGrSimIP = ip;
-		mGrSimPort = port;
-        mGrSimPortYellow = portYellow;
-	}
+    return mRobotPort;
 }
 
 void Connector::sendNewCommand(const QVector<Rule> & rule)
 {
-//    qDebug() << "sending new command start" << '\n';
-	if (!mIsPause) {
-//        qDebug() << "sending new command not PAUSE" << '\n';
-        for (int k = 0; k < 32; k++) {
-			QByteArray command;
-			bool simFlag = mIsSim;
-			if (!simFlag) {
+    if (!mIsPause) {
+        for (int k = 0; k < rule.size(); k++) {
+            QByteArray command;
+            bool simFlag = mIsSim;
+            if (!simFlag) {
                 if (!mIsPause) {
-//                    if (k >= 2 && k <= 4) {
-
-//                    qint64 timestamp = QDateTime::currentMSecsSinceEpoch();
-
-//                    qDebug() << "sending commands to " << k + 1 << " at " << timestamp << " " << rule[k].mSpeedX << " " << rule[k].mSpeedY << " " << rule[k].mSpeedR <<   '\n';
-//                    out << "sending commands to " << k + 1 << " at " << timestamp << " " << rule[k].mSpeedX << " " << rule[k].mSpeedY << " " << rule[k].mSpeedR <<   endl;
-//                    }
                     DefaultRobot::formControlPacket(command, k + 1, rule[k].mSpeedX, rule[k].mSpeedY, -rule[k].mSpeedR,
-							rule[k].mKickUp, rule[k].mKickForward, rule[k].mKickerVoltageLevel,
-													rule[k].mDribblerEnable, rule[k].mSpeedDribbler, rule[k].mAutoKick,
-													rule[k].mKickerChargeEnable, rule[k].mBeep);
-				} else {
-//                    qDebug() << "sending zeros to" << k + 1 << '\n';
-//                    qint64 timestamp = QDateTime::currentMSecsSinceEpoch();
-
-//                    qDebug() << "sending commands to " << k + 1 << " at " << timestamp << " " << rule[k].mSpeedX << " " << rule[k].mSpeedY << " " << rule[k].mSpeedR <<   '\n';
-//                    out << "sending zeos to " << k + 1 << " at " << timestamp <<   endl;
-
+                            rule[k].mKickUp, rule[k].mKickForward, rule[k].mKickerVoltageLevel,
+                                                    rule[k].mDribblerEnable, rule[k].mSpeedDribbler, rule[k].mAutoKick,
+                                                    rule[k].mKickerChargeEnable, rule[k].mBeep);
+                } else {
                     DefaultRobot::formControlPacket(command, k + 1, 0, 0, 0, 0, 0, 0, 0);
-				}
-			} else {
-				if (!mIsPause) {
+                }
+            } else {
+                if (!mIsPause) {
 //                    GrSimRobot::formControlPacket(command, k, rule[k].mSpeedX, rule[k].mSpeedY, rule[k].mSpeedR,
 //                                                  rule[k].mKickUp, rule[k].mKickForward, rule[k].mKickerVoltageLevel,
 //                                                  rule[k].mDribblerEnable, rule[k].mSpeedDribbler, rule[k].mAutoKick,
@@ -118,8 +67,8 @@ void Connector::sendNewCommand(const QVector<Rule> & rule)
                 } else {
 //                    GrSimRobot::formControlPacket(command, k, 0, 0, 0, 0, 0, 0, 0);
                     ErForceRobot::formControlPacket(command, k, 0, 0, 0, 0, 0, 0, 0);
-				}
-			}
+                }
+            }
             /*
             if (rule[k].mSpeedX != 0 ||
                 rule[k].mSpeedY != 0 ||
@@ -140,16 +89,28 @@ void Connector::sendNewCommand(const QVector<Rule> & rule)
                 rule[k].mKickerChargeEnable != oldRule[k].mKickerChargeEnable ||
                 rule[k].mBeep != oldRule[k].mBeep) {*/
                 if (!simFlag) {
-//                    qDebug() << "Emitting new command" << endl;
-                    emit run(k, command);
+                    mSharedRes->setLastCommand(command, k);
+//                    emit run(k, command);
                 } else {
-                    emit runSim(command, k >= rule.size()/2);
+                    mSharedRes->setLastCommand(command, k);
+//                    emit runSim(command, k >= rule.size()/2);
                 }
                 oldRule[k] = rule[k];
             //}
-		}
+        }
 
-	}
+    }
+}
+
+void Connector::onConnectorChange(bool isSim, const QString &ip, int port, int portYellow, const QString &)
+{
+    mIsSim = isSim;
+
+    if (mIsSim) {
+        mGrSimIP = ip;
+        mGrSimPort = port;
+        mGrSimPortYellow = portYellow;
+    }
 }
 
 void Connector::onPauseChanged(bool status)
@@ -161,19 +122,21 @@ void Connector::onPauseChanged(bool status)
 	if (mIsPause) {
 		QByteArray command;
 		if (!mIsSim) {
-            for (int k = 0; k < attemptCount; ++k) {
+//            for (int k = 0; k < attemptCount; ++k) {
                 for (int i = 1; i <= Constants::maxNumOfRobots; i++) {
                     DefaultRobot::formControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
-                    run(i, command);
+                    mSharedRes->setLastCommand(command, i);
+//                    run(i, command);
                 }
                 //qDebug() << "Attempt\n";
-                QThread::msleep(100);
-            }
+//                QThread::msleep(100);
+//            }
 		} else {
             for (int i = 0; i <= Constants::maxNumOfRobots; i++) {
 //                GrSimRobot::formControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
                 ErForceRobot::formControlPacket(command, i, 0, 0, 0, 0, 0, 0, 0);
-                runSim(command, i >= Constants::maxRobotsInTeam);
+                mSharedRes->setLastCommand(command, i);
+//                runSim(command, i >= Constants::maxRobotsInTeam);
 			}
 		}
 	}

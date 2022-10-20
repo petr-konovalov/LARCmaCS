@@ -24,6 +24,13 @@ SharedRes::SharedRes()
 		mDetection->replace(i, QSharedPointer<SSL_WrapperPacket>());
 	}
 	mBarrierState.resize(Constants::maxRobotsInTeam);
+
+
+    mCommand = QSharedPointer<QVector<QByteArray>>
+            (new QVector<QByteArray>(Constants::maxNumOfRobots));
+    for (auto i = 0; i < Constants::maxNumOfRobots; i++) {
+        mCommand->replace(i, NULL);
+    }
 }
 
 QVector<bool> SharedRes::getBarrierState()
@@ -68,13 +75,20 @@ bool SharedRes::getRefereePartOfFieldLeft()
 
 QSharedPointer<QVector<QSharedPointer<SSL_WrapperPacket> > > SharedRes::getDetection()
 {
-	return mDetection;
+    return mDetection;
 }
 
 int SharedRes::getDetectionSize()
 {
 	return mDetection->size();
 }
+
+QByteArray SharedRes::getLastCommand(int k)
+{
+    QReadLocker locker(&mCommandLock);
+    return mCommand->at(k);
+}
+
 
 void SharedRes::setBarrierState(const QVector<bool> & barrierState)
 {
@@ -101,3 +115,13 @@ void SharedRes::setRefereeData(int state, int team, bool partOfField)
 	mRefereeTeam = team;
 	mRefereePartOfFieldLeft = partOfField;
 }
+
+void SharedRes::setLastCommand(QByteArray command, int k)
+{
+    QWriteLocker locker(&mCommandLock);
+    mCommand->replace(k, command);
+}
+
+
+
+

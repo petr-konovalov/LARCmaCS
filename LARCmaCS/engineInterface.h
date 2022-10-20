@@ -4,24 +4,6 @@
 
 #include "sharedRes.h"
 
-typedef struct Rule
-{
-	int mSpeedX = 0;
-	int mSpeedY = 0;
-	int mSpeedR = 0;
-
-    float mSpeedDribbler = 0;
-	int mDribblerEnable = 0;
-
-	int mKickerVoltageLevel = 12;
-	int mKickerChargeEnable = 1;
-	int mKickUp = 0;
-	int mKickForward = 0;
-
-	int mBeep = 0;
-	int mAutoKick = 0;
-} Rule;
-
 
 class EngineInterface : public QObject
 {
