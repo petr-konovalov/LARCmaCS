@@ -73,7 +73,8 @@ void ConnectorWorker::start()
 {
     qDebug() << "CONNECTOR-WORKER start loop" << endl;
     while (!mShutdownFlag) {
-        for (int k = 0; k < Constants::maxNumOfRobots; k++) {
+//        for (int k = 0; k < Constants::maxNumOfRobots; k++) {
+        for (int k = 0; k < 8; k++) {
             QByteArray command = mSharedRes->getLastCommand(k);
 //            qDebug() << "CONNECTOR-WORKER sending command " << command << " " << command.size() << endl;
             if (command.size() > 0) {
@@ -84,7 +85,7 @@ void ConnectorWorker::start()
                 }
             }
         }
-        QThread::msleep(25);
+        QThread::msleep(10);
     }
 }
 
